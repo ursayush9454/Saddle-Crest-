@@ -1,0 +1,401 @@
+.horse-page {
+  background: #f3eee3;
+  color: #171410;
+  font-family: "Jost", sans-serif;
+}
+
+.horse-hero {
+  min-height: 82vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-image: url("https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&w=2200&q=90");
+  background-size: cover;
+  background-position: center;
+  color: #f3eee3;
+}
+
+.horse-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(17, 13, 9, 0.8),
+    rgba(17, 13, 9, 0.3)
+  );
+}
+
+.horse-hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 150px 8% 100px;
+  max-width: 750px;
+}
+
+.horse-eyebrow {
+  font-size: 9px;
+  letter-spacing: 3px;
+  font-weight: 600;
+}
+
+.horse-hero h1 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(60px, 8vw, 115px);
+  line-height: 0.86;
+  font-weight: 400;
+  letter-spacing: -3px;
+  margin: 28px 0;
+}
+
+.horse-hero h1 em {
+  display: block;
+  color: #d1b77e;
+  font-weight: 300;
+}
+
+.horse-hero p {
+  max-width: 500px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(243, 238, 227, 0.8);
+}
+
+.horse-hero a,
+.horse-story-content a,
+.horse-cta a {
+  margin-top: 35px;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: inherit;
+  text-decoration: none;
+  font-size: 9px;
+  letter-spacing: 2px;
+  border-bottom: 1px solid #b08d57;
+  padding-bottom: 11px;
+}
+
+.horse-hero-bottom {
+  position: absolute;
+  bottom: 30px;
+  left: 8%;
+  right: 8%;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.horse-intro {
+  max-width: 1450px;
+  margin: auto;
+  padding: 140px 7%;
+  display: grid;
+  grid-template-columns: 0.6fr 1.5fr;
+  gap: 80px;
+}
+
+.horse-label {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #777066;
+}
+
+.horse-label span:first-child {
+  color: #b08d57;
+}
+
+.horse-intro h2 {
+  margin: 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 7vw, 100px);
+  line-height: 0.88;
+  font-weight: 400;
+}
+
+.horse-intro h2 em {
+  color: #5c2a2a;
+  font-weight: 300;
+}
+
+.horse-intro p {
+  max-width: 570px;
+  margin-top: 40px;
+  font-size: 14px;
+  line-height: 1.9;
+  color: #6f675e;
+}
+
+.horse-values {
+  background: #2b4433;
+  color: #f3eee3;
+  padding: 90px 7%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 50px;
+}
+
+.horse-values > div {
+  border-left: 1px solid rgba(176, 141, 87, 0.5);
+  padding-left: 30px;
+}
+
+.horse-values svg {
+  color: #b08d57;
+}
+
+.horse-values h3 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 32px;
+  font-weight: 400;
+  margin: 20px 0 10px;
+}
+
+.horse-values p {
+  max-width: 280px;
+  color: rgba(243, 238, 227, 0.65);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.horse-collection {
+  padding: 130px 6%;
+  max-width: 1600px;
+  margin: auto;
+}
+
+.horse-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 55px;
+}
+
+.horse-heading h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 6vw, 88px);
+  line-height: 0.9;
+  font-weight: 400;
+  margin: 20px 0 0;
+}
+
+.horse-heading h2 em {
+  color: #5c2a2a;
+  font-weight: 300;
+}
+
+.horse-heading a {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: #171410;
+  text-decoration: none;
+  font-size: 9px;
+  letter-spacing: 2px;
+  border-bottom: 1px solid #171410;
+  padding-bottom: 10px;
+}
+
+.horse-products {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.horse-product-image {
+  position: relative;
+  aspect-ratio: 0.82;
+  overflow: hidden;
+  background: #ddd5c7;
+}
+
+.horse-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.7s ease;
+}
+
+.horse-products article:hover img {
+  transform: scale(1.05);
+}
+
+.horse-product-image span {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  color: white;
+  font-size: 8px;
+  letter-spacing: 2px;
+}
+
+.horse-product-info {
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.horse-product-info small {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #8a8176;
+}
+
+.horse-product-info h3 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 24px;
+  font-weight: 500;
+  margin: 7px 0;
+}
+
+.horse-product-info strong {
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.horse-story {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #171410;
+  color: #f3eee3;
+}
+
+.horse-story-image {
+  min-height: 650px;
+}
+
+.horse-story-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.horse-story-content {
+  padding: 100px 10%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.horse-story-content h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 6vw, 90px);
+  line-height: 0.9;
+  font-weight: 400;
+  margin: 30px 0;
+}
+
+.horse-story-content h2 em {
+  color: #b08d57;
+  font-weight: 300;
+}
+
+.horse-story-content p {
+  max-width: 470px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: rgba(243, 238, 227, 0.65);
+}
+
+.horse-cta {
+  padding: 140px 20px;
+  text-align: center;
+  background: #5c2a2a;
+  color: #f3eee3;
+}
+
+.horse-cta h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 7vw, 100px);
+  line-height: 0.9;
+  font-weight: 400;
+  margin: 30px 0;
+}
+
+.horse-cta h2 em {
+  color: #d1b77e;
+  font-weight: 300;
+}
+
+.horse-cta a {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 800px) {
+  .horse-intro {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .horse-values {
+    grid-template-columns: 1fr;
+  }
+
+  .horse-products {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .horse-story {
+    grid-template-columns: 1fr;
+  }
+
+  .horse-story-image {
+    min-height: 450px;
+  }
+}
+
+@media (max-width: 600px) {
+  .horse-hero-content {
+    padding: 120px 25px 90px;
+  }
+
+  .horse-hero h1 {
+    font-size: 58px;
+  }
+
+  .horse-hero-bottom {
+    left: 25px;
+    right: 25px;
+  }
+
+  .horse-intro {
+    padding: 90px 25px;
+  }
+
+  .horse-values {
+    padding: 75px 25px;
+  }
+
+  .horse-collection {
+    padding: 90px 20px;
+  }
+
+  .horse-heading {
+    display: block;
+  }
+
+  .horse-heading a {
+    width: fit-content;
+    margin-top: 30px;
+  }
+
+  .horse-products {
+    grid-template-columns: 1fr;
+  }
+
+  .horse-story-content {
+    padding: 80px 25px;
+  }
+
+  .horse-cta {
+    padding: 100px 25px;
+  }
+}

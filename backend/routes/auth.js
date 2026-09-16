@@ -1,0 +1,2 @@
+const r=require("express").Router();const c=require("../controllers/authController");const {auth}=require("../middleware/auth");
+r.post("/register",c.register);r.post("/login",c.login);r.post("/reset-password",c.resetPassword);r.get("/me",auth,c.me);r.get("/profile",auth,c.me);r.put("/profile",auth,c.updateProfile);r.post("/addresses",auth,c.addAddress);r.delete("/addresses/:id",auth,c.deleteAddress);module.exports=r;

@@ -1,0 +1,743 @@
+/* =====================================================
+   SADDLE & CREST — HERO
+===================================================== */
+
+.hero {
+  position: relative;
+
+  width: 100%;
+  height: calc(100vh - 36px);
+
+  min-height: 680px;
+
+  overflow: hidden;
+
+  background: #0d0d0c;
+
+  color: #e9e2d5;
+}
+
+
+/* =====================================================
+   HERO IMAGE
+===================================================== */
+
+.hero-image {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  background-size: cover;
+
+  background-position: var(--desktop-position, center center);
+
+  background-repeat: no-repeat;
+
+  transform: scale(1.04);
+
+  animation:
+    heroImageReveal 1.2s ease forwards,
+    heroImageZoom 5s ease forwards;
+}
+
+
+@keyframes heroImageReveal {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+@keyframes heroImageZoom {
+  from {
+    transform: scale(1.05);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+
+/* =====================================================
+   OVERLAY
+===================================================== */
+
+.hero-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 2;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(8, 8, 7, 0.82) 0%,
+      rgba(8, 8, 7, 0.55) 35%,
+      rgba(8, 8, 7, 0.14) 72%,
+      rgba(8, 8, 7, 0.32) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(8, 8, 7, 0.25) 0%,
+      transparent 38%,
+      rgba(8, 8, 7, 0.78) 100%
+    );
+}
+
+
+/* =====================================================
+   HERO CONTENT
+===================================================== */
+
+.hero-content {
+  position: relative;
+
+  z-index: 3;
+
+  height: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: flex-start;
+
+  padding-left: 8.5%;
+
+  padding-bottom: 25px;
+
+  max-width: 800px;
+
+  animation: contentUp 0.8s ease both;
+}
+
+
+@keyframes contentUp {
+  from {
+    opacity: 0;
+
+    transform: translateY(25px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+
+/* =====================================================
+   EYEBROW
+===================================================== */
+
+.hero-eyebrow {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  margin: 0 0 24px;
+
+  color: #c5a46d;
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 9px;
+
+  font-weight: 500;
+
+  letter-spacing: 3.5px;
+
+  text-transform: uppercase;
+}
+
+
+.hero-eyebrow::after {
+  content: "";
+
+  width: 85px;
+
+  height: 1px;
+
+  background: rgba(197, 164, 109, 0.65);
+}
+
+
+/* =====================================================
+   HEADING
+===================================================== */
+
+.hero h1 {
+  margin: 0;
+
+  color: #e9e2d5;
+
+  font-family: "Cormorant Garamond", serif;
+
+  font-size: clamp(64px, 7.5vw, 112px);
+
+  font-weight: 400;
+
+  line-height: 0.82;
+
+  letter-spacing: -3px;
+}
+
+
+.hero h1 em {
+  color: #c5a46d;
+
+  font-style: italic;
+
+  font-weight: 400;
+}
+
+
+/* =====================================================
+   DESCRIPTION
+===================================================== */
+
+.hero-description {
+  margin: 32px 0 30px;
+
+  color: rgba(233, 226, 213, 0.78);
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 11px;
+
+  line-height: 1.9;
+
+  letter-spacing: 1px;
+}
+
+
+/* =====================================================
+   BUTTON
+===================================================== */
+
+.hero-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 15px 25px;
+
+  border: 1px solid #c5a46d;
+
+  color: #e9e2d5;
+
+  background: rgba(13, 13, 12, 0.18);
+
+  text-decoration: none;
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 9px;
+
+  font-weight: 500;
+
+  letter-spacing: 2.2px;
+
+  text-transform: uppercase;
+
+  transition:
+    background 0.35s ease,
+    color 0.35s ease,
+    gap 0.35s ease;
+}
+
+
+.hero-button:hover {
+  background: #c5a46d;
+
+  color: #0d0d0c;
+
+  gap: 20px;
+}
+
+
+/* =====================================================
+   SLIDER CONTROLS
+===================================================== */
+
+.hero-controls {
+  position: absolute;
+
+  z-index: 5;
+
+  right: 5%;
+
+  bottom: 75px;
+
+  display: flex;
+
+  gap: 8px;
+}
+
+
+.hero-arrow {
+  width: 38px;
+
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: 1px solid rgba(233, 226, 213, 0.35);
+
+  background: rgba(13, 13, 12, 0.2);
+
+  color: #e9e2d5;
+
+  cursor: pointer;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+
+.hero-arrow:hover {
+  background: #c5a46d;
+
+  border-color: #c5a46d;
+
+  color: #0d0d0c;
+}
+
+
+/* =====================================================
+   BOTTOM
+===================================================== */
+
+.hero-bottom {
+  position: absolute;
+
+  z-index: 5;
+
+  left: 5%;
+
+  right: 5%;
+
+  bottom: 27px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  color: rgba(233, 226, 213, 0.65);
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 8px;
+
+  letter-spacing: 2px;
+}
+
+
+/* =====================================================
+   SLIDE NUMBERS
+===================================================== */
+
+.hero-location {
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+}
+
+
+.hero-location button {
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: rgba(233, 226, 213, 0.5);
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 8px;
+
+  letter-spacing: 2px;
+
+  cursor: pointer;
+
+  transition: color 0.3s ease;
+}
+
+
+.hero-location button.active {
+  color: #c5a46d;
+}
+
+
+.hero-location button:hover {
+  color: #c5a46d;
+}
+
+
+/* =====================================================
+   SCROLL
+===================================================== */
+
+.scroll-indicator {
+  position: absolute;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 8px;
+
+  color: #c5a46d;
+}
+
+
+.scroll-circle {
+  width: 35px;
+
+  height: 35px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: 1px solid rgba(197, 164, 109, 0.7);
+
+  border-radius: 50%;
+
+  animation: scrollBounce 2s infinite ease-in-out;
+}
+
+
+.scroll-indicator span {
+  font-size: 7px;
+
+  letter-spacing: 2.5px;
+}
+
+
+@keyframes scrollBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+
+/* =====================================================
+   EST
+===================================================== */
+
+.hero-est {
+  color: rgba(233, 226, 213, 0.55);
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+.hero-progress {
+  position: absolute;
+
+  z-index: 6;
+
+  left: 5%;
+
+  right: 5%;
+
+  bottom: 0;
+
+  height: 2px;
+
+  background: rgba(233, 226, 213, 0.12);
+}
+
+
+.hero-progress-bar {
+  width: 0;
+
+  height: 100%;
+
+  background: #c5a46d;
+
+  animation: progressBar 5s linear forwards;
+}
+
+
+@keyframes progressBar {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+
+  .hero-content {
+    padding-left: 7%;
+  }
+
+  .hero h1 {
+    font-size: clamp(58px, 9vw, 85px);
+  }
+
+  .hero-controls {
+    right: 7%;
+  }
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 700px) {
+
+  .hero {
+    height: calc(100vh - 32px);
+
+    min-height: 620px;
+  }
+
+
+  /* IMPORTANT:
+     Each image uses its own mobile position
+  */
+
+  .hero-image {
+    background-position: var(--mobile-position, center center);
+
+    background-size: cover;
+
+    transform: scale(1.02);
+
+    animation:
+      heroImageReveal 1s ease forwards,
+      heroImageZoom 5s ease forwards;
+  }
+
+
+  .hero-overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(8, 8, 7, 0.84) 0%,
+        rgba(8, 8, 7, 0.50) 58%,
+        rgba(8, 8, 7, 0.28) 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(8, 8, 7, 0.25) 0%,
+        transparent 40%,
+        rgba(8, 8, 7, 0.84) 100%
+      );
+  }
+
+
+  .hero-content {
+    padding: 70px 7% 90px;
+
+    justify-content: center;
+  }
+
+
+  .hero-eyebrow {
+    font-size: 7px;
+
+    letter-spacing: 2.2px;
+
+    gap: 10px;
+  }
+
+
+  .hero-eyebrow::after {
+    width: 45px;
+  }
+
+
+  .hero h1 {
+    font-size: clamp(52px, 15vw, 76px);
+
+    line-height: 0.85;
+
+    letter-spacing: -2px;
+  }
+
+
+  .hero-description {
+    margin: 25px 0;
+
+    font-size: 9px;
+
+    line-height: 1.8;
+  }
+
+
+  .hero-button {
+    padding: 13px 20px;
+
+    font-size: 8px;
+  }
+
+
+  /* arrows */
+
+  .hero-controls {
+    right: 7%;
+
+    bottom: 82px;
+
+    gap: 5px;
+  }
+
+
+  .hero-arrow {
+    width: 32px;
+
+    height: 32px;
+  }
+
+
+  /* bottom */
+
+  .hero-bottom {
+    left: 7%;
+
+    right: 7%;
+
+    bottom: 18px;
+  }
+
+
+  .hero-location {
+    gap: 10px;
+  }
+
+
+  .hero-location button {
+    font-size: 7px;
+  }
+
+
+  .hero-est {
+    display: none;
+  }
+
+
+  .scroll-indicator {
+    position: static;
+
+    transform: none;
+
+    margin-left: auto;
+
+    margin-right: auto;
+  }
+
+
+  .scroll-circle {
+    width: 30px;
+
+    height: 30px;
+  }
+
+
+  .hero-progress {
+    left: 7%;
+
+    right: 7%;
+  }
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 420px) {
+
+  .hero h1 {
+    font-size: clamp(48px, 15vw, 68px);
+  }
+
+
+  .hero-eyebrow {
+    font-size: 6.5px;
+  }
+
+
+  .hero-description {
+    font-size: 8px;
+  }
+
+
+  .hero-controls {
+    bottom: 80px;
+  }
+
+
+  .hero-location {
+    gap: 7px;
+  }
+}
+
+
+/* =====================================================
+   REDUCED MOTION
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .hero-image,
+  .hero-content,
+  .scroll-circle,
+  .hero-progress-bar {
+    animation: none;
+  }
+}

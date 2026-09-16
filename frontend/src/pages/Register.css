@@ -1,0 +1,120 @@
+/* =========================================
+   SADDLE & CREST
+   REGISTER
+========================================= */
+
+.register-page .auth-wrapper {
+  min-height: 760px;
+}
+
+.register-brand-panel {
+  min-height: 760px;
+}
+
+.register-form-panel {
+  min-height: 760px;
+}
+
+/* =========================================
+   PERKS
+========================================= */
+
+.register-perks {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+
+  margin-top: 30px;
+}
+
+.register-perks > div {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  color: rgba(243, 238, 227, 0.7);
+
+  font-size: 11px;
+}
+
+.perk-icon {
+  width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(176, 141, 87, 0.5);
+  border-radius: 50%;
+
+  color: #b08d57;
+}
+
+/* =========================================
+   REGISTER FORM
+========================================= */
+
+.register-form {
+  gap: 19px;
+}
+
+.register-two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+/* =========================================
+   TERMS
+========================================= */
+
+.register-terms {
+  margin: 1px 0 0;
+
+  color: #817a6e;
+
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 900px) {
+  .register-page .auth-wrapper {
+    min-height: auto;
+  }
+
+  .register-brand-panel {
+    min-height: 400px;
+  }
+
+  .register-form-panel {
+    min-height: 700px;
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+  .register-brand-panel {
+    min-height: 360px;
+  }
+
+  .register-form-panel {
+    min-height: auto;
+  }
+
+  .register-two-column {
+    grid-template-columns: 1fr;
+    gap: 19px;
+  }
+
+  .register-perks {
+    margin-top: 22px;
+  }
+}

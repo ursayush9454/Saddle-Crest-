@@ -1,0 +1,279 @@
+
+.dashboard-page {
+  width: 100%;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.dashboard-hero {
+  padding: 4px 0 25px;
+}
+
+.dashboard-eyebrow {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #b08d57;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.dashboard-hero h1 {
+  max-width: 700px;
+
+  margin: 0;
+
+  font-family: "Cormorant Garamond", serif;
+
+  font-size: 32px;
+
+  line-height: 0.98;
+
+  font-weight: 600;
+}
+
+.dashboard-hero p {
+  margin: 11px 0 0;
+
+  color: #81796d;
+
+  font-size: 12px;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.dashboard-stats {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 12px;
+
+  margin-bottom: 20px;
+}
+
+.dashboard-stat-card {
+  min-height: 112px;
+
+  padding: 15px;
+
+  border: 1px solid #ddd5c7;
+  border-radius: 9px;
+
+  background: #fff;
+
+  box-shadow: 0 6px 18px rgba(23, 20, 16, 0.05);
+}
+
+.dashboard-stat-top {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 12px;
+}
+
+.dashboard-stat-top > span {
+  color: #81796d;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dashboard-stat-icon {
+  width: 29px;
+  height: 29px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #fdfcfa14;
+
+  color: #0eff5a;
+}
+
+.dashboard-stat-card strong {
+  display: block;
+
+  font-size: 18px;
+  line-height: 1.1;
+
+  font-weight: 700;
+}
+
+.dashboard-stat-card small {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #f07d36;
+
+  font-size: 9px;
+}
+
+/* =========================
+   QUICK ACCESS
+========================= */
+
+.dashboard-quick-panel {
+  overflow: hidden;
+
+  border: 1px solid #ddd5c7;
+  border-radius: 10px;
+
+  background: #fff;
+
+  box-shadow: 0 6px 18px rgba(23, 20, 16, 0.05);
+}
+
+.dashboard-panel-heading {
+  padding: 17px 20px;
+
+  border-bottom: 1px solid #ddd5c7;
+}
+
+.dashboard-panel-heading .dashboard-eyebrow {
+  margin-bottom: 3px;
+}
+
+.dashboard-panel-heading h3 {
+  margin: 0;
+
+  font-family: "Cormorant Garamond", serif;
+
+  font-size: 23px;
+  font-weight: 600;
+}
+
+.dashboard-quick-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.dashboard-quick-card {
+  min-height: 78px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 16px 20px;
+
+  border: 0;
+
+  border-right: 1px solid #ddd5c7;
+  border-bottom: 1px solid #ddd5c7;
+
+  background: #fff;
+
+  color: #171410;
+
+  text-align: left;
+
+  transition: 0.2s ease;
+}
+
+.dashboard-quick-card:nth-child(2n) {
+  border-right: 0;
+}
+
+.dashboard-quick-card:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.dashboard-quick-card:hover {
+  background: #faf8f3;
+}
+
+.dashboard-quick-card strong {
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-family: "Cormorant Garamond", serif;
+
+  font-size: 18px;
+}
+
+.dashboard-quick-card span {
+  color: #81796d;
+
+  font-size: 10px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1000px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-hero h1 {
+    font-size: 38px;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: 1fr 1fr;
+
+    gap: 9px;
+  }
+
+  .dashboard-stat-card {
+    min-height: 100px;
+
+    padding: 13px;
+  }
+
+  .dashboard-stat-card strong {
+    font-size: 20px;
+  }
+
+  .dashboard-quick-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-quick-card,
+  .dashboard-quick-card:nth-child(2n),
+  .dashboard-quick-card:nth-last-child(-n + 2) {
+    border-right: 0;
+    border-bottom: 1px solid #ddd5c7;
+  }
+
+  .dashboard-quick-card:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-stat-card {
+    min-height: 90px;
+  }
+}
+

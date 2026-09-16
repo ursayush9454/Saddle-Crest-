@@ -1,0 +1,858 @@
+/* =====================================================
+   SADDLE & CREST — NAVBAR
+===================================================== */
+
+.navbar {
+  position: fixed;
+  /* top: 36px; */
+  top: var(top, 36px);
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  height: 86px;
+
+  padding: 0 5%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  color: #e9e2d500;
+
+  /* background: transparent; */
+  background: var(--navbar-bg, transparent);
+
+  border-bottom: 1px solid rgba(233, 226, 213, 0.18);
+
+  font-family: "Jost", sans-serif;
+
+  transition:
+    background 0.35s ease,
+    border-color 0.35s ease,
+    backdrop-filter 0.35s ease;
+    
+}
+
+.navbar-scrolled {
+  /* background: linear-gradient(-145deg , #847a7a,#534892); */
+/* background: linear-gradient(
+    90deg,
+    #3c2d1e 0%,
+    #241814 35%,
+    #351d20 65%,
+    #100e0c 100%
+  ); */
+  background: linear-gradient(
+  90deg,
+  rgba(44, 38, 29, 0.75),
+  rgba(94, 60, 60, 0.7),
+  rgba(87, 70, 47, 0.75)
+);
+
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+   top: 0px;
+   z-index: 9999;
+   
+
+  border-bottom: 1px solid rgba(176, 141, 87, 0.18);
+}
+.navbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(176, 141, 87, 0.7),
+    transparent
+  );
+
+  pointer-events: none;
+}
+
+/* .navbar {
+  position:fixed;
+  top: 36px;
+  left: 0;
+  z-index: 50;
+
+  width: 100%;
+  height: 86px;
+  padding: 0 5%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  color: #e9e2d5;
+  border-bottom: 1px solid rgba(233, 226, 213, 0.18);
+
+  font-family: "Jost", sans-serif;
+
+  transition:
+    background 0.35s ease,
+    border-color 0.35s ease;
+}
+.navbar-scrolled {
+  background: rgba(0, 0, 0, 0.96);
+
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+
+  border-bottom: 1px solid rgba(176, 141, 87, 0.18);
+} */
+/* 
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 82px;
+
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 5vw;
+
+  background: transparent;
+  color: #f3eee3;
+
+  transition:
+    background 0.35s ease,
+    backdrop-filter 0.35s ease;
+}
+
+.navbar-scrolled {
+  background: rgba(23, 20, 16, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+} */
+
+/* =====================================================
+   LEFT / DESKTOP NAV
+===================================================== */
+
+.navbar-left {
+  width: 33.333%;
+
+  display: flex;
+  align-items: center;
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 27px;
+}
+
+.desktop-nav a,
+.desktop-nav a:visited {
+  position: relative;
+
+  color: #e9e2d5;
+  text-decoration: none;
+
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+
+  transition: color 0.3s ease;
+}
+
+.desktop-nav a::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  bottom: -7px;
+
+  width: 0;
+  height: 1px;
+
+  background: #c5a46d;
+
+  transition: width 0.3s ease;
+}
+
+.desktop-nav a:hover {
+  color: #c5a46d;
+}
+
+.desktop-nav a:hover::after {
+  width: 100%;
+}
+
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.brand-logo {
+  width: 33.333%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  color: #e9e2d5;
+  text-decoration: none;
+
+  line-height: 0.82;
+  letter-spacing: 5px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 25px;
+
+  transition: opacity 0.3s ease;
+}
+
+.brand-logo:hover,
+.brand-logo:visited {
+  color: #e9e2d5;
+}
+
+.brand-logo:hover {
+  opacity: 0.82;
+}
+
+.brand-logo small {
+  margin: 4px 0;
+
+  color: #c5a46d;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+
+/* =====================================================
+   NAVBAR ACTIONS
+===================================================== */
+
+.navbar-actions {
+  width: 33.333%;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 19px;
+}
+
+
+/* All navbar buttons + links */
+
+.navbar-actions button,
+.navbar-actions a {
+  position: relative;
+
+  width: 30px;
+  height: 30px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  background: transparent;
+
+  color: #e9e2d5;
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+
+/* IMPORTANT:
+   Prevent browser/global CSS from making
+   Wishlist & Cart purple
+*/
+
+.navbar-actions a:visited,
+.navbar-actions a:active,
+.navbar-actions a:focus {
+  color: #e9e2d5;
+  text-decoration: none;
+}
+
+.navbar-actions button:hover,
+.navbar-actions a:hover {
+  color: #c5a46d;
+  transform: translateY(-1px);
+}
+
+.navbar-actions button svg,
+.navbar-actions a svg {
+  color: currentColor;
+  stroke: currentColor;
+}
+
+
+/* =====================================================
+   CART / WISHLIST COUNT
+===================================================== */
+
+.bag-button {
+  position: relative;
+}
+
+.bag-count {
+  position: absolute;
+
+  top: -3px;
+  right: -5px;
+
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #c5a46d;
+  color: #0d0d0c;
+
+  font-family: "Jost", sans-serif;
+  font-size: 7px;
+  font-weight: 700;
+  line-height: 1;
+
+  pointer-events: none;
+}
+
+
+/* Wishlist count */
+
+.navbar-actions .wishlist-count {
+  background: #c5a46d !important;
+  color: #0d0d0c !important;
+}
+
+
+/* =====================================================
+   MOBILE MENU BUTTON
+===================================================== */
+
+.mobile-menu-btn {
+  display: none;
+}
+
+
+/* =====================================================
+   MOBILE BACKDROP
+===================================================== */
+
+.mobile-menu-backdrop {
+  position: fixed;
+  inset: 0;
+
+  z-index: 90;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    opacity 0.35s ease,
+    visibility 0.35s ease;
+}
+
+.mobile-menu-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+
+/* =====================================================
+   MOBILE MENU
+===================================================== */
+
+.mobile-menu {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+  z-index: 100;
+
+  width: min(420px, 88vw);
+  height: 100dvh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #0d0d0c;
+
+  transform: translateX(-105%);
+
+  transition:
+    transform 0.5s cubic-bezier(0.77, 0, 0.18, 1);
+
+  box-shadow:
+    15px 0 50px rgba(0, 0, 0, 0.25);
+}
+
+.mobile-menu.active {
+  transform: translateX(0);
+}
+
+
+/* =====================================================
+   MOBILE MENU HEADER
+===================================================== */
+
+.mobile-menu-header {
+  min-height: 88px;
+  padding: 0 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid rgba(197, 164, 109, 0.22);
+}
+
+.mobile-menu-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  line-height: 0.8;
+
+  color: #e9e2d5;
+  text-decoration: none;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 21px;
+  letter-spacing: 3px;
+}
+
+.mobile-menu-logo:visited,
+.mobile-menu-logo:hover {
+  color: #e9e2d5;
+}
+
+.mobile-menu-logo small {
+  margin: 3px 0;
+
+  color: #c5a46d;
+
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.mobile-menu-header button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  background: transparent;
+
+  color: #e9e2d5;
+
+  cursor: pointer;
+
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.mobile-menu-header button:hover {
+  color: #c5a46d;
+  transform: rotate(90deg);
+}
+
+
+/* =====================================================
+   MOBILE NAV
+===================================================== */
+
+.mobile-menu-nav {
+  display: flex;
+  flex-direction: column;
+
+  padding: 25px 28px;
+}
+
+.mobile-menu-nav a,
+.mobile-menu-nav a:visited,
+.mobile-menu-nav a:active,
+.mobile-menu-nav a:focus {
+  min-height: 67px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid rgba(233, 226, 213, 0.12);
+
+  color: #e9e2d5;
+  text-decoration: none;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 31px;
+  font-weight: 400;
+
+  transition:
+    color 0.3s ease,
+    padding-left 0.3s ease;
+}
+
+.mobile-menu-nav a:hover {
+  color: #c5a46d;
+  padding-left: 7px;
+}
+
+.mobile-menu-nav a svg {
+  color: #c5a46d;
+  stroke: currentColor;
+
+  opacity: 0;
+  transform: translate(-8px, 8px);
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.mobile-menu-nav a:hover svg {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+
+/* =====================================================
+   MOBILE COUNTS
+===================================================== */
+
+.mobile-menu-nav a span {
+  display: flex;
+  align-items: center;
+}
+
+.mobile-count {
+  min-width: 19px;
+  height: 19px;
+  margin-left: 10px;
+  padding: 0 4px;
+
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #c5a46d;
+  color: #0d0d0c;
+
+  font-family: "Jost", sans-serif !important;
+  font-size: 8px !important;
+  font-style: normal;
+
+  letter-spacing: 0 !important;
+}
+
+
+/* =====================================================
+   MOBILE MENU FOOTER
+===================================================== */
+
+.mobile-menu-footer {
+  margin-top: auto;
+
+  padding: 25px 28px 30px;
+
+  border-top: 1px solid rgba(233, 226, 213, 0.1);
+}
+
+.mobile-menu-footer span {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #c5a46d;
+
+  font-family: "Jost", sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+}
+
+.mobile-menu-footer p {
+  margin: 0;
+
+  color: #777168;
+
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 1000px) {
+  .navbar {
+    padding: 0 4%;
+  }
+  .navbar-scrolled{
+    top:0;
+  }
+
+  .desktop-nav {
+    gap: 17px;
+  }
+
+  .desktop-nav a {
+    font-size: 8.5px;
+    letter-spacing: 1.4px;
+  }
+
+  .navbar-actions {
+    gap: 12px;
+  }
+
+  .brand-logo {
+    font-size: 23px;
+    letter-spacing: 4px;
+  }
+}
+
+
+/* =====================================================
+   TABLET / LARGE MOBILE
+===================================================== */
+
+@media (max-width: 760px) {
+  .navbar {
+    top: 32px;
+
+    height: 72px;
+    padding: 0 5%;
+
+    border-bottom-color: rgba(233, 226, 213, 0.2);
+  }
+  .navbar-scrolled{
+    top: 0;
+    z-index: 9999;
+  }
+  .navbar-left {
+    width: 25%;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  .mobile-menu-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background: transparent;
+
+    color: #e9e2d5;
+
+    cursor: pointer;
+
+    transition: color 0.3s ease;
+  }
+
+  .mobile-menu-btn:hover {
+    color: #c5a46d;
+  }
+
+  .brand-logo {
+    width: 50%;
+
+    font-size: 21px;
+    letter-spacing: 4px;
+  }
+
+  .brand-logo small {
+    font-size: 10px;
+    margin: 3px 0;
+  }
+
+  .navbar-actions {
+    width: 25%;
+    gap: 5px;
+  }
+
+  .navbar-actions button,
+  .navbar-actions a {
+    width: 29px;
+    height: 29px;
+  }
+
+  .navbar-actions svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .desktop-action {
+    display: none !important;
+  }
+
+  .bag-count {
+    top: -2px;
+    right: -3px;
+  }
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 480px) {
+  .navbar {
+    top: 30px;
+
+    height: 66px;
+    padding: 0 18px;
+  }
+  .navbar-scrolled{
+    top: 0;
+  }
+
+  .mobile-menu-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .brand-logo {
+    font-size: 18px;
+    letter-spacing: 3px;
+  }
+
+  .brand-logo small {
+    font-size: 9px;
+    margin: 2px 0;
+  }
+
+  .navbar-actions {
+    gap: 1px;
+  }
+
+  .navbar-actions button,
+  .navbar-actions a {
+    width: 30px;
+    height: 30px;
+  }
+
+  .navbar-actions svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mobile-menu {
+    width: 88vw;
+  }
+
+  .mobile-menu-header {
+    min-height: 76px;
+    padding: 0 22px;
+  }
+
+  .mobile-menu-nav {
+    padding: 20px 22px;
+  }
+
+  .mobile-menu-nav a {
+    min-height: 61px;
+    font-size: 28px;
+  }
+
+  .mobile-menu-footer {
+    padding: 22px;
+  }
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 360px) {
+  .navbar {
+    padding: 0 14px;
+  }
+.navbar-scrolled{
+  top: 0;
+}
+  .brand-logo {
+    font-size: 16px;
+    letter-spacing: 2.5px;
+  }
+
+  .navbar-actions {
+    gap: 0;
+  }
+
+  .navbar-actions button,
+  .navbar-actions a {
+    width: 27px;
+    height: 27px;
+  }
+
+  .navbar-actions svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .mobile-menu-nav a {
+    font-size: 26px;
+  }
+}
+
+
+/* =====================================================
+   REDUCED MOTION
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar,
+  .mobile-menu,
+  .mobile-menu-backdrop,
+  .desktop-nav a,
+  .mobile-menu-nav a,
+  .mobile-menu-nav a svg,
+  .navbar-actions button,
+  .navbar-actions a {
+    transition: none;
+  }
+}

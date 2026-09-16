@@ -1,0 +1,282 @@
+.collections-page {
+  background: #f3eee3;
+  color: #171410;
+  font-family: "Jost", sans-serif;
+}
+
+.collections-hero {
+  min-height: 75vh;
+  position: relative;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(15, 12, 9, 0.9),
+      rgba(15, 12, 9, 0.35)
+    ),
+    url("https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=2200&q=90");
+  background-size: cover;
+  background-position: center;
+  color: #f3eee3;
+  display: flex;
+  align-items: center;
+}
+
+.collections-hero-content {
+  padding: 140px 8%;
+  max-width: 800px;
+}
+
+.collections-hero-content > span {
+  font-size: 9px;
+  letter-spacing: 3px;
+}
+
+.collections-hero h1 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(60px, 8vw, 115px);
+  line-height: 0.86;
+  font-weight: 400;
+  letter-spacing: -3px;
+  margin: 30px 0;
+}
+
+.collections-hero h1 em {
+  display: block;
+  color: #d1b77e;
+  font-weight: 300;
+}
+
+.collections-hero p {
+  max-width: 500px;
+  color: rgba(243, 238, 227, 0.75);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.collections-hero-bottom {
+  position: absolute;
+  bottom: 30px;
+  left: 8%;
+  right: 8%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.collections-intro {
+  padding: 130px 7%;
+  max-width: 1100px;
+}
+
+.collections-intro > span {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: #b08d57;
+}
+
+.collections-intro h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 7vw, 100px);
+  font-weight: 400;
+  line-height: 0.88;
+  margin: 25px 0;
+}
+
+.collections-intro h2 em {
+  color: #5c2a2a;
+  font-weight: 300;
+}
+
+.collections-intro p {
+  max-width: 550px;
+  color: #6f675e;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.collections-list {
+  padding: 0 5% 130px;
+}
+
+.collection-card {
+  min-height: 680px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  margin-bottom: 100px;
+  background: #171410;
+  color: #f3eee3;
+}
+
+.collection-card.reverse {
+  grid-template-columns: 0.9fr 1.1fr;
+}
+
+.collection-card.reverse .collection-image {
+  order: 2;
+}
+
+.collection-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.collection-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.8s ease;
+}
+
+.collection-card:hover .collection-image img {
+  transform: scale(1.04);
+}
+
+.collection-image > span {
+  position: absolute;
+  left: 25px;
+  bottom: 25px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 25px;
+  color: #d1b77e;
+}
+
+.collection-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 90px 11%;
+}
+
+.collection-subtitle {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: #b08d57;
+}
+
+.collection-content h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(50px, 5vw, 80px);
+  line-height: 0.9;
+  font-weight: 400;
+  margin: 25px 0;
+}
+
+.collection-content p {
+  max-width: 400px;
+  color: rgba(243, 238, 227, 0.65);
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.collection-content a {
+  width: fit-content;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-top: 35px;
+  color: #f3eee3;
+  text-decoration: none;
+  font-size: 9px;
+  letter-spacing: 2px;
+  border-bottom: 1px solid #b08d57;
+  padding-bottom: 10px;
+}
+
+.collections-custom {
+  background: #5c2a2a;
+  color: #f3eee3;
+  text-align: center;
+  padding: 150px 20px;
+}
+
+.collections-custom > span {
+  color: #b08d57;
+  font-size: 9px;
+  letter-spacing: 3px;
+}
+
+.collections-custom h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 7vw, 100px);
+  line-height: 0.88;
+  font-weight: 400;
+  margin: 30px 0;
+}
+
+.collections-custom h2 em {
+  color: #d1b77e;
+  font-weight: 300;
+}
+
+.collections-custom p {
+  max-width: 520px;
+  margin: auto;
+  color: rgba(243, 238, 227, 0.7);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.collections-custom a {
+  width: fit-content;
+  margin: 35px auto 0;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  color: #f3eee3;
+  text-decoration: none;
+  border-bottom: 1px solid #b08d57;
+  padding-bottom: 10px;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+@media (max-width: 800px) {
+  .collection-card,
+  .collection-card.reverse {
+    grid-template-columns: 1fr;
+  }
+
+  .collection-card.reverse .collection-image {
+    order: initial;
+  }
+
+  .collection-image {
+    min-height: 450px;
+  }
+}
+
+@media (max-width: 600px) {
+  .collections-hero-content {
+    padding: 120px 25px 90px;
+  }
+
+  .collections-hero h1 {
+    font-size: 60px;
+  }
+
+  .collections-hero-bottom {
+    left: 25px;
+    right: 25px;
+  }
+
+  .collections-intro {
+    padding: 90px 25px;
+  }
+
+  .collections-list {
+    padding: 0 18px 90px;
+  }
+
+  .collection-card {
+    margin-bottom: 55px;
+  }
+
+  .collection-content {
+    padding: 70px 25px;
+  }
+
+  .collections-custom {
+    padding: 100px 25px;
+  }
+}

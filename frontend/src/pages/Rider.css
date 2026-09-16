@@ -1,0 +1,436 @@
+.rider-page {
+  background: #f3eee3;
+  color: #171410;
+  font-family: "Jost", sans-serif;
+}
+
+.rider-hero {
+  min-height: 82vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-image: url("https://images.unsplash.com/photo-1551884831-bbf3cdc6469e?auto=format&fit=crop&w=2200&q=90");
+  background-size: cover;
+  background-position: center;
+  color: #f3eee3;
+}
+
+.rider-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(17, 13, 9, 0.82),
+    rgba(17, 13, 9, 0.35)
+  );
+}
+
+.rider-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+  padding: 150px 8% 100px;
+}
+
+.rider-eyebrow {
+  font-size: 9px;
+  letter-spacing: 3px;
+  font-weight: 600;
+}
+
+.rider-hero h1 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(60px, 8vw, 115px);
+  line-height: 0.86;
+  font-weight: 400;
+  letter-spacing: -3px;
+  margin: 28px 0;
+}
+
+.rider-hero h1 em {
+  display: block;
+  color: #d1b77e;
+  font-weight: 300;
+}
+
+.rider-hero p {
+  max-width: 500px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(243, 238, 227, 0.8);
+}
+
+.rider-hero-link {
+  margin-top: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 25px;
+  color: #f3eee3;
+  text-decoration: none;
+  border-bottom: 1px solid #b08d57;
+  padding-bottom: 12px;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.rider-hero-bottom {
+  position: absolute;
+  z-index: 2;
+  bottom: 30px;
+  left: 8%;
+  right: 8%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.rider-intro {
+  max-width: 1450px;
+  margin: auto;
+  padding: 140px 7%;
+  display: grid;
+  grid-template-columns: 0.6fr 1.5fr;
+  gap: 80px;
+}
+
+.rider-section-number {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #777066;
+}
+
+.rider-section-number span:first-child {
+  color: #b08d57;
+}
+
+.rider-intro h2 {
+  margin: 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 7vw, 100px);
+  line-height: 0.88;
+  font-weight: 400;
+}
+
+.rider-intro h2 em {
+  color: #5c2a2a;
+  font-weight: 300;
+}
+
+.rider-intro p {
+  max-width: 570px;
+  margin-top: 40px;
+  font-size: 14px;
+  line-height: 1.9;
+  color: #6f675e;
+}
+
+.rider-features {
+  background: #171410;
+  color: #f3eee3;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 90px 7%;
+  gap: 50px;
+}
+
+.rider-feature {
+  border-left: 1px solid rgba(176, 141, 87, 0.4);
+  padding-left: 30px;
+}
+
+.rider-feature svg {
+  color: #b08d57;
+}
+
+.rider-feature span {
+  display: block;
+  margin-top: 30px;
+  font-size: 9px;
+  color: #b08d57;
+}
+
+.rider-feature h3 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 32px;
+  font-weight: 400;
+  margin: 10px 0;
+}
+
+.rider-feature p {
+  max-width: 300px;
+  color: rgba(243, 238, 227, 0.6);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.rider-products {
+  padding: 130px 6%;
+  max-width: 1600px;
+  margin: auto;
+}
+
+.rider-products-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 55px;
+}
+
+.rider-products-heading h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 6vw, 85px);
+  font-weight: 400;
+  line-height: 0.9;
+  margin: 20px 0 0;
+}
+
+.rider-products-heading h2 em {
+  color: #5c2a2a;
+  font-weight: 300;
+}
+
+.rider-products-heading a {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: #171410;
+  text-decoration: none;
+  font-size: 9px;
+  letter-spacing: 2px;
+  border-bottom: 1px solid #171410;
+  padding-bottom: 10px;
+}
+
+.rider-product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.rider-product-image {
+  aspect-ratio: 0.82;
+  position: relative;
+  overflow: hidden;
+  background: #ddd5c7;
+}
+
+.rider-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.7s ease;
+}
+
+.rider-product:hover img {
+  transform: scale(1.05);
+}
+
+.rider-product-image button {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  width: 45px;
+  height: 45px;
+  border: none;
+  background: #f3eee3;
+  cursor: pointer;
+}
+
+.rider-product-info {
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.rider-product-info span {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #8a8176;
+}
+
+.rider-product-info h3 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 24px;
+  font-weight: 500;
+  margin: 7px 0;
+}
+
+.rider-product-info strong {
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.rider-editorial {
+  background: #2b4433;
+  color: #f3eee3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.rider-editorial-image {
+  min-height: 650px;
+}
+
+.rider-editorial-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rider-editorial-content {
+  padding: 100px 10%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.rider-editorial-content h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 6vw, 90px);
+  font-weight: 400;
+  line-height: 0.9;
+  margin: 30px 0;
+}
+
+.rider-editorial-content h2 em {
+  color: #d1b77e;
+  font-weight: 300;
+}
+
+.rider-editorial-content p {
+  max-width: 470px;
+  color: rgba(243, 238, 227, 0.7);
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.rider-editorial-content a {
+  width: fit-content;
+  margin-top: 35px;
+  color: #f3eee3;
+  text-decoration: none;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  border-bottom: 1px solid #b08d57;
+  padding-bottom: 10px;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.rider-cta {
+  padding: 140px 20px;
+  text-align: center;
+  background: #5c2a2a;
+  color: #f3eee3;
+}
+
+.rider-cta h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 7vw, 100px);
+  line-height: 0.88;
+  font-weight: 400;
+  margin: 30px 0;
+}
+
+.rider-cta h2 em {
+  color: #d1b77e;
+  font-weight: 300;
+}
+
+.rider-cta p {
+  max-width: 500px;
+  margin: auto;
+  font-size: 13px;
+  line-height: 1.8;
+  color: rgba(243, 238, 227, 0.7);
+}
+
+.rider-cta button {
+  margin-top: 35px;
+  padding: 16px 24px;
+  border: none;
+  background: #b08d57;
+  color: #171410;
+  font-family: "Jost", sans-serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
+@media (max-width: 800px) {
+  .rider-intro {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .rider-features {
+    grid-template-columns: 1fr;
+  }
+
+  .rider-product-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .rider-editorial {
+    grid-template-columns: 1fr;
+  }
+
+  .rider-editorial-image {
+    min-height: 450px;
+  }
+}
+
+@media (max-width: 600px) {
+  .rider-hero-content {
+    padding: 120px 25px 90px;
+  }
+
+  .rider-hero h1 {
+    font-size: 58px;
+  }
+
+  .rider-hero-bottom {
+    left: 25px;
+    right: 25px;
+  }
+
+  .rider-intro {
+    padding: 90px 25px;
+  }
+
+  .rider-products {
+    padding: 90px 20px;
+  }
+
+  .rider-products-heading {
+    display: block;
+  }
+
+  .rider-products-heading a {
+    width: fit-content;
+    margin-top: 30px;
+  }
+
+  .rider-product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rider-features {
+    padding: 75px 25px;
+  }
+
+  .rider-editorial-content {
+    padding: 80px 25px;
+  }
+
+  .rider-cta {
+    padding: 100px 25px;
+  }
+}

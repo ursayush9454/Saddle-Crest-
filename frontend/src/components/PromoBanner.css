@@ -1,0 +1,290 @@
+.promo-banner {
+  position: relative;
+
+  width: 100%;
+  min-height: 620px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background: #171410;
+  color: #f0ebe1;
+}
+
+/* =========================
+   IMAGE
+========================= */
+
+.promo-image {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+}
+
+.promo-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+  object-position: center center;
+
+  filter: saturate(0.88) sepia(0.08);
+
+  transform: scale(1.01);
+
+  transition: transform 1.2s ease;
+}
+
+.promo-banner:hover .promo-image img {
+  transform: scale(1.035);
+}
+
+/* =========================
+   DARK OVERLAY
+========================= */
+
+.promo-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(23, 20, 16, 0.88) 0%,
+      rgba(23, 20, 16, 0.48) 45%,
+      rgba(23, 20, 16, 0.72) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(23, 20, 16, 0.2) 0%,
+      rgba(23, 20, 16, 0.15) 40%,
+      rgba(23, 20, 16, 0.8) 100%
+    );
+
+  z-index: 1;
+}
+
+/* =========================
+   GOLD BORDER
+========================= */
+
+.promo-border {
+  position: relative;
+
+  z-index: 2;
+
+  width: 90%;
+  min-height: 480px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(197, 164, 109, 0.6);
+
+  text-align: center;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.promo-content {
+  width: 100%;
+  max-width: 650px;
+
+  padding: 40px 30px;
+}
+
+.promo-content > span {
+  display: block;
+
+  color: #c5a46d;
+
+  font-family: "Jost", sans-serif;
+  font-size: 8px;
+  font-weight: 500;
+
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.promo-content h2 {
+  margin: 25px 0;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 7vw, 95px);
+  font-weight: 400;
+
+  line-height: 0.82;
+  letter-spacing: -2px;
+}
+
+.promo-content h2 em {
+  color: #c5a46d;
+
+  font-style: italic;
+  font-weight: 400;
+}
+
+.promo-content p {
+  max-width: 430px;
+
+  margin: 0 auto 28px;
+
+  color: rgba(240, 235, 225, 0.76);
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+
+  line-height: 1.9;
+  letter-spacing: 0.2px;
+}
+
+.promo-content a {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding-bottom: 9px;
+
+  border-bottom: 1px solid #c5a46d;
+
+  color: #f0ebe1;
+
+  font-family: "Jost", sans-serif;
+  font-size: 8px;
+  font-weight: 500;
+
+  letter-spacing: 2px;
+
+  text-decoration: none;
+  text-transform: uppercase;
+
+  transition:
+    color 0.3s ease,
+    gap 0.3s ease;
+}
+
+.promo-content a:hover {
+  color: #c5a46d;
+  gap: 18px;
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 900px) {
+  .promo-banner {
+    min-height: 580px;
+  }
+
+  .promo-border {
+    width: 88%;
+    min-height: 450px;
+  }
+
+  .promo-content h2 {
+    font-size: clamp(52px, 8vw, 78px);
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+  .promo-banner {
+    min-height: 560px;
+  }
+
+  .promo-image img {
+    object-position: 62% center;
+  }
+
+  .promo-border {
+    width: 86%;
+    min-height: 430px;
+  }
+
+  .promo-content {
+    padding: 30px 20px;
+  }
+
+  .promo-content > span {
+    font-size: 7px;
+    letter-spacing: 2.3px;
+  }
+
+  .promo-content h2 {
+    margin: 22px 0;
+
+    font-size: clamp(48px, 13vw, 65px);
+
+    line-height: 0.86;
+    letter-spacing: -1px;
+  }
+
+  .promo-content p {
+    max-width: 300px;
+
+    font-size: 9.5px;
+    line-height: 1.85;
+
+    margin-bottom: 24px;
+  }
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media (max-width: 380px) {
+  .promo-banner {
+    min-height: 520px;
+  }
+
+  .promo-border {
+    width: 84%;
+    min-height: 400px;
+  }
+
+  .promo-content {
+    padding: 25px 15px;
+  }
+
+  .promo-content h2 {
+    font-size: 45px;
+  }
+
+  .promo-content p {
+    font-size: 9px;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-image img {
+    transition: none;
+  }
+
+  .promo-banner:hover .promo-image img {
+    transform: none;
+  }
+
+  .promo-content a {
+    transition: none;
+  }
+}

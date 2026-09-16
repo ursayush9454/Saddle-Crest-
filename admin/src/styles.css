@@ -1,0 +1,1200 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap");
+
+/* =========================================================
+   SADDLE & CREST — ADMIN GLOBAL STYLES
+========================================================= */
+
+:root {
+  --cream: #f3eee3;
+  --cream-light: #faf8f3;
+  --white: #ffffff;
+
+  --dark: #171410;
+  --dark-soft: #29251f;
+
+  --green: #2b4433;
+  --green-dark: #203326;
+
+  --burgundy: #5c2a2a;
+  --gold: #b08d57;
+
+  --border: #ddd5c7;
+  --muted: #81796d;
+
+  --danger: #9b3939;
+  --success: #2f6948;
+
+  --shadow: 0 8px 28px rgba(23, 20, 16, 0.06);
+
+  font-family: "Jost", sans-serif;
+  color: var(--dark);
+  background: var(--cream-light);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--cream-light);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+img {
+  display: block;
+}
+
+/* =========================================================
+   COMMON TYPOGRAPHY
+========================================================= */
+
+.eyebrow {
+  display: block;
+  margin-bottom: 6px;
+
+  color: var(--gold);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+}
+
+.loading-state {
+  min-height: 260px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.error-panel {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+
+  border: 1px solid rgba(155, 57, 57, 0.2);
+  border-left: 3px solid var(--danger);
+  border-radius: 8px;
+
+  background: #fff7f7;
+  color: var(--danger);
+
+  font-size: 13px;
+}
+
+.error-panel h3 {
+  margin: 0 0 5px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.error-panel p {
+  margin: 0;
+}
+
+/* =========================================================
+   COMMON PANEL
+========================================================= */
+
+.panel {
+  min-width: 0;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  background: var(--white);
+  box-shadow: var(--shadow);
+
+  overflow: hidden;
+}
+
+.panel-heading {
+  min-height: 68px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 16px 20px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-heading h3 {
+  margin: 0;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.primary-button,
+.outline-button,
+.icon-button,
+.refresh-button,
+.tiny-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border: 0;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* Primary */
+
+.primary-button {
+  min-height: 40px;
+
+  padding: 0 17px;
+
+  border-radius: 6px;
+
+  background: var(--green);
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.primary-button:hover {
+  background: var(--green-dark);
+  transform: translateY(-1px);
+}
+
+/* Outline */
+
+.outline-button {
+  min-height: 38px;
+
+  padding: 0 13px;
+
+  border: 1px solid var(--border);
+  border-radius: 6px;
+
+  background: var(--white);
+  color: var(--dark);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.outline-button:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+/* Icon */
+
+.icon-button {
+  width: 35px;
+  height: 35px;
+
+  border: 1px solid var(--border);
+  border-radius: 50%;
+
+  background: var(--white);
+  color: var(--dark);
+}
+
+.icon-button:hover {
+  background: var(--cream);
+}
+
+/* Refresh */
+
+.refresh-button {
+  min-height: 37px;
+
+  padding: 0 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 6px;
+
+  background: transparent;
+  color: var(--dark);
+
+  font-size: 12px;
+}
+
+.refresh-button:hover {
+  background: var(--cream);
+}
+
+/* Tiny */
+
+.tiny-button {
+  width: 32px;
+  height: 32px;
+
+  border: 1px solid var(--border);
+  border-radius: 6px;
+
+  background: var(--white);
+  color: var(--dark);
+}
+
+.tiny-button:hover {
+  background: var(--cream);
+}
+
+.tiny-button.danger:hover {
+  border-color: rgba(155, 57, 57, 0.3);
+
+  background: #fff4f4;
+  color: var(--danger);
+}
+
+/* =========================================================
+   ADMIN MAIN LAYOUT
+========================================================= */
+
+.admin-app {
+  min-height: 100vh;
+
+  display: flex;
+
+  background: var(--cream-light);
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+  position: fixed;
+
+  z-index: 100;
+
+  top: 0;
+  left: 0;
+
+  width: 245px;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: var(--dark);
+  color: #fff;
+}
+
+.sidebar-brand {
+  min-height: 78px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 17px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(176, 141, 87, 0.7);
+  border-radius: 50%;
+
+  color: var(--gold);
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.brand-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-info strong {
+  font-family: "Cormorant Garamond", serif;
+
+  font-size: 19px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.brand-info span {
+  margin-top: 2px;
+
+  color: #9e9890;
+
+  font-size: 7px;
+  letter-spacing: 0.16em;
+
+  white-space: nowrap;
+}
+
+.sidebar-close {
+  display: none;
+
+  margin-left: auto;
+
+  padding: 5px;
+
+  border: 0;
+
+  background: transparent;
+  color: #fff;
+}
+
+/* Sidebar Navigation */
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  padding: 20px 12px;
+}
+
+.sidebar-link {
+  position: relative;
+
+  min-height: 43px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 0 13px;
+
+  border-radius: 6px;
+
+  color: #a9a198;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.sidebar-link.active {
+  background: var(--green);
+  color: #fff;
+}
+
+.sidebar-link.active::before {
+  position: absolute;
+
+  left: 0;
+
+  width: 3px;
+  height: 20px;
+
+  border-radius: 0 3px 3px 0;
+
+  background: var(--gold);
+
+  content: "";
+}
+
+/* Sidebar Bottom */
+
+.sidebar-bottom {
+  margin-top: auto;
+
+  padding: 15px 12px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logout-button {
+  width: 100%;
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 0 13px;
+
+  border: 0;
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: #a9a198;
+
+  font-size: 12px;
+
+  text-align: left;
+
+  transition: 0.2s ease;
+}
+
+.logout-button:hover {
+  background: rgba(155, 57, 57, 0.14);
+  color: #e8a6a6;
+}
+
+/* Mobile overlay */
+
+.sidebar-overlay {
+  display: none;
+}
+
+/* =========================================================
+   MAIN AREA
+========================================================= */
+
+.admin-main {
+  width: calc(100% - 245px);
+
+  min-width: 0;
+  min-height: 100vh;
+
+  margin-left: 245px;
+}
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.topbar {
+  position: sticky;
+
+  z-index: 50;
+
+  top: 0;
+
+  min-height: 68px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 28px;
+
+  border-bottom: 1px solid var(--border);
+
+  background: rgba(250, 248, 243, 0.96);
+
+  backdrop-filter: blur(12px);
+}
+
+.topbar-title h2 {
+  margin: 0;
+
+  font-family: "Cormorant Garamond", serif;
+
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.mobile-menu-button {
+  display: none;
+
+  padding: 6px;
+
+  border: 0;
+
+  background: transparent;
+  color: var(--dark);
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.admin-content {
+  width: 100%;
+  max-width: 1500px;
+
+  margin: 0 auto;
+
+  padding: 26px 28px;
+}
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+.login-page {
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(176, 141, 87, 0.12),
+      transparent 35%
+    ),
+    var(--cream);
+}
+
+.login-card {
+  width: min(410px, 100%);
+
+  padding: 40px;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.96);
+
+  box-shadow: 0 20px 60px rgba(23, 20, 16, 0.11);
+}
+
+.login-logo {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto 20px;
+
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+
+  background: var(--dark);
+
+  color: var(--gold);
+
+  font-family: "Cormorant Garamond", serif;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.login-card h1 {
+  margin: 0;
+
+  font-family: "Cormorant Garamond", serif;
+
+  font-size: 40px;
+  font-weight: 600;
+
+  line-height: 1;
+  text-align: center;
+}
+
+.login-card > p {
+  margin: 11px 0 27px;
+
+  color: var(--muted);
+
+  font-size: 12px;
+  line-height: 1.7;
+
+  text-align: center;
+}
+
+.login-card form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+.login-button {
+  width: 100%;
+
+  margin-top: 3px;
+}
+
+/* =========================================================
+   FORMS — GLOBAL
+========================================================= */
+
+.form-group {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.form-group label {
+  color: var(--dark-soft);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+
+  border: 1px solid var(--border);
+  border-radius: 6px;
+
+  outline: none;
+
+  background: var(--white);
+  color: var(--dark);
+
+  font-size: 12px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input,
+.form-group select {
+  height: 40px;
+
+  padding: 0 11px;
+}
+
+.form-group textarea {
+  min-height: 100px;
+
+  padding: 10px 11px;
+
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--green);
+
+  box-shadow: 0 0 0 3px rgba(43, 68, 51, 0.07);
+}
+
+.error-message {
+  padding: 10px 12px;
+
+  border-radius: 6px;
+
+  background: #fff2f2;
+  color: var(--danger);
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   TABLE — GLOBAL
+========================================================= */
+
+.table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: 12px;
+}
+
+th {
+  padding: 11px 15px;
+
+  border-bottom: 1px solid var(--border);
+
+  background: #fcfaf6;
+
+  color: var(--muted);
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+
+  text-align: left;
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+td {
+  padding: 12px 15px;
+
+  border-bottom: 1px solid #eee8dd;
+
+  color: var(--dark-soft);
+
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody tr:hover {
+  background: #fdfbf8;
+}
+
+/* =========================================================
+   PRODUCT TABLE — GLOBAL HELPERS
+========================================================= */
+
+.product-table-info {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 190px;
+}
+
+.product-table-info img {
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  object-fit: cover;
+
+  border-radius: 5px;
+
+  background: var(--cream);
+}
+
+.product-table-info strong {
+  display: block;
+
+  color: var(--dark);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.product-table-info small {
+  display: block;
+
+  margin-top: 2px;
+
+  color: var(--muted);
+
+  font-size: 9px;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+}
+
+.table-flags {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 4px;
+}
+
+.pill,
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 21px;
+
+  padding: 0 7px;
+
+  border-radius: 20px;
+
+  background: var(--cream);
+
+  color: var(--green);
+
+  font-size: 9px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.status-pill.active {
+  background: rgba(47, 105, 72, 0.1);
+  color: var(--success);
+}
+
+.status-pill.inactive {
+  background: rgba(155, 57, 57, 0.1);
+  color: var(--danger);
+}
+
+.stock-ok {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.stock-low {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.empty-state {
+  padding: 35px 20px;
+
+  color: var(--muted);
+
+  font-size: 12px;
+
+  text-align: center;
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+  .sidebar {
+    width: 225px;
+  }
+
+  .admin-main {
+    width: calc(100% - 225px);
+    margin-left: 225px;
+  }
+
+  .admin-content {
+    padding: 23px;
+  }
+
+  .topbar {
+    padding: 0 23px;
+  }
+
+  .topbar-title h2 {
+    font-size: 24px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 850px) {
+  .sidebar {
+    width: 245px;
+
+    transform: translateX(-100%);
+
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+
+    z-index: 90;
+
+    inset: 0;
+
+    display: block;
+
+    background: rgba(23, 20, 16, 0.45);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+      opacity 0.25s ease,
+      visibility 0.25s ease;
+  }
+
+  .sidebar-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .admin-main {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .mobile-menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .topbar {
+    min-height: 62px;
+
+    padding: 0 18px;
+  }
+
+  .topbar-title {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+  }
+
+  .topbar-title h2 {
+    font-size: 23px;
+  }
+
+  .admin-content {
+    padding: 20px 18px;
+  }
+
+  .panel-heading {
+    padding: 14px 16px;
+  }
+
+  .panel-heading h3 {
+    font-size: 23px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 680px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .admin-content {
+    padding: 16px 12px;
+  }
+
+  .topbar {
+    padding: 0 12px;
+  }
+
+  .topbar-title h2 {
+    font-size: 21px;
+  }
+
+  .panel {
+    border-radius: 9px;
+  }
+
+  .panel-heading {
+    min-height: 60px;
+
+    gap: 10px;
+
+    padding: 12px;
+  }
+
+  .panel-heading h3 {
+    font-size: 21px;
+  }
+
+  .eyebrow {
+    font-size: 8px;
+  }
+
+  .outline-button,
+  .primary-button {
+    min-height: 37px;
+
+    padding-left: 11px;
+    padding-right: 11px;
+
+    font-size: 11px;
+  }
+
+  .login-page {
+    padding: 14px;
+  }
+
+  .login-card {
+    padding: 30px 20px;
+  }
+
+  .login-card h1 {
+    font-size: 35px;
+  }
+
+  .form-group input,
+  .form-group select {
+    height: 42px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL DEVICES
+========================================================= */
+
+@media (max-width: 380px) {
+  .admin-content {
+    padding: 12px 9px;
+  }
+
+  .topbar {
+    padding: 0 9px;
+  }
+
+  .topbar-title h2 {
+    font-size: 19px;
+  }
+
+  .panel-heading {
+    padding: 11px;
+  }
+
+  .panel-heading h3 {
+    font-size: 20px;
+  }
+
+  .login-page {
+    padding: 9px;
+  }
+
+  .login-card {
+    padding: 25px 15px;
+  }
+
+  .login-card h1 {
+    font-size: 32px;
+  }
+}
+
+/* =========================================================
+   TOUCH DEVICES
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a,
+  select {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .sidebar-link {
+    min-height: 48px;
+  }
+
+  .logout-button {
+    min-height: 48px;
+  }
+
+  .tiny-button {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* =========================================================
+   OVERFLOW PROTECTION
+========================================================= */
+
+.admin-app,
+.admin-main,
+.admin-content,
+.panel,
+.table-panel,
+.form-panel {
+  min-width: 0;
+}
+
+input,
+textarea,
+select,
+button {
+  max-width: 100%;
+}

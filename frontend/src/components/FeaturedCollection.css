@@ -1,0 +1,383 @@
+.featured-section {
+  position: relative;
+
+  width: 100%;
+  min-height: 720px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+
+  background: #191816;
+  color: #e9e2d5;
+}
+
+/* =========================
+   FEATURED IMAGE
+========================= */
+
+.featured-image {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+}
+
+.featured-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: contain;
+
+  /*
+    Image mein horse/rider center-left hai,
+    isliye desktop par center positioning rakhi hai.
+  */
+  object-position: center center;
+
+  transform: scale(1.01);
+
+  transition: transform 1.2s ease;
+}
+
+.featured-section:hover .featured-image img {
+  transform: scale(1.035);
+}
+
+/* =========================
+   OVERLAY
+========================= */
+
+.featured-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(13, 13, 12, 0.94) 0%,
+      rgba(13, 13, 12, 0.68) 32%,
+      rgba(13, 13, 12, 0.25) 68%,
+      rgba(13, 13, 12, 0.2) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(13, 13, 12, 0.12) 0%,
+      transparent 45%,
+      rgba(13, 13, 12, 0.55) 100%
+    );
+
+  z-index: 1;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.featured-content {
+  position: relative;
+
+  z-index: 2;
+
+  width: 100%;
+  max-width: 1250px;
+
+  margin: 0 auto;
+
+  padding: 80px 5%;
+}
+
+.featured-label {
+  display: block;
+
+  color: #c5a46d;
+
+  font-family: "Jost", sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+
+  letter-spacing: 3px;
+
+  text-transform: uppercase;
+}
+
+.featured-content h2 {
+  margin: 25px 0;
+
+  font-family: "Cormorant Garamond", serif;
+
+  font-size: clamp(70px, 9vw, 130px);
+
+  font-weight: 400;
+
+  line-height: 0.75;
+
+  letter-spacing: -3px;
+}
+
+.featured-content h2 em {
+  color: #c5a46d;
+
+  font-style: italic;
+  font-weight: 400;
+}
+
+.featured-content p {
+  max-width: 350px;
+
+  margin: 0 0 32px;
+
+  color: rgba(233, 226, 213, 0.72);
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 11px;
+
+  line-height: 1.9;
+
+  letter-spacing: 0.5px;
+}
+
+.featured-content a {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding-bottom: 10px;
+
+  border-bottom: 1px solid #c5a46d;
+
+  color: #e9e2d5;
+
+  text-decoration: none;
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 9px;
+
+  font-weight: 500;
+
+  letter-spacing: 2px;
+
+  text-transform: uppercase;
+
+  transition:
+    color 0.3s ease,
+    gap 0.3s ease;
+}
+
+.featured-content a:hover {
+  color: #c5a46d;
+
+  gap: 18px;
+}
+
+/* =========================
+   NUMBER
+========================= */
+
+.featured-number {
+  position: absolute;
+
+  z-index: 3;
+
+  right: 5%;
+  bottom: 35px;
+
+  color: #c5a46d;
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 9px;
+
+  letter-spacing: 2px;
+}
+
+/* =========================
+   LAPTOP
+========================= */
+
+@media (max-width: 1100px) {
+  .featured-section {
+    min-height: 680px;
+  }
+
+  .featured-content {
+    padding: 80px 7%;
+  }
+
+  .featured-content h2 {
+    font-size: clamp(68px, 10vw, 110px);
+  }
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 800px) {
+  .featured-section {
+    min-height: 650px;
+  }
+
+  .featured-image img {
+    object-position: 55% center;
+  }
+
+  .featured-overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(13, 13, 12, 0.94) 0%,
+        rgba(13, 13, 12, 0.72) 48%,
+        rgba(13, 13, 12, 0.32) 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(13, 13, 12, 0.15) 0%,
+        transparent 45%,
+        rgba(13, 13, 12, 0.65) 100%
+      );
+  }
+
+  .featured-content {
+    padding: 70px 7%;
+  }
+
+  .featured-content h2 {
+    font-size: clamp(64px, 13vw, 100px);
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+  .featured-section {
+    min-height: 650px;
+  }
+
+  .featured-image img {
+    /*
+      Mobile mein image ko thoda right shift
+      kar rahe hain taaki rider/horse visible rahe.
+    */
+    object-position: 60% center;
+  }
+
+  .featured-overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(13, 13, 12, 0.95) 0%,
+        rgba(13, 13, 12, 0.76) 55%,
+        rgba(13, 13, 12, 0.38) 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(13, 13, 12, 0.2) 0%,
+        transparent 38%,
+        rgba(13, 13, 12, 0.8) 100%
+      );
+  }
+
+  .featured-content {
+    padding: 70px 7%;
+  }
+
+  .featured-label {
+    font-size: 7px;
+
+    letter-spacing: 2.2px;
+  }
+
+  .featured-content h2 {
+    margin: 20px 0;
+
+    font-size: clamp(60px, 18vw, 86px);
+
+    line-height: 0.78;
+
+    letter-spacing: -2px;
+  }
+
+  .featured-content p {
+    max-width: 285px;
+
+    margin-bottom: 27px;
+
+    font-size: 9px;
+
+    line-height: 1.8;
+  }
+
+  .featured-content a {
+    font-size: 8px;
+
+    letter-spacing: 1.7px;
+
+    gap: 9px;
+  }
+
+  .featured-number {
+    right: 7%;
+    bottom: 22px;
+
+    font-size: 7px;
+  }
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media (max-width: 380px) {
+  .featured-section {
+    min-height: 600px;
+  }
+
+  .featured-content {
+    padding: 60px 6%;
+  }
+
+  .featured-content h2 {
+    font-size: 58px;
+  }
+
+  .featured-content p {
+    max-width: 265px;
+  }
+
+  .featured-number {
+    right: 6%;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-image img,
+  .featured-content a {
+    transition: none;
+  }
+}
+.featured-content button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}

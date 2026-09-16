@@ -1,0 +1,4 @@
+const Wishlist=require("../models/Wishlist"),Product=require("../models/Product");
+exports.get=async(req,res)=>res.json({wishlist:await Wishlist.find({user:req.user._id}).populate("product")});
+exports.add=async(req,res)=>{const{productId}=req.body;if(!await Product.findOne({_id:productId,isActive:true}))return res.status(404).json({message:"Product not found"});const x=await Wishlist.findOne({user:req.user._id,product:productId});if(x)return res.status(409).json({message:"Product already in wishlist"});const w=await Wishlist.create({user:req.user._id,product:productId});res.status(201).json({message:"Product added to wishlist",wishlist:w});};
+exports.remove=async(req,res)=>{const w=await Wishlist.findOneAndDelete({user:req.user._id,product:req.params.productId});if(!w)return res.status(404).json({message:"Product not found in wishlist"});res.json({message:"Product removed from wishlist"});};
