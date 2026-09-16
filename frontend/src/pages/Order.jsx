@@ -96,7 +96,7 @@ const Orders = () => {
 
   return (
     <main className="orders-page">
-      <Navbar />
+    <Navbar navbarBackground={'#000'} top="0"/>
 
       <section className="orders-header">
         <Link to="/" className="orders-back">
