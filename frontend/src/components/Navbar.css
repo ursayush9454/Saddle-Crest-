@@ -5,7 +5,7 @@
 .navbar {
   position: fixed;
   /* top: 36px; */
-  top: var(top, 36px);
+  top: 0;
   left: 0;
   z-index: 9999;
   width: 100%;

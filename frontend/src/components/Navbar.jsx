@@ -14,7 +14,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useShop } from "../ShopContext/ShopContext";
 import { getUser } from "../services/api";
 
-const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
+const Navbar = ({
+  navbarBackground = "transparent",
+  top = "0",
+}) => {
   const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,7 +37,10 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
     window.addEventListener("auth-change", handleAuthChange);
 
     return () => {
-      window.removeEventListener("auth-change", handleAuthChange);
+      window.removeEventListener(
+        "auth-change",
+        handleAuthChange
+      );
     };
   }, []);
 
@@ -44,7 +50,9 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
   // MOBILE MENU BODY SCROLL
   // --------------------------------
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    document.body.style.overflow = menuOpen
+      ? "hidden"
+      : "";
 
     return () => {
       document.body.style.overflow = "";
@@ -64,7 +72,10 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
     window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
     };
   }, []);
 
@@ -98,17 +109,16 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
         className={`navbar ${
           scrolled ? "navbar-scrolled" : ""
         }`}
-         style={{
-    "--navbar-bg": navbarBackground,
-    "top": top,
-  }}
+        style={{
+          "--navbar-bg": navbarBackground,
+          top: top,
+        }}
       >
         {/* =====================================
             LEFT
         ====================================== */}
 
         <div className="navbar-left">
-
           {/* MOBILE MENU BUTTON */}
 
           <button
@@ -126,7 +136,6 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
           {/* DESKTOP NAVIGATION */}
 
           <nav className="desktop-nav">
-
             <Link to="/shop">
               Shop
             </Link>
@@ -146,9 +155,7 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
             <Link to="/journal">
               Journal
             </Link>
-
           </nav>
-
         </div>
 
         {/* =====================================
@@ -177,7 +184,6 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
         ====================================== */}
 
         <div className="navbar-actions">
-
           {/* SEARCH */}
 
           <button
@@ -247,7 +253,6 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
                 : cartCount}
             </span>
           </Link>
-
         </div>
       </header>
 
@@ -271,11 +276,9 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
           menuOpen ? "active" : ""
         }`}
       >
-
         {/* MOBILE MENU HEADER */}
 
         <div className="mobile-menu-header">
-
           <Link
             to="/"
             className="mobile-menu-logo"
@@ -304,7 +307,6 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
               strokeWidth={1.4}
             />
           </button>
-
         </div>
 
         {/* =====================================
@@ -312,7 +314,6 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
         ====================================== */}
 
         <nav className="mobile-menu-nav">
-
           {/* SHOP */}
 
           <Link
@@ -404,7 +405,6 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
             onClick={closeMenu}
           >
             <span>
-
               Wishlist
 
               {wishlistCount > 0 && (
@@ -412,7 +412,6 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
                   {wishlistCount}
                 </small>
               )}
-
             </span>
 
             <Heart
@@ -428,7 +427,6 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
             onClick={closeMenu}
           >
             <span>
-
               Shopping Bag
 
               {cartCount > 0 && (
@@ -436,7 +434,6 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
                   {cartCount}
                 </small>
               )}
-
             </span>
 
             <ShoppingBag
@@ -444,7 +441,6 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
               strokeWidth={1.4}
             />
           </Link>
-
         </nav>
 
         {/* =====================================
@@ -452,7 +448,6 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
         ====================================== */}
 
         <div className="mobile-menu-footer">
-
           <span>
             THE WORLD OF SADDLE & CREST
           </span>
@@ -460,9 +455,7 @@ const Navbar = ({ navbarBackground = "transparent", top="0" }) => {
           <p>
             Crafted in India. Made for the journey.
           </p>
-
         </div>
-
       </aside>
     </>
   );
