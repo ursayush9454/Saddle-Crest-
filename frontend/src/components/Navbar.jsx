@@ -140,12 +140,12 @@ const Navbar = ({
               Shop
             </Link>
 
-            <Link to="/rider">
-              Rider
+            <Link to="/about">
+              About
             </Link>
 
-            <Link to="/horse">
-              Horse
+            <Link to="/Story">
+              Our Story
             </Link>
 
             <Link to="/collections">

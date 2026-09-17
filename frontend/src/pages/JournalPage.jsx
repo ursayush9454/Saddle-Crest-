@@ -7,6 +7,7 @@ import {
 
 import "./JournalPage.css";
 import Navbar from "../components/Navbar";
+import { Link } from "react-router-dom";
 
 const articles = [
   {
@@ -102,10 +103,9 @@ const JournalPage = () => {
             <span>{articles[0].read}</span>
           </div>
 
-          <a href="#journal-articles">
-            READ STORY
-            <ArrowUpRight size={17} />
-          </a>
+          <Link to ="/Story">
+         <span id="12"> Read Story  <ArrowUpRight size={17} /></span>
+          </Link>
 
         </div>
 

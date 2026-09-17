@@ -1,0 +1,678 @@
+.about-page {
+  background: #f3eee3;
+  color: #171410;
+  overflow: hidden;
+}
+
+
+/* =========================================
+   HERO
+========================================= */
+
+.about-hero {
+  position: relative;
+  min-height: 88vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-image: url("/assets/about-hero.jpg");
+  background-size: cover;
+  background-position: center;
+  color: #f3eee3;
+}
+
+.about-hero-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(23, 20, 16, 0.78),
+      rgba(23, 20, 16, 0.30),
+      rgba(23, 20, 16, 0.55)
+    );
+}
+
+.about-hero-content {
+  position: relative;
+  z-index: 2;
+
+  width: min(1000px, 90%);
+  text-align: center;
+}
+
+.about-eyebrow {
+  display: block;
+
+  margin-bottom: 25px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+
+  color: #b08d57;
+}
+
+.about-eyebrow.dark {
+  color: #80643a;
+}
+
+.about-hero h1 {
+  margin: 0;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(58px, 8vw, 110px);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: -0.035em;
+}
+
+.about-hero h1 em {
+  color: #d1b27c;
+  font-style: italic;
+}
+
+.about-hero-content p {
+  max-width: 600px;
+
+  margin: 35px auto 0;
+
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  line-height: 1.9;
+
+  color: rgba(243, 238, 227, 0.78);
+}
+
+.about-hero-scroll {
+  position: absolute;
+  z-index: 3;
+
+  bottom: 35px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+}
+
+.about-scroll-line {
+  width: 1px;
+  height: 45px;
+
+  background: rgba(243, 238, 227, 0.5);
+}
+
+
+/* =========================================
+   INTRO
+========================================= */
+
+.about-intro {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 80px;
+
+  max-width: 1250px;
+  margin: auto;
+
+  padding: 140px 50px;
+}
+
+.about-intro-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+
+  color: #81786c;
+}
+
+.about-intro-label span:first-child {
+  color: #b08d57;
+}
+
+.about-intro-content {
+  max-width: 900px;
+}
+
+.about-intro-content h2 {
+  margin: 0 0 55px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(44px, 5vw, 70px);
+  font-weight: 400;
+  line-height: 0.98;
+}
+
+.about-intro-text {
+  max-width: 670px;
+  margin-left: auto;
+}
+
+.about-intro-text p {
+  margin: 0 0 24px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 15px;
+  line-height: 1.95;
+
+  color: #5b554d;
+}
+
+
+/* =========================================
+   HERITAGE
+========================================= */
+
+.about-heritage {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+
+  background: #171410;
+  color: #f3eee3;
+}
+
+.about-heritage-image {
+  min-height: 700px;
+}
+
+.about-heritage-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  display: block;
+}
+
+.about-heritage-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 90px;
+}
+
+.about-heritage-content h2 {
+  margin: 0 0 35px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(48px, 5vw, 75px);
+  font-weight: 400;
+  line-height: 0.95;
+}
+
+.about-heritage-content p {
+  max-width: 480px;
+
+  margin: 0 0 20px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  line-height: 1.9;
+
+  color: rgba(243, 238, 227, 0.68);
+}
+
+
+/* =========================================
+   CRAFT
+========================================= */
+
+.about-craft {
+  padding: 140px 50px;
+}
+
+.about-section-heading {
+  max-width: 700px;
+  margin-bottom: 80px;
+}
+
+.about-section-heading h2 {
+  margin: 0 0 25px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(48px, 6vw, 78px);
+  font-weight: 400;
+  line-height: 0.95;
+}
+
+.about-section-heading p {
+  max-width: 500px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  line-height: 1.9;
+
+  color: #625b51;
+}
+
+.about-craft-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  max-width: 1250px;
+  margin: auto;
+
+  border-top: 1px solid rgba(23, 20, 16, 0.18);
+}
+
+.craft-card {
+  padding: 45px 35px 20px;
+
+  border-right: 1px solid rgba(23, 20, 16, 0.18);
+}
+
+.craft-card:last-child {
+  border-right: none;
+}
+
+.craft-card span {
+  display: block;
+
+  margin-bottom: 55px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+
+  color: #b08d57;
+}
+
+.craft-card h3 {
+  margin: 0 0 18px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 35px;
+  font-weight: 500;
+}
+
+.craft-card p {
+  margin: 0;
+
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  line-height: 1.9;
+
+  color: #625b51;
+}
+
+
+/* =========================================
+   STATEMENT
+========================================= */
+
+.about-statement {
+  padding: 170px 30px;
+
+  background: #2b4433;
+  color: #f3eee3;
+
+  text-align: center;
+}
+
+.about-statement-inner {
+  max-width: 850px;
+  margin: auto;
+}
+
+.about-statement h2 {
+  margin: 0;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(52px, 7vw, 90px);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 0.95;
+}
+
+.about-statement-line {
+  width: 60px;
+  height: 1px;
+
+  margin: 45px auto;
+
+  background: #b08d57;
+}
+
+.about-statement p {
+  max-width: 550px;
+  margin: auto;
+
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  line-height: 1.9;
+
+  color: rgba(243, 238, 227, 0.72);
+}
+
+
+/* =========================================
+   RIDER
+========================================= */
+
+.about-rider {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+}
+
+.about-rider-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 100px 90px;
+}
+
+.about-rider-content h2 {
+  margin: 0 0 35px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(45px, 5vw, 72px);
+  font-weight: 400;
+  line-height: 0.95;
+}
+
+.about-rider-content p {
+  max-width: 470px;
+
+  margin: 0 0 20px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  line-height: 1.9;
+
+  color: #625b51;
+}
+
+.about-rider-image {
+  min-height: 700px;
+}
+
+.about-rider-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+  object-fit: cover;
+}
+
+
+/* =========================================
+   VALUES
+========================================= */
+
+.about-values {
+  padding: 140px 50px;
+  background: #ebe4d7;
+}
+
+.about-values-list {
+  max-width: 1250px;
+  margin: auto;
+
+  border-top: 1px solid rgba(23, 20, 16, 0.2);
+}
+
+.value-item {
+  display: grid;
+  grid-template-columns: 80px 220px 1fr;
+  align-items: center;
+  gap: 30px;
+
+  padding: 30px 0;
+
+  border-bottom: 1px solid rgba(23, 20, 16, 0.2);
+}
+
+.value-item span {
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: #b08d57;
+}
+
+.value-item h3 {
+  margin: 0;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 30px;
+  font-weight: 500;
+}
+
+.value-item p {
+  margin: 0;
+
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: #625b51;
+}
+
+
+/* =========================================
+   CTA
+========================================= */
+
+.about-cta {
+  padding: 160px 25px;
+
+  background:
+    linear-gradient(
+      rgba(23, 20, 16, 0.75),
+      rgba(23, 20, 16, 0.75)
+    ),
+    url("/assets/about-cta.jpg");
+
+  background-size: cover;
+  background-position: center;
+
+  color: #f3eee3;
+
+  text-align: center;
+}
+
+.about-cta-inner {
+  max-width: 750px;
+  margin: auto;
+}
+
+.about-cta h2 {
+  margin: 0;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(60px, 8vw, 100px);
+  font-weight: 400;
+  line-height: 0.88;
+}
+
+.about-cta h2 em {
+  color: #d1b27c;
+}
+
+.about-cta p {
+  max-width: 500px;
+  margin: 35px auto;
+
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  line-height: 1.9;
+
+  color: rgba(243, 238, 227, 0.72);
+}
+
+.about-cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+
+  padding: 16px 25px;
+
+  border: 1px solid rgba(243, 238, 227, 0.45);
+
+  color: #f3eee3;
+  text-decoration: none;
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+
+  transition: 0.3s ease;
+}
+
+.about-cta-button:hover {
+  background: #f3eee3;
+  color: #171410;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+  .about-intro {
+    grid-template-columns: 1fr;
+    gap: 45px;
+    padding: 100px 25px;
+  }
+
+  .about-intro-text {
+    margin-left: 0;
+  }
+
+  .about-heritage,
+  .about-rider {
+    grid-template-columns: 1fr;
+  }
+
+  .about-heritage-image,
+  .about-rider-image {
+    min-height: 550px;
+  }
+
+  .about-heritage-content,
+  .about-rider-content {
+    padding: 80px 30px;
+  }
+
+  .about-craft {
+    padding: 100px 25px;
+  }
+
+  .about-craft-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .craft-card {
+    border-right: none;
+    border-bottom: 1px solid rgba(23, 20, 16, 0.18);
+  }
+
+  .craft-card:last-child {
+    border-bottom: none;
+  }
+
+  .about-values {
+    padding: 100px 25px;
+  }
+
+  .value-item {
+    grid-template-columns: 45px 1fr;
+  }
+
+  .value-item p {
+    grid-column: 2;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .about-hero {
+    min-height: 78vh;
+  }
+
+  .about-hero h1 {
+    font-size: 58px;
+  }
+
+  .about-hero-content p {
+    font-size: 13px;
+  }
+
+  .about-intro {
+    padding: 80px 20px;
+  }
+
+  .about-intro-content h2 {
+    font-size: 45px;
+    margin-bottom: 40px;
+  }
+
+  .about-heritage-image,
+  .about-rider-image {
+    min-height: 420px;
+  }
+
+  .about-heritage-content,
+  .about-rider-content {
+    padding: 70px 22px;
+  }
+
+  .about-craft {
+    padding: 80px 20px;
+  }
+
+  .about-section-heading {
+    margin-bottom: 55px;
+  }
+
+  .about-statement {
+    padding: 110px 22px;
+  }
+
+  .about-statement h2 {
+    font-size: 52px;
+  }
+
+  .about-values {
+    padding: 80px 20px;
+  }
+
+  .value-item {
+    grid-template-columns: 35px 1fr;
+    gap: 15px;
+  }
+
+  .value-item h3 {
+    font-size: 27px;
+  }
+
+  .about-cta {
+    padding: 110px 20px;
+  }
+
+  .about-cta h2 {
+    font-size: 65px;
+  }
+
+}

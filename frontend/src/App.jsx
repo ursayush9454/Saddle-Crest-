@@ -16,6 +16,18 @@ import Orders from "./pages/Order";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import ShippingDelivery from "./pages/ShippingDelivery";
+import ReturnsRefunds from "./pages/ReturnsRefunds";
+import CancellationPolicy from "./pages/CancellationPolicy";
+import PolicyPage from "./components/PolicyPage";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import FAQ from "./pages/Faq";
+import Terms from "./pages/Terms";
+import Reviews from "./pages/Reviews";
+import Story from "./pages/Story";
+
+
 
 // Context
 import { ShopProvider } from "./ShopContext/ShopContext";
@@ -38,6 +50,9 @@ const App = () => {
           path="/"
           element={<Home />}
         />
+
+            <Route path="/About"
+            element={<About/>}/>
 
         {/* =========================================
             SHOP
@@ -139,6 +154,46 @@ const App = () => {
           path="/profile"
           element={<Profile />}
         />
+
+
+       
+<Route
+  path="/shipping-delivery"
+  element={<ShippingDelivery />}
+/>
+
+<Route
+  path="/returns-refunds"
+  element={<ReturnsRefunds />}
+/>
+
+<Route
+  path="/cancellation-policy"
+  element={<CancellationPolicy />}
+/>
+
+<Route
+  path="/terms"
+  element={<Terms />}
+/> 
+
+<Route
+  path="/privacy-policy"
+  element={<PolicyPage/>}
+/> 
+
+<Route path="/Contact" element={<Contact/>}/>
+
+<Route path="/Faq" element={<FAQ/>}/>
+
+ <Route
+          path="/reviews"
+          element={<Reviews />}/>
+
+             <Route
+          path="/story"
+          element={<Story />}/>
+
 
       </Routes>
 

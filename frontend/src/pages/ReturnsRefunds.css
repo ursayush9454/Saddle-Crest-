@@ -1,0 +1,641 @@
+/* =========================================
+   SADDLE & CREST
+   RETURNS & REFUNDS
+========================================= */
+
+.policy-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f3eee3;
+  color: #171410;
+}
+
+/* =========================================
+   HERO
+========================================= */
+
+.policy-hero {
+  position: relative;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  padding: 140px 7vw 100px;
+  background: #171410;
+  color: #f3eee3;
+  overflow: hidden;
+}
+
+.policy-hero::before {
+  content: "";
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  right: -180px;
+  top: -180px;
+  border: 1px solid rgba(176, 141, 87, 0.18);
+  border-radius: 50%;
+}
+
+.policy-hero::after {
+  content: "";
+  position: absolute;
+  width: 330px;
+  height: 330px;
+  right: -90px;
+  top: -90px;
+  border: 1px solid rgba(176, 141, 87, 0.12);
+  border-radius: 50%;
+}
+
+.policy-hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+}
+
+.policy-eyebrow {
+  display: block;
+  margin-bottom: 28px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+
+  color: #b08d57;
+}
+
+.policy-hero h1 {
+  margin: 0;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(70px, 9vw, 130px);
+  font-weight: 400;
+  line-height: 0.82;
+  letter-spacing: -0.035em;
+}
+
+.policy-hero h1 em {
+  color: #b08d57;
+  font-style: italic;
+}
+
+.policy-hero p {
+  max-width: 560px;
+  margin: 40px 0 0;
+
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.9;
+
+  color: rgba(243, 238, 227, 0.65);
+}
+
+.policy-hero-line {
+  position: absolute;
+  bottom: 35px;
+  left: 7vw;
+  right: 7vw;
+
+  display: flex;
+  align-items: center;
+  gap: 25px;
+
+  z-index: 2;
+}
+
+.policy-hero-line span {
+  font-family: "Jost", sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: rgba(243, 238, 227, 0.4);
+}
+
+.policy-hero-line div {
+  height: 1px;
+  flex: 1;
+  background: rgba(243, 238, 227, 0.15);
+}
+
+/* =========================================
+   POLICY CONTENT
+========================================= */
+
+.policy-content {
+  background: #f3eee3;
+}
+
+.policy-container {
+  width: min(1100px, 86vw);
+  margin: 0 auto;
+  padding: 100px 0 120px;
+}
+
+/* =========================================
+   UPDATED DATE
+========================================= */
+
+.policy-updated {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: 28px;
+  margin-bottom: 80px;
+
+  border-bottom: 1px solid rgba(23, 20, 16, 0.15);
+}
+
+.policy-updated span {
+  font-family: "Jost", sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: #80643a;
+}
+
+.policy-updated p {
+  margin: 0;
+
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: #625b51;
+}
+
+/* =========================================
+   POLICY SECTION
+========================================= */
+
+.policy-section {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 45px;
+
+  padding: 65px 0;
+
+  border-bottom: 1px solid rgba(23, 20, 16, 0.12);
+}
+
+.policy-section:first-of-type {
+  padding-top: 0;
+}
+
+.policy-number {
+  display: block;
+
+  padding-top: 7px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+
+  color: #b08d57;
+}
+
+.policy-section h2 {
+  margin: 0 0 25px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(38px, 4vw, 54px);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+
+  color: #171410;
+}
+
+.policy-section p {
+  max-width: 760px;
+  margin: 0 0 18px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.95;
+
+  color: #625b51;
+}
+
+.policy-section p:last-child {
+  margin-bottom: 0;
+}
+
+.policy-section strong {
+  font-weight: 500;
+  color: #171410;
+}
+
+/* =========================================
+   LISTS
+========================================= */
+
+.policy-section ul {
+  max-width: 760px;
+
+  margin: 5px 0 25px;
+  padding: 0;
+
+  list-style: none;
+}
+
+.policy-section li {
+  position: relative;
+
+  padding: 10px 0 10px 25px;
+
+  border-bottom: 1px solid rgba(23, 20, 16, 0.08);
+
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.7;
+
+  color: #625b51;
+}
+
+.policy-section li:first-child {
+  border-top: 1px solid rgba(23, 20, 16, 0.08);
+}
+
+.policy-section li::before {
+  content: "";
+
+  position: absolute;
+  left: 2px;
+  top: 20px;
+
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+  background: #b08d57;
+}
+
+/* =========================================
+   FAQ
+========================================= */
+
+.policy-faq {
+  display: grid;
+  grid-template-columns: 0.75fr 1.25fr;
+  gap: 90px;
+
+  padding: 130px 7vw;
+
+  background: #ebe4d7;
+}
+
+.policy-faq-heading {
+  max-width: 430px;
+}
+
+.policy-eyebrow.dark {
+  color: #80643a;
+}
+
+.policy-faq-heading h2 {
+  margin: 0 0 25px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 6vw, 78px);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+
+.policy-faq-heading h2 em {
+  color: #80643a;
+  font-style: italic;
+}
+
+.policy-faq-heading p {
+  max-width: 350px;
+
+  margin: 0;
+
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  line-height: 1.9;
+
+  color: #625b51;
+}
+
+.policy-faq-list {
+  border-top: 1px solid rgba(23, 20, 16, 0.18);
+}
+
+.policy-faq-item {
+  border-bottom: 1px solid rgba(23, 20, 16, 0.18);
+}
+
+.policy-faq-question {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 25px;
+  padding: 24px 0;
+
+  border: none;
+  background: transparent;
+
+  color: #171410;
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.policy-faq-question > span:first-child {
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.policy-faq-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(23, 20, 16, 0.2);
+
+  transition: 0.3s ease;
+}
+
+.policy-faq-icon svg {
+  transition: transform 0.3s ease;
+}
+
+.policy-faq-item.open .policy-faq-icon {
+  background: #171410;
+  color: #f3eee3;
+}
+
+.policy-faq-item.open .policy-faq-icon svg {
+  transform: rotate(180deg);
+}
+
+.policy-faq-answer {
+  display: grid;
+  grid-template-rows: 0fr;
+
+  padding: 0;
+
+  transition:
+    grid-template-rows 0.35s ease,
+    padding 0.35s ease;
+}
+
+.policy-faq-answer p {
+  min-height: 0;
+  overflow: hidden;
+
+  max-width: 650px;
+
+  margin: 0;
+
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.9;
+
+  color: #625b51;
+}
+
+.policy-faq-item.open .policy-faq-answer {
+  grid-template-rows: 1fr;
+  padding-bottom: 25px;
+}
+
+/* =========================================
+   CONTACT CTA
+========================================= */
+
+.policy-contact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+
+  padding: 140px 7vw;
+
+  background: #2b4433;
+  color: #f3eee3;
+}
+
+.policy-contact h2 {
+  margin: 0;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(55px, 7vw, 90px);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+}
+
+.policy-contact h2 em {
+  color: #d1b27c;
+  font-style: italic;
+}
+
+.policy-contact-right {
+  align-self: end;
+  max-width: 430px;
+}
+
+.policy-contact-right p {
+  margin: 0 0 30px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.9;
+
+  color: rgba(243, 238, 227, 0.72);
+}
+
+.policy-contact-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+
+  padding: 16px 25px;
+
+  border: 1px solid rgba(243, 238, 227, 0.5);
+
+  color: #f3eee3;
+  text-decoration: none;
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+
+  transition: all 0.3s ease;
+}
+
+.policy-contact-button:hover {
+  background: #f3eee3;
+  color: #171410;
+}
+
+.policy-contact-button svg {
+  transition: transform 0.3s ease;
+}
+
+.policy-contact-button:hover svg {
+  transform: translate(3px, -3px);
+}
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 900px) {
+  .policy-hero {
+    min-height: 430px;
+    padding: 120px 30px 90px;
+  }
+
+  .policy-hero-line {
+    left: 30px;
+    right: 30px;
+  }
+
+  .policy-container {
+    width: calc(100% - 60px);
+    padding: 80px 0 100px;
+  }
+
+  .policy-section {
+    grid-template-columns: 55px 1fr;
+    gap: 30px;
+    padding: 55px 0;
+  }
+
+  .policy-faq {
+    grid-template-columns: 1fr;
+    gap: 55px;
+    padding: 100px 30px;
+  }
+
+  .policy-contact {
+    grid-template-columns: 1fr;
+    gap: 50px;
+    padding: 100px 30px;
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+  .policy-hero {
+    min-height: 390px;
+    padding: 110px 20px 80px;
+  }
+
+  .policy-hero h1 {
+    font-size: 68px;
+    line-height: 0.84;
+  }
+
+  .policy-hero p {
+    margin-top: 30px;
+    font-size: 13px;
+  }
+
+  .policy-hero-line {
+    left: 20px;
+    right: 20px;
+    bottom: 25px;
+  }
+
+  .policy-hero-line span {
+    font-size: 8px;
+  }
+
+  .policy-container {
+    width: calc(100% - 40px);
+    padding: 65px 0 80px;
+  }
+
+  .policy-updated {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+
+    margin-bottom: 55px;
+  }
+
+  .policy-section {
+    grid-template-columns: 1fr;
+    gap: 15px;
+
+    padding: 45px 0;
+  }
+
+  .policy-section:first-of-type {
+    padding-top: 0;
+  }
+
+  .policy-number {
+    padding-top: 0;
+  }
+
+  .policy-section h2 {
+    margin-bottom: 20px;
+    font-size: 42px;
+  }
+
+  .policy-section p,
+  .policy-section li {
+    font-size: 13px;
+  }
+
+  .policy-faq {
+    padding: 80px 20px;
+  }
+
+  .policy-faq-heading h2 {
+    font-size: 55px;
+  }
+
+  .policy-faq-question {
+    padding: 20px 0;
+  }
+
+  .policy-faq-question > span:first-child {
+    font-size: 13px;
+  }
+
+  .policy-faq-icon {
+    width: 29px;
+    height: 29px;
+  }
+
+  .policy-contact {
+    padding: 80px 20px;
+  }
+
+  .policy-contact h2 {
+    font-size: 58px;
+  }
+
+  .policy-contact-right p {
+    font-size: 13px;
+  }
+
+  .policy-contact-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -242,7 +242,7 @@
   color: #625e58;
 }
 
-.footer-contact-item p {
+.footer-contact-item a {
   margin: 0;
 
   font-family: "Jost", sans-serif;
@@ -251,6 +251,7 @@
   line-height: 1.5;
 
   color: #d0c9bd;
+  text-decoration: none;
 }
 
 
