@@ -372,7 +372,8 @@
   text-align: center;
 
   width: min(650px, 88%);
-  margin: auto;
+  margin:auto;
+  align-items: center;
 }
 
 .cart-empty-icon {
@@ -387,6 +388,7 @@
   color: #b08d57;
 
   margin-bottom: 28px;
+  margin-top: 6rem;
 }
 
 .cart-empty-section > span {

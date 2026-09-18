@@ -17,6 +17,7 @@ import {
   getCategories,
 } from "../services/api";
 import { useShop } from "../ShopContext/ShopContext";
+import Footer from "../components/Footer";
 
 const sortOptions = [
   "Featured",
@@ -574,108 +575,12 @@ const Shop = () => {
           HERO
       ===================================================== */}
 
-      <section className="shop-hero">
-        <div className="shop-hero-image"></div>
-
-        <div className="shop-hero-overlay"></div>
-
-        <div className="shop-hero-content">
-          <span className="shop-eyebrow">
-            THE HOUSE COLLECTION
-          </span>
-
-          <h1>
-            Everything
-            <br />
-            <em>
-              for the ride.
-            </em>
-          </h1>
-
-          <p>
-            Discover saddlery,
-            rider essentials,
-            horse care and
-            handcrafted leather
-            goods shaped by Indian
-            heritage.
-          </p>
-
-          <button
-            onClick={() =>
-              document
-                .getElementById(
-                  "shop-products"
-                )
-                ?.scrollIntoView({
-                  behavior: "smooth",
-                })
-            }
-          >
-            EXPLORE THE COLLECTION
-
-            <ArrowUpRight
-              size={17}
-            />
-          </button>
-        </div>
-
-        <div className="shop-hero-footer">
-          <span>
-            01 — SHOP
-          </span>
-
-          <span>
-            {normalizedProducts.length}{" "}
-            PIECES
-          </span>
-
-          <span>
-            EST. MMXXVI
-          </span>
-        </div>
-      </section>
 
       {/* =====================================================
           INTRO
       ===================================================== */}
 
-      <section className="shop-intro">
-        <div className="shop-intro-side">
-          <span>02</span>
-
-          <span>
-            CURATED BY SADDLE & CREST
-          </span>
-        </div>
-
-        <div className="shop-intro-main">
-          <span className="shop-gold-label">
-            THE COLLECTION
-          </span>
-
-          <h2>
-            Crafted with purpose.
-            <br />
-            <em>
-              Chosen with intention.
-            </em>
-          </h2>
-
-          <p>
-            From the saddle beneath
-            you to the leather in
-            your hands, every piece
-            has been selected to
-            bring together
-            performance,
-            craftsmanship and the
-            unmistakable character
-            of Indian equestrian
-            culture.
-          </p>
-        </div>
-      </section>
+      
 
       {/* =====================================================
           PRODUCTS
@@ -1261,7 +1166,9 @@ const Shop = () => {
             />
           </button>
         </div>
+
       </section>
+      <Footer/>
     </main>
   );
 };

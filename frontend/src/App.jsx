@@ -26,6 +26,9 @@ import FAQ from "./pages/Faq";
 import Terms from "./pages/Terms";
 import Reviews from "./pages/Reviews";
 import Story from "./pages/Story";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ReviewOrder from "./pages/ReviewsOrder";
+import OrderDetails from "./pages/OrderDetails";
 
 
 
@@ -142,11 +145,9 @@ const App = () => {
         {/* =========================================
             ORDERS
         ========================================= */}
-        <Route
-          path="/order"
-          element={<Orders />}
-        />
+        <Route path="/orders"element={<Orders/>}/>
 
+        <Route path="/orders/:id" element={<OrderDetails />} />
         {/* =========================================
             PROFILE
         ========================================= */}
@@ -177,10 +178,9 @@ const App = () => {
   element={<Terms />}
 /> 
 
-<Route
-  path="/privacy-policy"
-  element={<PolicyPage/>}
-/> 
+
+<Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
 
 <Route path="/Contact" element={<Contact/>}/>
 
@@ -194,7 +194,7 @@ const App = () => {
           path="/story"
           element={<Story />}/>
 
-
+<Route path="/review-order" element={<ReviewOrder />} />
       </Routes>
 
     </ShopProvider>

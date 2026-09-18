@@ -1,306 +1,103 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import {
-  UserRound,
-  Mail,
-  Phone,
   MapPin,
-  Package,
-  Heart,
-  ShoppingBag,
-  LogOut,
-  Edit3,
-  Save,
-  X,
+  User,
+  Phone,
   Plus,
+  Pencil,
   Trash2,
-  Home,
-  LockKeyhole,
   Check,
+  X,
   Loader2,
-  ChevronRight,
 } from "lucide-react";
 
 import Navbar from "../components/Navbar";
-import {
-  apiRequest,
-  clearAuth,
-  getUser,
-} from "../services/api";
-
+import { apiRequest } from "../services/api";
 import "./Profile.css";
 
 const emptyAddress = {
   fullName: "",
   phone: "",
   address: "",
+  addressLine2: "",
   city: "",
   state: "",
   pincode: "",
+  country: "India",
 };
 
 const Profile = () => {
-  const navigate = useNavigate();
-
-  const [user, setUser] = useState(getUser());
+  const [currentUser, setCurrentUser] = useState(null);
+  const [addresses, setAddresses] = useState([]);
 
   const [loading, setLoading] = useState(true);
-  const [profileSaving, setProfileSaving] = useState(false);
-
-  const [editingProfile, setEditingProfile] = useState(false);
-
-  const [profileForm, setProfileForm] = useState({
-    name: "",
-    phone: "",
-  });
-
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
-  const [passwordSaving, setPasswordSaving] = useState(false);
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-
-  const [addresses, setAddresses] = useState([]);
+  const [addressLoading, setAddressLoading] = useState(false);
 
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState(null);
-  const [addressForm, setAddressForm] = useState(emptyAddress);
 
-  const [addressSaving, setAddressSaving] = useState(false);
-  const [deletingAddressId, setDeletingAddressId] = useState(null);
-  const [defaultAddressId, setDefaultAddressId] = useState(null);
-
-  const [message, setMessage] = useState({
-    type: "",
-    text: "",
+  const [addressForm, setAddressForm] = useState({
+    ...emptyAddress,
   });
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-  const showMessage = (type, text) => {
-    setMessage({ type, text });
-
-    window.clearTimeout(window.__profileMessageTimer);
-
-    window.__profileMessageTimer = window.setTimeout(() => {
-      setMessage({
-        type: "",
-        text: "",
-      });
-    }, 3500);
-  };
+  /* =========================================================
+     LOAD PROFILE
+  ========================================================= */
 
   const loadProfile = async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      navigate("/login", {
-        state: {
-          from: "/profile",
-        },
-      });
-      return;
-    }
-
     try {
       setLoading(true);
+      setError("");
 
-      const data = await apiRequest("/auth/me");
+      const response = await apiRequest("/auth/me");
 
-      const currentUser =
-        data?.user ||
-        data?.data?.user ||
-        data?.data ||
-        data;
+      const user =
+        response?.user ||
+        response?.data?.user ||
+        response?.data ||
+        response;
 
-      if (currentUser) {
-        setUser(currentUser);
+      setCurrentUser(user);
 
-        localStorage.setItem(
-          "user",
-          JSON.stringify(currentUser)
-        );
+      setAddresses(user?.addresses || []);
 
-        setProfileForm({
-          name: currentUser.name || "",
-          phone: currentUser.phone || "",
-        });
+      console.log(
+        "PROFILE USER:",
+        user
+      );
 
-        const userAddresses = currentUser.addresses || [];
+      console.log(
+        "SAVED ADDRESSES:",
+        user?.addresses || []
+      );
+    } catch (err) {
+      console.error(
+        "Profile load error:",
+        err
+      );
 
-        setAddresses(userAddresses);
-
-        const defaultAddress =
-          userAddresses.find((item) => item.isDefault) ||
-          userAddresses.find((item) => item.default);
-
-        setDefaultAddressId(
-          defaultAddress?._id ||
-            defaultAddress?.id ||
-            null
-        );
-      }
-    } catch (error) {
-      showMessage(
-        "error",
-        error.message || "Unable to load profile."
+      setError(
+        err?.message ||
+          "Unable to load your profile."
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleProfileChange = (event) => {
-    const { name, value } = event.target;
+  useEffect(() => {
+    loadProfile();
+  }, []);
 
-    setProfileForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  /* =========================================================
+     ADDRESS INPUT
+  ========================================================= */
 
-  const saveProfile = async (event) => {
-    event.preventDefault();
-
-    if (!profileForm.name.trim()) {
-      showMessage("error", "Please enter your name.");
-      return;
-    }
-
-    try {
-      setProfileSaving(true);
-
-      const data = await apiRequest("/auth/profile", {
-        method: "PUT",
-        body: JSON.stringify({
-          name: profileForm.name.trim(),
-          phone: profileForm.phone.trim(),
-        }),
-      });
-
-      const updatedUser =
-        data?.user ||
-        data?.data?.user ||
-        data?.data ||
-        data;
-
-      if (updatedUser) {
-        setUser(updatedUser);
-
-        localStorage.setItem(
-          "user",
-          JSON.stringify(updatedUser)
-        );
-
-        setProfileForm({
-          name: updatedUser.name || "",
-          phone: updatedUser.phone || "",
-        });
-      }
-
-      setEditingProfile(false);
-
-      window.dispatchEvent(new Event("auth-change"));
-
-      showMessage(
-        "success",
-        "Profile updated successfully."
-      );
-    } catch (error) {
-      showMessage(
-        "error",
-        error.message || "Unable to update profile."
-      );
-    } finally {
-      setProfileSaving(false);
-    }
-  };
-
-  const handlePasswordChange = (event) => {
-    const { name, value } = event.target;
-
-    setPasswordForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const changePassword = async (event) => {
-    event.preventDefault();
-
-    if (
-      !passwordForm.currentPassword ||
-      !passwordForm.newPassword ||
-      !passwordForm.confirmPassword
-    ) {
-      showMessage(
-        "error",
-        "Please fill all password fields."
-      );
-      return;
-    }
-
-    if (passwordForm.newPassword.length < 6) {
-      showMessage(
-        "error",
-        "New password must be at least 6 characters."
-      );
-      return;
-    }
-
-    if (
-      passwordForm.newPassword !==
-      passwordForm.confirmPassword
-    ) {
-      showMessage(
-        "error",
-        "New passwords do not match."
-      );
-      return;
-    }
-
-    try {
-      setPasswordSaving(true);
-
-      await apiRequest("/auth/change-password", {
-        method: "PUT",
-        body: JSON.stringify({
-          currentPassword:
-            passwordForm.currentPassword,
-          newPassword:
-            passwordForm.newPassword,
-        }),
-      });
-
-      setPasswordForm({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-
-      setShowPasswordForm(false);
-
-      showMessage(
-        "success",
-        "Password changed successfully."
-      );
-    } catch (error) {
-      showMessage(
-        "error",
-        error.message || "Unable to change password."
-      );
-    } finally {
-      setPasswordSaving(false);
-    }
-  };
-
-  const handleAddressChange = (event) => {
-    const { name, value } = event.target;
+  const handleAddressChange = (e) => {
+    const { name, value } = e.target;
 
     setAddressForm((prev) => ({
       ...prev,
@@ -308,11 +105,26 @@ const Profile = () => {
     }));
   };
 
+  /* =========================================================
+     OPEN ADD ADDRESS
+  ========================================================= */
+
   const openAddAddress = () => {
     setEditingAddressId(null);
-    setAddressForm(emptyAddress);
+
+    setAddressForm({
+      ...emptyAddress,
+    });
+
+    setMessage("");
+    setError("");
+
     setShowAddressForm(true);
   };
+
+  /* =========================================================
+     OPEN EDIT ADDRESS
+  ========================================================= */
 
   const openEditAddress = (address) => {
     setEditingAddressId(
@@ -320,963 +132,997 @@ const Profile = () => {
     );
 
     setAddressForm({
-      fullName: address.fullName || "",
-      phone: address.phone || "",
-      address: address.address || "",
-      city: address.city || "",
-      state: address.state || "",
-      pincode: address.pincode || "",
+      fullName:
+        address.fullName || "",
+
+      phone:
+        address.phone || "",
+
+      /*
+       * IMPORTANT:
+       * Database uses addressLine1.
+       * UI uses address.
+       */
+      address:
+        address.addressLine1 ||
+        address.address ||
+        "",
+
+      addressLine2:
+        address.addressLine2 || "",
+
+      city:
+        address.city || "",
+
+      state:
+        address.state || "",
+
+      pincode:
+        address.pincode || "",
+
+      country:
+        address.country || "India",
     });
+
+    setMessage("");
+    setError("");
 
     setShowAddressForm(true);
   };
 
+  /* =========================================================
+     CLOSE FORM
+  ========================================================= */
+
   const closeAddressForm = () => {
     setShowAddressForm(false);
+
     setEditingAddressId(null);
-    setAddressForm(emptyAddress);
+
+    setAddressForm({
+      ...emptyAddress,
+    });
   };
+
+  /* =========================================================
+     VALIDATE ADDRESS
+  ========================================================= */
 
   const validateAddress = () => {
+    if (!addressForm.fullName.trim()) {
+      return "Please enter full name.";
+    }
+
+    if (!addressForm.phone.trim()) {
+      return "Please enter phone number.";
+    }
+
     if (
-      !addressForm.fullName.trim() ||
-      !addressForm.phone.trim() ||
-      !addressForm.address.trim() ||
-      !addressForm.city.trim() ||
-      !addressForm.state.trim() ||
-      !addressForm.pincode.trim()
+      !/^[6-9]\d{9}$/.test(
+        addressForm.phone.trim()
+      )
     ) {
-      showMessage(
-        "error",
-        "Please fill all address fields."
-      );
-      return false;
+      return "Please enter a valid 10-digit phone number.";
     }
 
-    if (!/^[6-9]\d{9}$/.test(addressForm.phone)) {
-      showMessage(
-        "error",
-        "Please enter a valid 10-digit phone number."
-      );
-      return false;
+    if (!addressForm.address.trim()) {
+      return "Please enter your address.";
     }
 
-    if (!/^\d{6}$/.test(addressForm.pincode)) {
-      showMessage(
-        "error",
-        "Please enter a valid 6-digit pincode."
-      );
-      return false;
+    if (!addressForm.city.trim()) {
+      return "Please enter city.";
     }
 
-    return true;
+    if (!addressForm.state.trim()) {
+      return "Please enter state.";
+    }
+
+    if (
+      !/^\d{6}$/.test(
+        addressForm.pincode.trim()
+      )
+    ) {
+      return "Please enter a valid 6-digit pincode.";
+    }
+
+    return "";
   };
 
-  const saveAddress = async (event) => {
-    event.preventDefault();
+  /* =========================================================
+     SAVE ADDRESS
+  ========================================================= */
 
-    if (!validateAddress()) return;
+  const handleSaveAddress = async (e) => {
+    e.preventDefault();
+
+    const validationError =
+      validateAddress();
+
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     try {
-      setAddressSaving(true);
+      setAddressLoading(true);
 
-      let data;
+      setError("");
+      setMessage("");
+
+      /*
+       * IMPORTANT:
+       *
+       * UI field:
+       * address
+       *
+       * Backend / MongoDB field:
+       * addressLine1
+       */
+      const payload = {
+        fullName:
+          addressForm.fullName.trim(),
+
+        phone:
+          addressForm.phone.trim(),
+
+        addressLine1:
+          addressForm.address.trim(),
+
+        addressLine2:
+          addressForm.addressLine2?.trim() ||
+          "",
+
+        city:
+          addressForm.city.trim(),
+
+        state:
+          addressForm.state.trim(),
+
+        pincode:
+          addressForm.pincode.trim(),
+
+        country:
+          addressForm.country?.trim() ||
+          "India",
+      };
+
+      console.log(
+        "ADDRESS PAYLOAD:",
+        payload
+      );
+
+      let response;
+
+      /* =========================
+         UPDATE
+      ========================= */
 
       if (editingAddressId) {
-        data = await apiRequest(
+        response = await apiRequest(
           `/auth/addresses/${editingAddressId}`,
           {
             method: "PUT",
-            body: JSON.stringify(addressForm),
+            body: JSON.stringify(payload),
           }
         );
-      } else {
-        data = await apiRequest("/auth/addresses", {
-          method: "POST",
-          body: JSON.stringify(addressForm),
-        });
       }
 
-      const updatedAddresses =
-        data?.addresses ||
-        data?.user?.addresses ||
-        data?.data?.addresses ||
-        data?.data?.user?.addresses;
+      /* =========================
+         ADD
+      ========================= */
 
-      if (Array.isArray(updatedAddresses)) {
-        setAddresses(updatedAddresses);
+      else {
+        response = await apiRequest(
+          "/auth/addresses",
+          {
+            method: "POST",
+            body: JSON.stringify(payload),
+          }
+        );
+      }
+
+      console.log(
+        "ADDRESS RESPONSE:",
+        response
+      );
+
+      /*
+       * Backend returns:
+       *
+       * {
+       *   message,
+       *   addresses
+       * }
+       */
+
+      if (
+        response?.addresses
+      ) {
+        setAddresses(
+          response.addresses
+        );
+
+        setCurrentUser((prev) => ({
+          ...prev,
+          addresses:
+            response.addresses,
+        }));
       } else {
         await loadProfile();
       }
 
-      closeAddressForm();
-
-      showMessage(
-        "success",
+      setMessage(
         editingAddressId
           ? "Address updated successfully."
           : "Address added successfully."
       );
-    } catch (error) {
-      showMessage(
-        "error",
-        error.message || "Unable to save address."
+
+      closeAddressForm();
+    } catch (err) {
+      console.error(
+        "Save address error:",
+        err
+      );
+
+      setError(
+        err?.message ||
+          "Unable to save address."
       );
     } finally {
-      setAddressSaving(false);
+      setAddressLoading(false);
     }
   };
 
-  const deleteAddress = async (addressId) => {
-    if (!addressId) return;
+  /* =========================================================
+     DELETE ADDRESS
+  ========================================================= */
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this address?"
-    );
+  const handleDeleteAddress = async (
+    addressId
+  ) => {
+    const confirmed =
+      window.confirm(
+        "Are you sure you want to delete this address?"
+      );
 
     if (!confirmed) return;
 
     try {
-      setDeletingAddressId(addressId);
+      setError("");
+      setMessage("");
 
-      const data = await apiRequest(
-        `/auth/addresses/${addressId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response =
+        await apiRequest(
+          `/auth/addresses/${addressId}`,
+          {
+            method: "DELETE",
+          }
+        );
 
-      const updatedAddresses =
-        data?.addresses ||
-        data?.user?.addresses ||
-        data?.data?.addresses ||
-        data?.data?.user?.addresses;
+      if (
+        response?.addresses
+      ) {
+        setAddresses(
+          response.addresses
+        );
 
-      if (Array.isArray(updatedAddresses)) {
-        setAddresses(updatedAddresses);
+        setCurrentUser((prev) => ({
+          ...prev,
+          addresses:
+            response.addresses,
+        }));
       } else {
         await loadProfile();
       }
 
-      if (defaultAddressId === addressId) {
-        setDefaultAddressId(null);
-      }
-
-      showMessage(
-        "success",
+      setMessage(
         "Address deleted successfully."
       );
-    } catch (error) {
-      showMessage(
-        "error",
-        error.message || "Unable to delete address."
+    } catch (err) {
+      console.error(
+        "Delete address error:",
+        err
       );
-    } finally {
-      setDeletingAddressId(null);
+
+      setError(
+        err?.message ||
+          "Unable to delete address."
+      );
     }
   };
 
-  const makeDefaultAddress = async (addressId) => {
-    if (!addressId) return;
+  /* =========================================================
+     SET DEFAULT ADDRESS
+  ========================================================= */
 
+  const handleSetDefault = async (
+    addressId
+  ) => {
     try {
-      const data = await apiRequest(
-        `/auth/addresses/${addressId}/default`,
-        {
-          method: "PUT",
-        }
-      );
+      setError("");
+      setMessage("");
 
-      const updatedAddresses =
-        data?.addresses ||
-        data?.user?.addresses ||
-        data?.data?.addresses ||
-        data?.data?.user?.addresses;
+      const response =
+        await apiRequest(
+          `/auth/addresses/${addressId}/default`,
+          {
+            method: "PUT",
+          }
+        );
 
-      if (Array.isArray(updatedAddresses)) {
-        setAddresses(updatedAddresses);
+      if (
+        response?.addresses
+      ) {
+        setAddresses(
+          response.addresses
+        );
+
+        setCurrentUser((prev) => ({
+          ...prev,
+          addresses:
+            response.addresses,
+        }));
       } else {
         await loadProfile();
       }
 
-      setDefaultAddressId(addressId);
-
-      showMessage(
-        "success",
+      setMessage(
         "Default address updated."
       );
-    } catch (error) {
-      showMessage(
-        "error",
-        error.message ||
+    } catch (err) {
+      console.error(
+        "Default address error:",
+        err
+      );
+
+      setError(
+        err?.message ||
           "Unable to update default address."
       );
     }
   };
 
-  const logout = () => {
-    clearAuth();
-    navigate("/");
-  };
-
-  const getInitials = () => {
-    const name = user?.name || "User";
-
-    return name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase();
-  };
+  /* =========================================================
+     LOADING
+  ========================================================= */
 
   if (loading) {
     return (
       <>
-        <Navbar />
+        <Navbar
+          navbarBackground="#000"
+          top="0"
+        />
 
         <main className="profile-page">
           <div className="profile-loading">
-            <Loader2 className="profile-spinner" size={32} />
-            <p>Loading your profile...</p>
+            <Loader2
+              className="spin"
+              size={30}
+            />
+
+            <p>
+              Loading profile...
+            </p>
           </div>
         </main>
       </>
     );
   }
 
+  /* =========================================================
+     PAGE
+  ========================================================= */
+
   return (
     <>
-     <Navbar navbarBackground={'#000'} top="0"/>
+      <Navbar
+        navbarBackground="#000"
+        top="0"
+      />
 
       <main className="profile-page">
-        {message.text && (
-          <div
-            className={`profile-toast ${message.type}`}
-          >
-            {message.type === "success" ? (
-              <Check size={17} />
-            ) : (
-              <X size={17} />
-            )}
+        <div className="profile-container">
 
-            <span>{message.text}</span>
+          {/* =================================================
+              HEADER
+          ================================================= */}
+
+          <div className="profile-header">
+            <span className="profile-eyebrow">
+              MY ACCOUNT
+            </span>
+
+            <h1>
+              My Profile
+            </h1>
+
+            <p>
+              Manage your personal information
+              and saved delivery addresses.
+            </p>
           </div>
-        )}
 
+          {/* =================================================
+              MESSAGES
+          ================================================= */}
 
-        <section className="profile-container">
-          <div className="profile-grid">
-            {/* LEFT SIDE */}
-            <aside className="profile-sidebar">
-              <div className="profile-user-card">
-                <div className="profile-avatar">
-                  {getInitials()}
+          {message && (
+            <div className="profile-message">
+              <Check size={17} />
+
+              {message}
+            </div>
+          )}
+
+          {error && (
+            <div className="profile-error">
+              {error}
+            </div>
+          )}
+
+          {/* =================================================
+              PROFILE INFORMATION
+          ================================================= */}
+
+          <section className="profile-card">
+
+            <div className="profile-card-heading">
+
+              <div className="profile-heading-icon">
+                <User size={20} />
+              </div>
+
+              <div>
+                <span>
+                  ACCOUNT
+                </span>
+
+                <h2>
+                  Personal Information
+                </h2>
+              </div>
+
+            </div>
+
+            <div className="profile-info-grid">
+
+              <div className="profile-info-item">
+                <small>
+                  FULL NAME
+                </small>
+
+                <strong>
+                  {currentUser?.name ||
+                    currentUser?.fullName ||
+                    "Not available"}
+                </strong>
+              </div>
+
+              <div className="profile-info-item">
+                <small>
+                  EMAIL
+                </small>
+
+                <strong>
+                  {currentUser?.email ||
+                    "Not available"}
+                </strong>
+              </div>
+
+              {currentUser?.phone && (
+                <div className="profile-info-item">
+                  <small>
+                    PHONE
+                  </small>
+
+                  <strong>
+                    {currentUser.phone}
+                  </strong>
+                </div>
+              )}
+
+            </div>
+          </section>
+
+          {/* =================================================
+              SAVED ADDRESSES
+          ================================================= */}
+
+          <section className="profile-card addresses-card">
+
+            <div className="addresses-header">
+
+              <div className="profile-card-heading">
+
+                <div className="profile-heading-icon">
+                  <MapPin size={20} />
                 </div>
 
                 <div>
-                  <h2>
-                    {user?.name || "Saddle Rider"}
-                  </h2>
+                  <span>
+                    DELIVERY
+                  </span>
 
-                  <p>{user?.email}</p>
+                  <h2>
+                    Saved Addresses
+                  </h2>
                 </div>
+
               </div>
 
-              <nav className="profile-navigation">
-                <Link to="/orders">
-                  <Package size={18} />
-                  <span>My Orders</span>
-                  <ChevronRight size={16} />
-                </Link>
-
-                <Link to="/wishlist">
-                  <Heart size={18} />
-                  <span>Wishlist</span>
-                  <ChevronRight size={16} />
-                </Link>
-
-                <Link to="/cart">
-                  <ShoppingBag size={18} />
-                  <span>Shopping Bag</span>
-                  <ChevronRight size={16} />
-                </Link>
-              </nav>
-
               <button
-                className="profile-logout"
-                onClick={logout}
+                type="button"
+                className="add-address-btn"
+                onClick={openAddAddress}
               >
-                <LogOut size={18} />
-                Logout
+                <Plus size={17} />
+
+                ADD ADDRESS
               </button>
-            </aside>
 
-            {/* RIGHT SIDE */}
-            <div className="profile-content">
-              {/* PERSONAL INFORMATION */}
-              <section className="profile-card">
-                <div className="profile-card-header">
-                  <div>
-                    <span className="profile-section-label">
-                      ACCOUNT
-                    </span>
+            </div>
 
-                    <h2>Personal Information</h2>
-                  </div>
+            {/* =================================================
+                EMPTY
+            ================================================= */}
 
-                  {!editingProfile && (
-                    <button
-                      className="profile-edit-btn"
-                      onClick={() =>
-                        setEditingProfile(true)
-                      }
-                    >
-                      <Edit3 size={16} />
-                      Edit
-                    </button>
-                  )}
-                </div>
+            {addresses.length === 0 ? (
+              <div className="empty-addresses">
 
-                {editingProfile ? (
-                  <form
-                    className="profile-form"
-                    onSubmit={saveProfile}
-                  >
-                    <div className="profile-form-grid">
-                      <div className="profile-field">
-                        <label>Full Name</label>
+                <MapPin size={35} />
 
-                        <div className="profile-input-wrap">
-                          <UserRound size={17} />
+                <h3>
+                  No Saved Addresses
+                </h3>
 
-                          <input
-                            type="text"
-                            name="name"
-                            value={profileForm.name}
-                            onChange={
-                              handleProfileChange
-                            }
-                            placeholder="Your name"
-                          />
-                        </div>
-                      </div>
+                <p>
+                  Add a delivery address
+                  to make checkout faster.
+                </p>
 
-                      <div className="profile-field">
-                        <label>Email Address</label>
+                <button
+                  type="button"
+                  onClick={
+                    openAddAddress
+                  }
+                >
+                  <Plus size={17} />
 
-                        <div className="profile-input-wrap disabled">
-                          <Mail size={17} />
+                  ADD YOUR FIRST ADDRESS
+                </button>
 
-                          <input
-                            type="email"
-                            value={user?.email || ""}
-                            disabled
-                          />
-                        </div>
+              </div>
+            ) : (
 
-                        <small>
-                          Email cannot be changed here.
-                        </small>
-                      </div>
+              /* =================================================
+                 ADDRESS LIST
+              ================================================= */
 
-                      <div className="profile-field">
-                        <label>Phone Number</label>
+              <div className="address-list">
 
-                        <div className="profile-input-wrap">
-                          <Phone size={17} />
+                {addresses.map(
+                  (address) => {
 
-                          <input
-                            type="tel"
-                            name="phone"
-                            value={profileForm.phone}
-                            onChange={
-                              handleProfileChange
-                            }
-                            placeholder="10-digit phone number"
-                            maxLength={10}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    const addressId =
+                      address._id ||
+                      address.id;
 
-                    <div className="profile-form-actions">
-                      <button
-                        type="button"
-                        className="profile-cancel-btn"
-                        onClick={() => {
-                          setEditingProfile(false);
+                    const isDefault =
+                      address.isDefault ===
+                      true;
 
-                          setProfileForm({
-                            name: user?.name || "",
-                            phone: user?.phone || "",
-                          });
-                        }}
+                    return (
+                      <div
+                        className={`saved-address ${
+                          isDefault
+                            ? "default-address"
+                            : ""
+                        }`}
+                        key={addressId}
                       >
-                        <X size={16} />
-                        Cancel
-                      </button>
 
-                      <button
-                        type="submit"
-                        className="profile-save-btn"
-                        disabled={profileSaving}
-                      >
-                        {profileSaving ? (
-                          <>
-                            <Loader2
-                              size={16}
-                              className="profile-btn-spinner"
-                            />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save size={16} />
-                            Save Changes
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="profile-info-grid">
-                    <div className="profile-info-item">
-                      <span className="profile-info-icon">
-                        <UserRound size={18} />
-                      </span>
+                        {/* =========================
+                            ADDRESS TOP
+                        ========================= */}
 
-                      <div>
-                        <small>Full Name</small>
-                        <strong>
-                          {user?.name || "Not added"}
-                        </strong>
-                      </div>
-                    </div>
+                        <div className="saved-address-top">
 
-                    <div className="profile-info-item">
-                      <span className="profile-info-icon">
-                        <Mail size={18} />
-                      </span>
+                          <div className="saved-address-title">
 
-                      <div>
-                        <small>Email Address</small>
-                        <strong>
-                          {user?.email || "Not added"}
-                        </strong>
-                      </div>
-                    </div>
+                            <div className="address-icon">
+                              <MapPin
+                                size={18}
+                              />
+                            </div>
 
-                    <div className="profile-info-item">
-                      <span className="profile-info-icon">
-                        <Phone size={18} />
-                      </span>
+                            <div>
 
-                      <div>
-                        <small>Phone Number</small>
-                        <strong>
-                          {user?.phone || "Not added"}
-                        </strong>
-                      </div>
-                    </div>
-
-                    <div className="profile-info-item">
-                      <span className="profile-info-icon">
-                        <UserRound size={18} />
-                      </span>
-
-                      <div>
-                        <small>Account Type</small>
-                        <strong>
-                          {user?.role === "admin"
-                            ? "Administrator"
-                            : "Customer"}
-                        </strong>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </section>
-
-              {/* PASSWORD */}
-              <section className="profile-card">
-                <div className="profile-card-header">
-                  <div>
-                    <span className="profile-section-label">
-                      SECURITY
-                    </span>
-
-                    <h2>Password & Security</h2>
-                  </div>
-
-                  {!showPasswordForm && (
-                    <button
-                      className="profile-edit-btn"
-                      onClick={() =>
-                        setShowPasswordForm(true)
-                      }
-                    >
-                      <LockKeyhole size={16} />
-                      Change Password
-                    </button>
-                  )}
-                </div>
-
-                {showPasswordForm ? (
-                  <form
-                    className="profile-form"
-                    onSubmit={changePassword}
-                  >
-                    <div className="profile-form-grid">
-                      <div className="profile-field">
-                        <label>
-                          Current Password
-                        </label>
-
-                        <input
-                          className="profile-plain-input"
-                          type="password"
-                          name="currentPassword"
-                          value={
-                            passwordForm.currentPassword
-                          }
-                          onChange={
-                            handlePasswordChange
-                          }
-                          placeholder="Current password"
-                        />
-                      </div>
-
-                      <div className="profile-field">
-                        <label>New Password</label>
-
-                        <input
-                          className="profile-plain-input"
-                          type="password"
-                          name="newPassword"
-                          value={
-                            passwordForm.newPassword
-                          }
-                          onChange={
-                            handlePasswordChange
-                          }
-                          placeholder="Minimum 6 characters"
-                        />
-                      </div>
-
-                      <div className="profile-field">
-                        <label>
-                          Confirm New Password
-                        </label>
-
-                        <input
-                          className="profile-plain-input"
-                          type="password"
-                          name="confirmPassword"
-                          value={
-                            passwordForm.confirmPassword
-                          }
-                          onChange={
-                            handlePasswordChange
-                          }
-                          placeholder="Confirm new password"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="profile-form-actions">
-                      <button
-                        type="button"
-                        className="profile-cancel-btn"
-                        onClick={() => {
-                          setShowPasswordForm(false);
-
-                          setPasswordForm({
-                            currentPassword: "",
-                            newPassword: "",
-                            confirmPassword: "",
-                          });
-                        }}
-                      >
-                        <X size={16} />
-                        Cancel
-                      </button>
-
-                      <button
-                        type="submit"
-                        className="profile-save-btn"
-                        disabled={passwordSaving}
-                      >
-                        {passwordSaving ? (
-                          <>
-                            <Loader2
-                              size={16}
-                              className="profile-btn-spinner"
-                            />
-                            Updating...
-                          </>
-                        ) : (
-                          <>
-                            <LockKeyhole size={16} />
-                            Update Password
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="profile-security-row">
-                    <div className="profile-security-icon">
-                      <LockKeyhole size={20} />
-                    </div>
-
-                    <div>
-                      <strong>Password</strong>
-                      <p>
-                        Keep your account secure with
-                        a strong password.
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </section>
-
-              {/* ADDRESSES */}
-              <section className="profile-card">
-                <div className="profile-card-header">
-                  <div>
-                    <span className="profile-section-label">
-                      DELIVERY
-                    </span>
-
-                    <h2>Saved Addresses</h2>
-                  </div>
-
-                  <button
-                    className="profile-add-address-btn"
-                    onClick={openAddAddress}
-                  >
-                    <Plus size={17} />
-                    Add Address
-                  </button>
-                </div>
-
-                {addresses.length === 0 ? (
-                  <div className="profile-empty-address">
-                    <div>
-                      <MapPin size={28} />
-                    </div>
-
-                    <h3>No saved addresses</h3>
-
-                    <p>
-                      Add a delivery address for a
-                      faster checkout experience.
-                    </p>
-
-                    <button
-                      onClick={openAddAddress}
-                      className="profile-save-btn"
-                    >
-                      <Plus size={16} />
-                      Add Your First Address
-                    </button>
-                  </div>
-                ) : (
-                  <div className="profile-address-list">
-                    {addresses.map((address, index) => {
-                      const addressId =
-                        address._id ||
-                        address.id ||
-                        `address-${index}`;
-
-                      const isDefault =
-                        address.isDefault ||
-                        address.default ||
-                        defaultAddressId ===
-                          addressId;
-
-                      return (
-                        <div
-                          className={`profile-address ${
-                            isDefault
-                              ? "is-default"
-                              : ""
-                          }`}
-                          key={addressId}
-                        >
-                          <div className="profile-address-top">
-                            <div className="profile-address-title">
-                              <span className="profile-address-icon">
-                                <Home size={17} />
-                              </span>
-
-                              <strong>
-                                {address.fullName ||
-                                  "Delivery Address"}
-                              </strong>
+                              <h3>
+                                {address.fullName}
+                              </h3>
 
                               {isDefault && (
                                 <span className="default-badge">
-                                  Default
+                                  DEFAULT
                                 </span>
                               )}
+
                             </div>
 
-                            <div className="profile-address-actions">
-                              <button
-                                onClick={() =>
-                                  openEditAddress(
-                                    address
-                                  )
-                                }
-                                aria-label="Edit address"
-                              >
-                                <Edit3 size={16} />
-                              </button>
-
-                              <button
-                                onClick={() =>
-                                  deleteAddress(
-                                    addressId
-                                  )
-                                }
-                                disabled={
-                                  deletingAddressId ===
-                                  addressId
-                                }
-                                aria-label="Delete address"
-                              >
-                                {deletingAddressId ===
-                                addressId ? (
-                                  <Loader2
-                                    size={16}
-                                    className="profile-btn-spinner"
-                                  />
-                                ) : (
-                                  <Trash2 size={16} />
-                                )}
-                              </button>
-                            </div>
                           </div>
 
-                          <div className="profile-address-body">
-                            <p>
-                              {address.address}
-                            </p>
+                          <div className="address-actions">
 
-                            <p>
-                              {address.city},{" "}
-                              {address.state} -{" "}
-                              {address.pincode}
-                            </p>
-
-                            <p>
-                              Phone: {address.phone}
-                            </p>
-                          </div>
-
-                          {!isDefault && (
                             <button
-                              className="make-default-btn"
+                              type="button"
+                              title="Edit address"
                               onClick={() =>
-                                makeDefaultAddress(
+                                openEditAddress(
+                                  address
+                                )
+                              }
+                            >
+                              <Pencil
+                                size={16}
+                              />
+                            </button>
+
+                            <button
+                              type="button"
+                              title="Delete address"
+                              onClick={() =>
+                                handleDeleteAddress(
                                   addressId
                                 )
                               }
                             >
-                              Make Default
+                              <Trash2
+                                size={16}
+                              />
                             </button>
+
+                          </div>
+
+                        </div>
+
+                        {/* =========================
+                            ADDRESS CONTENT
+                        ========================= */}
+
+                        <div className="saved-address-content">
+
+                          <p>
+                            {address.addressLine1 ||
+                              address.address ||
+                              "Address not available"}
+                          </p>
+
+                          {address.addressLine2 && (
+                            <p>
+                              {
+                                address.addressLine2
+                              }
+                            </p>
                           )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
 
-                {/* ADDRESS FORM */}
-                {showAddressForm && (
-                  <div className="address-form-overlay">
-                    <div className="address-form-card">
-                      <div className="address-form-header">
-                        <div>
-                          <span>
-                            {editingAddressId
-                              ? "EDIT ADDRESS"
-                              : "NEW ADDRESS"}
-                          </span>
+                          <p>
+                            {address.city},{" "}
+                            {address.state}{" "}
+                            -{" "}
+                            {address.pincode}
+                          </p>
 
-                          <h3>
-                            {editingAddressId
-                              ? "Update Address"
-                              : "Add Delivery Address"}
-                          </h3>
+                          <p className="saved-phone">
+                            <Phone
+                              size={14}
+                            />
+
+                            {address.phone}
+                          </p>
+
                         </div>
 
-                        <button
-                          onClick={
-                            closeAddressForm
-                          }
-                        >
-                          <X size={20} />
-                        </button>
-                      </div>
+                        {/* =========================
+                            MAKE DEFAULT
+                        ========================= */}
 
-                      <form
-                        onSubmit={saveAddress}
-                        className="profile-form"
-                      >
-                        <div className="profile-form-grid">
-                          <div className="profile-field">
-                            <label>
-                              Full Name
-                            </label>
-
-                            <input
-                              className="profile-plain-input"
-                              type="text"
-                              name="fullName"
-                              value={
-                                addressForm.fullName
-                              }
-                              onChange={
-                                handleAddressChange
-                              }
-                              placeholder="Full name"
-                            />
-                          </div>
-
-                          <div className="profile-field">
-                            <label>Phone</label>
-
-                            <input
-                              className="profile-plain-input"
-                              type="tel"
-                              name="phone"
-                              value={
-                                addressForm.phone
-                              }
-                              onChange={
-                                handleAddressChange
-                              }
-                              placeholder="10-digit phone"
-                              maxLength={10}
-                            />
-                          </div>
-
-                          <div className="profile-field profile-field-full">
-                            <label>Address</label>
-
-                            <textarea
-                              name="address"
-                              value={
-                                addressForm.address
-                              }
-                              onChange={
-                                handleAddressChange
-                              }
-                              placeholder="House no., street, area..."
-                              rows="3"
-                            />
-                          </div>
-
-                          <div className="profile-field">
-                            <label>City</label>
-
-                            <input
-                              className="profile-plain-input"
-                              type="text"
-                              name="city"
-                              value={
-                                addressForm.city
-                              }
-                              onChange={
-                                handleAddressChange
-                              }
-                              placeholder="City"
-                            />
-                          </div>
-
-                          <div className="profile-field">
-                            <label>State</label>
-
-                            <input
-                              className="profile-plain-input"
-                              type="text"
-                              name="state"
-                              value={
-                                addressForm.state
-                              }
-                              onChange={
-                                handleAddressChange
-                              }
-                              placeholder="State"
-                            />
-                          </div>
-
-                          <div className="profile-field">
-                            <label>Pincode</label>
-
-                            <input
-                              className="profile-plain-input"
-                              type="text"
-                              name="pincode"
-                              value={
-                                addressForm.pincode
-                              }
-                              onChange={
-                                handleAddressChange
-                              }
-                              placeholder="6-digit pincode"
-                              maxLength={6}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="profile-form-actions">
+                        {!isDefault && (
                           <button
                             type="button"
-                            className="profile-cancel-btn"
-                            onClick={
-                              closeAddressForm
+                            className="make-default-btn"
+                            onClick={() =>
+                              handleSetDefault(
+                                addressId
+                              )
                             }
                           >
-                            <X size={16} />
-                            Cancel
+                            MAKE DEFAULT
                           </button>
+                        )}
 
-                          <button
-                            type="submit"
-                            className="profile-save-btn"
-                            disabled={addressSaving}
-                          >
-                            {addressSaving ? (
-                              <>
-                                <Loader2
-                                  size={16}
-                                  className="profile-btn-spinner"
-                                />
-                                Saving...
-                              </>
-                            ) : (
-                              <>
-                                <Save size={16} />
-                                {editingAddressId
-                                  ? "Update Address"
-                                  : "Save Address"}
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
+                      </div>
+                    );
+                  }
                 )}
-              </section>
+
+              </div>
+            )}
+
+          </section>
+
+          {/* =================================================
+              ADDRESS MODAL
+          ================================================= */}
+
+          {showAddressForm && (
+            <div className="address-modal-overlay">
+
+              <div className="address-modal">
+
+                {/* =========================
+                    MODAL HEADER
+                ========================= */}
+
+                <div className="address-modal-header">
+
+                  <div>
+
+                    <span>
+                      {editingAddressId
+                        ? "UPDATE ADDRESS"
+                        : "NEW ADDRESS"}
+                    </span>
+
+                    <h2>
+                      {editingAddressId
+                        ? "Edit Address"
+                        : "Add New Address"}
+                    </h2>
+
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={
+                      closeAddressForm
+                    }
+                  >
+                    <X size={20} />
+                  </button>
+
+                </div>
+
+                {/* =========================
+                    FORM
+                ========================= */}
+
+                <form
+                  onSubmit={
+                    handleSaveAddress
+                  }
+                >
+
+                  <div className="address-form-grid">
+
+                    {/* FULL NAME */}
+
+                    <div className="form-field">
+
+                      <label>
+                        FULL NAME
+                      </label>
+
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={
+                          addressForm.fullName
+                        }
+                        onChange={
+                          handleAddressChange
+                        }
+                        placeholder="Enter full name"
+                      />
+
+                    </div>
+
+                    {/* PHONE */}
+
+                    <div className="form-field">
+
+                      <label>
+                        PHONE NUMBER
+                      </label>
+
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={
+                          addressForm.phone
+                        }
+                        onChange={
+                          handleAddressChange
+                        }
+                        placeholder="10-digit mobile number"
+                        maxLength={10}
+                      />
+
+                    </div>
+
+                    {/* ADDRESS */}
+
+                    <div className="form-field full-width">
+
+                      <label>
+                        ADDRESS
+                      </label>
+
+                      <textarea
+                        name="address"
+                        value={
+                          addressForm.address
+                        }
+                        onChange={
+                          handleAddressChange
+                        }
+                        placeholder="House no., street, area"
+                        rows={3}
+                      />
+
+                    </div>
+
+                    {/* ADDRESS LINE 2 */}
+
+                    <div className="form-field full-width">
+
+                      <label>
+                        ADDRESS LINE 2
+                        <span>
+                          {" "}
+                          (OPTIONAL)
+                        </span>
+                      </label>
+
+                      <input
+                        type="text"
+                        name="addressLine2"
+                        value={
+                          addressForm.addressLine2
+                        }
+                        onChange={
+                          handleAddressChange
+                        }
+                        placeholder="Apartment, landmark, etc."
+                      />
+
+                    </div>
+
+                    {/* CITY */}
+
+                    <div className="form-field">
+
+                      <label>
+                        CITY
+                      </label>
+
+                      <input
+                        type="text"
+                        name="city"
+                        value={
+                          addressForm.city
+                        }
+                        onChange={
+                          handleAddressChange
+                        }
+                        placeholder="City"
+                      />
+
+                    </div>
+
+                    {/* STATE */}
+
+                    <div className="form-field">
+
+                      <label>
+                        STATE
+                      </label>
+
+                      <input
+                        type="text"
+                        name="state"
+                        value={
+                          addressForm.state
+                        }
+                        onChange={
+                          handleAddressChange
+                        }
+                        placeholder="State"
+                      />
+
+                    </div>
+
+                    {/* PINCODE */}
+
+                    <div className="form-field">
+
+                      <label>
+                        PINCODE
+                      </label>
+
+                      <input
+                        type="text"
+                        name="pincode"
+                        value={
+                          addressForm.pincode
+                        }
+                        onChange={
+                          handleAddressChange
+                        }
+                        placeholder="6-digit pincode"
+                        maxLength={6}
+                      />
+
+                    </div>
+
+                  </div>
+
+                  {/* =========================
+                      FORM ACTIONS
+                  ========================= */}
+
+                  <div className="address-form-actions">
+
+                    <button
+                      type="button"
+                      className="cancel-address-btn"
+                      onClick={
+                        closeAddressForm
+                      }
+                    >
+                      CANCEL
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="save-address-btn"
+                      disabled={
+                        addressLoading
+                      }
+                    >
+
+                      {addressLoading ? (
+                        <>
+                          <Loader2
+                            size={17}
+                            className="spin"
+                          />
+
+                          SAVING...
+                        </>
+                      ) : (
+                        <>
+                          <Check
+                            size={17}
+                          />
+
+                          {editingAddressId
+                            ? "UPDATE ADDRESS"
+                            : "SAVE ADDRESS"}
+                        </>
+                      )}
+
+                    </button>
+
+                  </div>
+
+                </form>
+
+              </div>
             </div>
-          </div>
-        </section>
+          )}
+
+        </div>
       </main>
     </>
   );

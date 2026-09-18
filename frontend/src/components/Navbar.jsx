@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   Search,
@@ -26,9 +27,38 @@ const Navbar = ({
 
   const { cartCount, wishlistCount } = useShop();
 
-  // --------------------------------
+  // =========================================
+  // NAVIGATION ITEMS
+  // Desktop + Mobile both use this list
+  // =========================================
+
+  const navItems = [
+    {
+      label: "Shop",
+      path: "/shop",
+    },
+    {
+      label: "About",
+      path: "/about",
+    },
+    {
+      label: "Our Story",
+      path: "/Story",
+    },
+    {
+      label: "Collections",
+      path: "/collections",
+    },
+    {
+      label: "Journal",
+      path: "/journal",
+    },
+  ];
+
+  // =========================================
   // AUTH STATE
-  // --------------------------------
+  // =========================================
+
   useEffect(() => {
     const handleAuthChange = () => {
       setUser(getUser());
@@ -37,31 +67,28 @@ const Navbar = ({
     window.addEventListener("auth-change", handleAuthChange);
 
     return () => {
-      window.removeEventListener(
-        "auth-change",
-        handleAuthChange
-      );
+      window.removeEventListener("auth-change", handleAuthChange);
     };
   }, []);
 
   const isLoggedIn = Boolean(localStorage.getItem("token"));
 
-  // --------------------------------
+  // =========================================
   // MOBILE MENU BODY SCROLL
-  // --------------------------------
+  // =========================================
+
   useEffect(() => {
-    document.body.style.overflow = menuOpen
-      ? "hidden"
-      : "";
+    document.body.style.overflow = menuOpen ? "hidden" : "";
 
     return () => {
       document.body.style.overflow = "";
     };
   }, [menuOpen]);
 
-  // --------------------------------
+  // =========================================
   // NAVBAR SCROLL EFFECT
-  // --------------------------------
+  // =========================================
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
@@ -72,23 +99,22 @@ const Navbar = ({
     window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener(
-        "scroll",
-        handleScroll
-      );
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  // --------------------------------
+  // =========================================
   // CLOSE MOBILE MENU
-  // --------------------------------
+  // =========================================
+
   const closeMenu = () => {
     setMenuOpen(false);
   };
 
-  // --------------------------------
+  // =========================================
   // ACCOUNT CLICK
-  // --------------------------------
+  // =========================================
+
   const handleAccountClick = () => {
     closeMenu();
 
@@ -119,6 +145,7 @@ const Navbar = ({
         ====================================== */}
 
         <div className="navbar-left">
+
           {/* MOBILE MENU BUTTON */}
 
           <button
@@ -136,26 +163,16 @@ const Navbar = ({
           {/* DESKTOP NAVIGATION */}
 
           <nav className="desktop-nav">
-            <Link to="/shop">
-              Shop
-            </Link>
-
-            <Link to="/about">
-              About
-            </Link>
-
-            <Link to="/Story">
-              Our Story
-            </Link>
-
-            <Link to="/collections">
-              Collections
-            </Link>
-
-            <Link to="/journal">
-              Journal
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
+
         </div>
 
         {/* =====================================
@@ -166,17 +183,11 @@ const Navbar = ({
           to="/"
           className="brand-logo"
         >
-          <span>
-            SADDLE
-          </span>
+          <span>SADDLE</span>
 
-          <small>
-            &
-          </small>
+          <small>&</small>
 
-          <span>
-            CREST
-          </span>
+          <span>CREST</span>
         </Link>
 
         {/* =====================================
@@ -184,6 +195,7 @@ const Navbar = ({
         ====================================== */}
 
         <div className="navbar-actions">
+
           {/* SEARCH */}
 
           <button
@@ -253,6 +265,7 @@ const Navbar = ({
                 : cartCount}
             </span>
           </Link>
+
         </div>
       </header>
 
@@ -276,25 +289,21 @@ const Navbar = ({
           menuOpen ? "active" : ""
         }`}
       >
+
         {/* MOBILE MENU HEADER */}
 
         <div className="mobile-menu-header">
+
           <Link
             to="/"
             className="mobile-menu-logo"
             onClick={closeMenu}
           >
-            <span>
-              SADDLE
-            </span>
+            <span>SADDLE</span>
 
-            <small>
-              &
-            </small>
+            <small>&</small>
 
-            <span>
-              CREST
-            </span>
+            <span>CREST</span>
           </Link>
 
           <button
@@ -307,6 +316,7 @@ const Navbar = ({
               strokeWidth={1.4}
             />
           </button>
+
         </div>
 
         {/* =====================================
@@ -314,70 +324,18 @@ const Navbar = ({
         ====================================== */}
 
         <nav className="mobile-menu-nav">
-          {/* SHOP */}
 
-          <Link
-            to="/shop"
-            onClick={closeMenu}
-          >
-            <span>
-              Shop
-            </span>
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={closeMenu}
+            >
+              <span>{item.label}</span>
 
-            <ArrowUpRight size={17} />
-          </Link>
-
-          {/* RIDER */}
-
-          <Link
-            to="/rider"
-            onClick={closeMenu}
-          >
-            <span>
-              Rider
-            </span>
-
-            <ArrowUpRight size={17} />
-          </Link>
-
-          {/* HORSE */}
-
-          <Link
-            to="/horse"
-            onClick={closeMenu}
-          >
-            <span>
-              Horse
-            </span>
-
-            <ArrowUpRight size={17} />
-          </Link>
-
-          {/* COLLECTIONS */}
-
-          <Link
-            to="/collections"
-            onClick={closeMenu}
-          >
-            <span>
-              Collections
-            </span>
-
-            <ArrowUpRight size={17} />
-          </Link>
-
-          {/* JOURNAL */}
-
-          <Link
-            to="/journal"
-            onClick={closeMenu}
-          >
-            <span>
-              Journal
-            </span>
-
-            <ArrowUpRight size={17} />
-          </Link>
+              <ArrowUpRight size={17} />
+            </Link>
+          ))}
 
           {/* ACCOUNT / PROFILE */}
 
@@ -441,6 +399,7 @@ const Navbar = ({
               strokeWidth={1.4}
             />
           </Link>
+
         </nav>
 
         {/* =====================================
@@ -448,6 +407,7 @@ const Navbar = ({
         ====================================== */}
 
         <div className="mobile-menu-footer">
+
           <span>
             THE WORLD OF SADDLE & CREST
           </span>
@@ -455,10 +415,13 @@ const Navbar = ({
           <p>
             Crafted in India. Made for the journey.
           </p>
+
         </div>
+
       </aside>
     </>
   );
 };
 
 export default Navbar;
+

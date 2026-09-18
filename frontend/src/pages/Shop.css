@@ -5,165 +5,11 @@
   overflow: hidden;
 }
 
-/* =====================================================
-   HERO
-===================================================== */
-
-.shop-hero {
-  min-height: 82vh;
-  position: relative;
-  display: flex;
-  align-items: center;
-  color: #f3eee3;
-  overflow: hidden;
-}
-
-.shop-hero-image {
-  position: absolute;
-  inset: 0;
-  background-image: url("https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&w=2200&q=90");
-  background-size: cover;
-  background-position: center;
-  transform: scale(1.02);
-}
-
-.shop-hero-overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(14, 11, 8, 0.88),
-      rgba(14, 11, 8, 0.48),
-      rgba(14, 11, 8, 0.18)
-    );
-}
-
-.shop-hero-content {
-  position: relative;
-  z-index: 2;
-  max-width: 800px;
-  padding: 160px 8% 110px;
-}
-
-.shop-eyebrow {
-  font-size: 9px;
-  letter-spacing: 3px;
-  font-weight: 600;
-}
-
-.shop-hero h1 {
-  font-family: "Cormorant Garamond", serif;
-  font-size: clamp(65px, 8vw, 120px);
-  line-height: 0.83;
-  letter-spacing: -4px;
-  font-weight: 400;
-  margin: 30px 0;
-}
-
-.shop-hero h1 em {
-  display: block;
-  color: #d1b77e;
-  font-weight: 300;
-}
-
-.shop-hero p {
-  max-width: 500px;
-  font-size: 14px;
-  line-height: 1.9;
-  color: rgba(243, 238, 227, 0.78);
-}
-
-.shop-hero button {
-  margin-top: 35px;
-  padding: 16px 22px;
-  background: #b08d57;
-  border: none;
-  color: #171410;
-  display: inline-flex;
-  align-items: center;
-  gap: 25px;
-  font-family: "Jost", sans-serif;
-  font-size: 9px;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-.shop-hero button:hover {
-  background: #f3eee3;
-}
-
-.shop-hero-footer {
-  position: absolute;
-  z-index: 2;
-  bottom: 28px;
-  left: 8%;
-  right: 8%;
-  display: flex;
-  justify-content: space-between;
-  font-size: 8px;
-  letter-spacing: 2px;
-}
 
 /* =====================================================
    INTRO
 ===================================================== */
 
-.shop-intro {
-  max-width: 1500px;
-  margin: auto;
-  padding: 140px 7%;
-  display: grid;
-  grid-template-columns: 0.55fr 1.45fr;
-  gap: 80px;
-}
-
-.shop-intro-side {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  color: #7e766c;
-  font-size: 9px;
-  letter-spacing: 2px;
-}
-
-.shop-intro-side span:first-child {
-  color: #b08d57;
-}
-
-.shop-intro-main {
-  max-width: 950px;
-}
-
-.shop-gold-label {
-  color: #b08d57;
-  font-size: 9px;
-  letter-spacing: 3px;
-  font-weight: 600;
-}
-
-.shop-intro h2 {
-  margin: 25px 0 0;
-  font-family: "Cormorant Garamond", serif;
-  font-size: clamp(55px, 7vw, 100px);
-  line-height: 0.86;
-  font-weight: 400;
-  letter-spacing: -3px;
-}
-
-.shop-intro h2 em {
-  color: #5c2a2a;
-  font-weight: 300;
-}
-
-.shop-intro p {
-  max-width: 600px;
-  margin-top: 42px;
-  font-size: 14px;
-  line-height: 1.9;
-  color: #6d665d;
-}
 
 /* =====================================================
    PRODUCT SECTION
@@ -173,6 +19,7 @@
   max-width: 1600px;
   margin: auto;
   padding: 20px 5% 150px;
+  margin-top: 5rem;
 }
 
 .shop-products-header {

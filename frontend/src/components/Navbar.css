@@ -21,6 +21,12 @@
 
   /* background: transparent; */
   background: var(--navbar-bg, transparent);
+  background: linear-gradient(
+  90deg,
+  rgba(44, 38, 29, 0.75),
+  rgba(94, 60, 60, 0.7),
+  rgba(87, 70, 47, 0.75)
+);
 
   border-bottom: 1px solid rgba(233, 226, 213, 0.18);
 

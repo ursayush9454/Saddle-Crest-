@@ -1,255 +1,117 @@
-/* =========================
-   POLICY FAQ
-========================= */
+/* =========================================
+   PRIVACY POLICY CONTENT - FINAL FIX
+========================================= */
 
-.policy-faq {
-  display: grid;
-  grid-template-columns: 0.75fr 1.25fr;
-  gap: 90px;
-
-  padding: 130px 7vw;
-
-  background: #ebe4d7;
-}
-
-.policy-faq-heading {
-  max-width: 430px;
-}
-
-.policy-eyebrow.dark {
-  color: #80643a;
-}
-
-.policy-faq-heading h2 {
-  margin: 0 0 25px;
-
-  font-family: "Cormorant Garamond", serif;
-  font-size: clamp(55px, 6vw, 78px);
-  font-weight: 400;
-
-  line-height: 0.9;
-}
-
-.policy-faq-heading h2 em {
-  color: #80643a;
-}
-
-.policy-faq-heading p {
-  max-width: 350px;
-
-  margin: 0;
-
-  font-family: "Jost", sans-serif;
-  font-size: 13px;
-  line-height: 1.9;
-
-  color: #625b51;
-}
-
-.policy-faq-list {
-  border-top: 1px solid rgba(23, 20, 16, 0.18);
-}
-
-.policy-faq-item {
-  border-bottom: 1px solid rgba(23, 20, 16, 0.18);
-}
-
-.policy-faq-question {
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 25px;
-
-  padding: 24px 0;
-
-  border: none;
-  background: transparent;
-
-  color: #171410;
-
-  text-align: left;
-
-  cursor: pointer;
-}
-
-.policy-faq-question > span:first-child {
-  font-family: "Jost", sans-serif;
-  font-size: 14px;
-}
-
-.policy-faq-icon {
-  width: 32px;
-  height: 32px;
-
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid rgba(23, 20, 16, 0.2);
-
-  transition: 0.3s ease;
-}
-
-.policy-faq-icon svg {
-  transition: transform 0.3s ease;
-}
-
-.policy-faq-item.open .policy-faq-icon {
-  background: #171410;
-  color: #f3eee3;
-}
-
-.policy-faq-item.open .policy-faq-icon svg {
-  transform: rotate(180deg);
-}
-
-.policy-faq-answer {
-  display: grid;
-  grid-template-rows: 0fr;
-
-  transition:
-    grid-template-rows 0.35s ease,
-    padding 0.35s ease;
-
-  padding: 0;
-}
-
-.policy-faq-answer p {
-  min-height: 0;
-  overflow: hidden;
-
-  max-width: 650px;
-
-  margin: 0;
-
-  font-family: "Jost", sans-serif;
-  font-size: 13px;
-  line-height: 1.9;
-
-  color: #625b51;
-}
-
-.policy-faq-item.open .policy-faq-answer {
-  grid-template-rows: 1fr;
-  padding-bottom: 25px;
-}
-
-/* =========================
-   POLICY CONTACT
-========================= */
-
-.policy-contact {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
-
-  padding: 140px 7vw;
-
-  background: #2b4433;
-  color: #f3eee3;
-}
-
-.policy-contact h2 {
-  margin: 0;
-
-  font-family: "Cormorant Garamond", serif;
-  font-size: clamp(55px, 7vw, 90px);
-
-  font-weight: 400;
-  line-height: 0.88;
-}
-
-.policy-contact h2 em {
-  color: #d1b27c;
-}
-
-.policy-contact-right {
-  align-self: end;
-  max-width: 430px;
-}
-
-.policy-contact-right p {
-  margin: 0 0 30px;
-
-  font-family: "Jost", sans-serif;
-  font-size: 14px;
-  line-height: 1.9;
-
-  color: rgba(243, 238, 227, 0.72);
-}
-
-.policy-contact-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 15px;
-
-  padding: 16px 25px;
-
-  border: 1px solid rgba(243, 238, 227, 0.5);
-
-  color: #f3eee3;
-  text-decoration: none;
-
-  font-family: "Jost", sans-serif;
-  font-size: 10px;
-
-  letter-spacing: 0.16em;
-
-  transition: 0.3s ease;
-}
-
-.policy-contact-button:hover {
+.policy-content {
   background: #f3eee3;
+  padding: 100px 7vw;
+}
+
+.policy-container {
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+/* Each policy section */
+.policy-container .policy-section {
+  margin: 0;
+  padding: 0 0 55px;
+  margin-bottom: 55px;
+  border-bottom: 1px solid rgba(23, 20, 16, 0.15);
+}
+
+.policy-container .policy-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* Heading */
+.policy-container .policy-section h2 {
+  margin: 0 0 18px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+
   color: #171410;
+  
+  width: fit-content;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+/* Paragraph */
+.policy-container .policy-section p {
+  max-width: 760px;
 
-@media (max-width: 900px) {
-  .policy-faq {
-    grid-template-columns: 1fr;
-    gap: 55px;
+  margin-left: 2rem;
 
-    padding: 100px 30px;
-  }
+  font-family: "Jost", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
 
-  .policy-contact {
-    grid-template-columns: 1fr;
-    gap: 50px;
+  color: rgba(23, 20, 16, 0.68);
+  width: fit-content;
 
-    padding: 100px 30px;
-  }
 }
 
-@media (max-width: 600px) {
-  .policy-faq {
-    padding: 80px 20px;
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .policy-content {
+    padding: 65px 24px;
   }
 
-  .policy-faq-heading h2 {
-    font-size: 55px;
+  .policy-container {
+    max-width: 100%;
   }
 
-  .policy-faq-question {
-    padding: 20px 0;
+  .policy-container .policy-section {
+    padding-bottom: 38px;
+    margin-bottom: 38px;
   }
 
-  .policy-faq-question > span:first-child {
+  .policy-container .policy-section h2 {
+    margin-bottom: 15px;
+    font-size: 34px;
+    line-height: 1.05;
+  }
+
+  .policy-container .policy-section p {
     font-size: 13px;
+    line-height: 1.8;
+  }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 480px) {
+
+  .policy-content {
+    padding: 55px 20px;
   }
 
-  .policy-contact {
-    padding: 80px 20px;
+  .policy-container .policy-section {
+    padding-bottom: 32px;
+    margin-bottom: 32px;
   }
 
-  .policy-contact h2 {
-    font-size: 58px;
+  .policy-container .policy-section h2 {
+    font-size: 30px;
+  }
+
+  .policy-container .policy-section p {
+    font-size: 12.5px;
+    line-height: 1.8;
   }
 }

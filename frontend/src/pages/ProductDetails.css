@@ -2,15 +2,25 @@
    SADDLE & CREST — PRODUCT DETAILS
    Scoped CSS to avoid conflicts with other project styles
    ========================================================= */
-
-.product-details-page {
+*{
+  
   --cream: #f3eee3;
   --dark: #171410;
   --green: #2b4433;
   --burgundy: #5c2a2a;
   --gold: #b08d57;
   --muted: #71695f;
+}
+.product-details-page {
 
+  
+  --cream: #f3eee3;
+  --dark: #171410;
+  --green: #2b4433;
+  --burgundy: #5c2a2a;
+  --gold: #b08d57;
+  --muted: #71695f;
+margin-top: 5.5rem;
   width: 100%;
   min-height: 100vh;
   background: var(--cream);
@@ -139,6 +149,9 @@
 
   min-width: 0 !important;
 }
+/* .product-details-container{
+  margin-top: 3rem;
+} */
 
 .product-details-page .thumbnail {
   display: block !important;

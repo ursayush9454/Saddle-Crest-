@@ -12,7 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useShop } from "../ShopContext/ShopContext";
 import { getProduct } from "../services/api";
 import "./ProductDetails.css";
-
+import Navbar from "../components/Navbar";
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -131,6 +131,7 @@ const ProductDetails = () => {
 
   if (loading) {
     return (
+      
       <div className="product-details-loading">
         <div className="product-loader"></div>
         <p>Loading product...</p>
@@ -156,7 +157,7 @@ const ProductDetails = () => {
 
   return (
     <main className="product-details-page">
-
+        <Navbar/>
       {/* Back */}
       <div className="product-details-container">
         <button
