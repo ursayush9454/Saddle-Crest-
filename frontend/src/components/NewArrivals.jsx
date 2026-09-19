@@ -24,11 +24,7 @@ const NewArrivals = () => {
 
         setArrivals(data?.products || []);
       } catch (error) {
-        console.error(
-          "New arrivals fetch failed:",
-          error
-        );
-
+        console.error("New arrivals fetch failed:", error);
         setArrivals([]);
       } finally {
         setLoading(false);
@@ -39,17 +35,28 @@ const NewArrivals = () => {
   }, []);
 
   const getPrice = (product) => {
-    return Number(
-      product.salePrice || product.price || 0
-    );
+    return Number(product.salePrice || product.price || 0);
   };
 
   const formatPrice = (price) => {
     return `₹${Number(price).toLocaleString("en-IN")}`;
   };
 
+  const getProductImage = (item) => {
+    return (
+      item.images?.[0] ||
+      item.image ||
+      item.images?.[1] ||
+      "https://via.placeholder.com/800x1000?text=Saddle+%26+Crest"
+    );
+  };
+
   return (
     <section className="new-arrivals" id="new-arrivals">
+      {/* =========================================
+          HEADER
+      ========================================= */}
+
       <div className="new-header">
         <div className="new-heading">
           <span>05 — JUST ARRIVED</span>
@@ -66,15 +73,21 @@ const NewArrivals = () => {
         </p>
       </div>
 
+      {/* =========================================
+          LOADING
+      ========================================= */}
+
       {loading ? (
         <div className="new-arrivals-loading">
-          Discovering new arrivals...
+          <span>Discovering new arrivals...</span>
         </div>
       ) : arrivals.length === 0 ? (
+        /* =========================================
+           EMPTY
+        ========================================= */
+
         <div className="new-arrivals-empty">
-          <p>
-            New arrivals are being prepared.
-          </p>
+          <p>New arrivals are being prepared.</p>
 
           <button
             type="button"
@@ -84,15 +97,15 @@ const NewArrivals = () => {
           </button>
         </div>
       ) : (
+        /* =========================================
+           PRODUCT GRID
+        ========================================= */
+
         <div className="arrival-grid">
           {arrivals.map((item, index) => {
-            const productId =
-              item._id || item.id;
+            const productId = item._id || item.id;
 
-            const image =
-              item.images?.[0] ||
-              item.image ||
-              "https://via.placeholder.com/600x700?text=Saddle+%26+Crest";
+            const image = getProductImage(item);
 
             return (
               <article
@@ -102,10 +115,14 @@ const NewArrivals = () => {
                   navigate(`/product/${productId}`)
                 }
               >
+                {/* =========================================
+                    IMAGE
+                ========================================= */}
+
                 <div className="arrival-image">
                   <img
                     src={image}
-                    alt={item.name}
+                    alt={item.name || "Saddle & Crest product"}
                     loading="lazy"
                   />
 
@@ -115,7 +132,10 @@ const NewArrivals = () => {
 
                   <button
                     type="button"
-                    aria-label={`View ${item.name}`}
+                    className="arrival-arrow"
+                    aria-label={`View ${
+                      item.name || "product"
+                    }`}
                     onClick={(event) => {
                       event.stopPropagation();
 
@@ -125,11 +145,15 @@ const NewArrivals = () => {
                     }}
                   >
                     <ArrowUpRight
-                      size={18}
+                      size={19}
                       strokeWidth={1.5}
                     />
                   </button>
                 </div>
+
+                {/* =========================================
+                    PRODUCT INFO
+                ========================================= */}
 
                 <div className="arrival-info">
                   <div className="arrival-details">
@@ -138,13 +162,13 @@ const NewArrivals = () => {
                         "NEW COLLECTION"}
                     </span>
 
-                    <h3>{item.name}</h3>
+                    <h3>
+                      {item.name || "Untitled Product"}
+                    </h3>
                   </div>
 
                   <strong>
-                    {formatPrice(
-                      getPrice(item)
-                    )}
+                    {formatPrice(getPrice(item))}
                   </strong>
                 </div>
               </article>

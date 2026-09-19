@@ -205,33 +205,7 @@ const Orders = () => {
 
       {/* HEADER */}
 
-      <section className="orders-header">
-        <div className="orders-header-inner">
-
-          <Link
-            to="/"
-            className="orders-back"
-          >
-            <ArrowLeft size={16} />
-            Back to Home
-          </Link>
-
-          <div className="orders-heading">
-            <span>YOUR JOURNEY</span>
-
-            <h1>
-              My <em>Orders.</em>
-            </h1>
-
-            <p>
-              Every order, every piece, and every
-              journey with Saddle & Crest.
-            </p>
-          </div>
-
-        </div>
-      </section>
-
+     
       {/* CONTENT */}
 
       <section className="orders-container">
@@ -297,6 +271,13 @@ const Orders = () => {
             <div className="orders-list">
 
               <div className="orders-list-top">
+                    <Link
+            to="/"
+            className="orders-back"
+          >
+            <ArrowLeft size={16} />
+            Back to Home
+          </Link>
 
                 <div>
                   <span>ORDER HISTORY</span>

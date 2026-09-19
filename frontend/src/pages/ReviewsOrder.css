@@ -663,3 +663,126 @@
     height: 70px;
   }
 }
+/* =========================================
+   CUSTOMER CONSENT
+========================================= */
+
+.consent-box {
+  margin-top: 22px;
+  padding: 16px;
+  border: 1px solid rgba(23, 20, 16, 0.12);
+  background: rgba(243, 238, 227, 0.55);
+}
+
+.consent-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  cursor: pointer;
+  position: relative;
+}
+
+.consent-label input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.custom-checkbox {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border: 1px solid #171410;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  transition: 0.2s ease;
+}
+
+.consent-label input:checked + .custom-checkbox {
+  background: #2b4433;
+  border-color: #2b4433;
+  color: #fff;
+}
+
+.consent-text {
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #171410;
+}
+
+.consent-link {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: #5c2a2a;
+  text-decoration: underline;
+  font: inherit;
+  cursor: pointer;
+}
+
+.consent-link:hover {
+  color: #b08d57;
+}
+
+.consent-security {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid rgba(23, 20, 16, 0.08);
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+  color: rgba(23, 20, 16, 0.62);
+}
+
+.consent-security svg {
+  flex-shrink: 0;
+}
+
+
+/* =========================================
+   DISABLED PLACE ORDER
+========================================= */
+
+.confirm-order-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.confirm-order-btn:disabled:hover {
+  transform: none;
+}
+
+
+/* =========================================
+   MOBILE CONSENT
+========================================= */
+
+@media (max-width: 600px) {
+  .consent-box {
+    padding: 14px;
+    margin-top: 18px;
+  }
+
+  .consent-text {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .consent-security {
+    font-size: 10px;
+  }
+
+  .custom-checkbox {
+    width: 19px;
+    height: 19px;
+    min-width: 19px;
+  }
+}

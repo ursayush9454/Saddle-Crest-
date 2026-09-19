@@ -854,4 +854,71 @@
     margin-left: 0;
   }
 }
+/* =========================================================
+   PROFILE LOGOUT
+========================================================= */
+
+.profile-logout-wrapper {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(23, 20, 16, 0.12);
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+.profile-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-height: 44px;
+  padding: 0 22px;
+
+  border: 1px solid rgba(92, 42, 42, 0.35);
+  border-radius: 0;
+
+  background: transparent;
+  color: #5c2a2a;
+
+  font-family: "Jost", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.profile-logout-btn svg {
+  flex-shrink: 0;
+}
+
+.profile-logout-btn:hover {
+  background: #5c2a2a;
+  color: #f3eee3;
+  border-color: #5c2a2a;
+  transform: translateY(-1px);
+}
+
+.profile-logout-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .profile-logout-wrapper {
+    justify-content: stretch;
+  }
+
+  .profile-logout-btn {
+    width: 100%;
+  }
+}
 

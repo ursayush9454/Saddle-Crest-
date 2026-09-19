@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   MapPin,
@@ -9,6 +10,7 @@ import {
   Check,
   X,
   Loader2,
+  LogOut,
 } from "lucide-react";
 
 import Navbar from "../components/Navbar";
@@ -64,20 +66,10 @@ const Profile = () => {
 
       setAddresses(user?.addresses || []);
 
-      console.log(
-        "PROFILE USER:",
-        user
-      );
-
-      console.log(
-        "SAVED ADDRESSES:",
-        user?.addresses || []
-      );
+      console.log("PROFILE USER:", user);
+      console.log("SAVED ADDRESSES:", user?.addresses || []);
     } catch (err) {
-      console.error(
-        "Profile load error:",
-        err
-      );
+      console.error("Profile load error:", err);
 
       setError(
         err?.message ||
@@ -91,6 +83,32 @@ const Profile = () => {
   useEffect(() => {
     loadProfile();
   }, []);
+
+  /* =========================================================
+     LOGOUT
+  ========================================================= */
+
+  const handleLogout = () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to logout?"
+    );
+
+    if (!confirmed) return;
+
+    /*
+     * Remove authentication data
+     */
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+
+    /*
+     * Redirect user to login page
+     */
+    window.location.href = "/login";
+  };
 
   /* =========================================================
      ADDRESS INPUT
@@ -132,11 +150,9 @@ const Profile = () => {
     );
 
     setAddressForm({
-      fullName:
-        address.fullName || "",
+      fullName: address.fullName || "",
 
-      phone:
-        address.phone || "",
+      phone: address.phone || "",
 
       /*
        * IMPORTANT:
@@ -335,9 +351,7 @@ const Profile = () => {
        * }
        */
 
-      if (
-        response?.addresses
-      ) {
+      if (response?.addresses) {
         setAddresses(
           response.addresses
         );
@@ -399,9 +413,7 @@ const Profile = () => {
           }
         );
 
-      if (
-        response?.addresses
-      ) {
+      if (response?.addresses) {
         setAddresses(
           response.addresses
         );
@@ -450,9 +462,7 @@ const Profile = () => {
           }
         );
 
-      if (
-        response?.addresses
-      ) {
+      if (response?.addresses) {
         setAddresses(
           response.addresses
         );
@@ -623,6 +633,25 @@ const Profile = () => {
               )}
 
             </div>
+
+            {/* =================================================
+                LOGOUT
+            ================================================= */}
+
+            <div className="profile-logout-wrapper">
+              <button
+                type="button"
+                className="profile-logout-btn"
+                onClick={handleLogout}
+              >
+                <LogOut size={17} />
+
+                <span>
+                  LOGOUT
+                </span>
+              </button>
+            </div>
+
           </section>
 
           {/* =================================================

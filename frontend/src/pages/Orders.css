@@ -81,7 +81,7 @@
 
 .orders-container {
   width: min(1200px, 88%);
-  margin: 0 auto;
+  margin: 2rem auto;
   padding: 80px 0 120px;
 }
 

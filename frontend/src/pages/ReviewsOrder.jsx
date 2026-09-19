@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState } from "react";
 import {
   ArrowLeft,
@@ -8,6 +7,7 @@ import {
   Package,
   Phone,
   User,
+  ShieldCheck,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -25,6 +25,13 @@ const ReviewOrder = () => {
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderId, setOrderId] = useState("");
 
+  // Customer consent
+  const [consentAccepted, setConsentAccepted] = useState(false);
+
+  // =========================================
+  // CHECKOUT DATA
+  // =========================================
+
   const checkoutData = useMemo(() => {
     try {
       const saved = sessionStorage.getItem("saddleCheckoutData");
@@ -33,6 +40,10 @@ const ReviewOrder = () => {
       return null;
     }
   }, []);
+
+  // =========================================
+  // SUBTOTAL
+  // =========================================
 
   const subtotal = useMemo(() => {
     return cart.reduce(
@@ -43,14 +54,36 @@ const ReviewOrder = () => {
     );
   }, [cart]);
 
+  // =========================================
+  // SHIPPING
+  // =========================================
+
   const shipping = useMemo(() => {
     if (subtotal === 0) return 0;
+
     return subtotal >= 10000 ? 0 : 450;
   }, [subtotal]);
 
+  // =========================================
+  // TOTAL
+  // =========================================
+
   const total = subtotal + shipping;
 
+  // =========================================
+  // PLACE ORDER
+  // =========================================
+
   const handlePlaceOrder = async () => {
+    // Consent validation
+    if (!consentAccepted) {
+      setError(
+        "Please accept the Terms & Conditions and Privacy Policy before placing your order."
+      );
+      return;
+    }
+
+    // Checkout validation
     if (!checkoutData) {
       setError(
         "Checkout details are missing. Please go back and enter your details."
@@ -58,6 +91,7 @@ const ReviewOrder = () => {
       return;
     }
 
+    // Cart validation
     if (!cart.length) {
       setError("Your cart is empty.");
       return;
@@ -68,13 +102,13 @@ const ReviewOrder = () => {
 
     try {
       /*
-       * Backend currently gets products/cart from the logged-in user's
-       * server-side cart, so the items array is not required here.
+       * Backend gets products/cart from the logged-in user's
+       * server-side cart.
        *
-       * Most important:
        * Profile/Checkout uses `address`
        * Backend Order model expects `addressLine1`
        */
+
       const orderData = {
         shippingAddress: {
           fullName: checkoutData.fullName || "",
@@ -88,12 +122,23 @@ const ReviewOrder = () => {
         },
 
         paymentMethod: checkoutData.paymentMethod || "COD",
+
+        // =========================================
+        // CUSTOMER CONSENT
+        // =========================================
+
+        termsAccepted: consentAccepted,
+        privacyPolicyAccepted: consentAccepted,
       };
 
       const response = await apiRequest("/orders/place", {
         method: "POST",
         body: JSON.stringify(orderData),
       });
+
+      // =========================================
+      // GET CREATED ORDER ID
+      // =========================================
 
       const createdOrderId =
         response?.order?._id ||
@@ -105,13 +150,16 @@ const ReviewOrder = () => {
 
       setOrderId(createdOrderId);
 
-      /*
-       * Clear cart only after successful order creation.
-       */
+      // =========================================
+      // CLEAR CART
+      // =========================================
+
       await clearCart();
 
+      // Remove checkout session data
       sessionStorage.removeItem("saddleCheckoutData");
 
+      // Show success screen
       setOrderSuccess(true);
     } catch (err) {
       console.error("Place order error:", err);
@@ -125,9 +173,9 @@ const ReviewOrder = () => {
     }
   };
 
-  /* =========================
-     ORDER SUCCESS
-  ========================= */
+  // =========================================
+  // ORDER SUCCESS
+  // =========================================
 
   if (orderSuccess) {
     return (
@@ -180,9 +228,9 @@ const ReviewOrder = () => {
     );
   }
 
-  /* =========================
-     NO CHECKOUT DATA
-  ========================= */
+  // =========================================
+  // NO CHECKOUT DATA
+  // =========================================
 
   if (!checkoutData) {
     return (
@@ -216,6 +264,10 @@ const ReviewOrder = () => {
     );
   }
 
+  // =========================================
+  // MAIN REVIEW PAGE
+  // =========================================
+
   return (
     <>
       <Navbar />
@@ -223,7 +275,10 @@ const ReviewOrder = () => {
       <main className="review-page">
         <div className="review-container">
 
-          {/* HEADER */}
+          {/* =========================================
+              HEADER
+          ========================================= */}
+
           <div className="review-header">
             <button
               type="button"
@@ -248,7 +303,10 @@ const ReviewOrder = () => {
             </div>
           </div>
 
-          {/* ERROR */}
+          {/* =========================================
+              ERROR
+          ========================================= */}
+
           {error && (
             <div className="review-error">
               {error}
@@ -257,13 +315,16 @@ const ReviewOrder = () => {
 
           <div className="review-layout">
 
-            {/* =========================
+            {/* =========================================
                 LEFT SIDE
-            ========================= */}
+            ========================================= */}
 
             <div className="review-main">
 
-              {/* DELIVERY */}
+              {/* =========================================
+                  DELIVERY
+              ========================================= */}
+
               <section className="review-card">
                 <div className="review-card-heading">
                   <div className="heading-icon">
@@ -279,6 +340,7 @@ const ReviewOrder = () => {
                 <div className="delivery-details">
 
                   {/* NAME */}
+
                   <div className="detail-row">
                     <User size={17} />
 
@@ -292,6 +354,7 @@ const ReviewOrder = () => {
                   </div>
 
                   {/* PHONE */}
+
                   <div className="detail-row">
                     <Phone size={17} />
 
@@ -305,6 +368,7 @@ const ReviewOrder = () => {
                   </div>
 
                   {/* ADDRESS */}
+
                   <div className="detail-row address-row">
                     <MapPin size={17} />
 
@@ -313,6 +377,7 @@ const ReviewOrder = () => {
 
                       <strong>
                         {checkoutData.address}
+
                         <br />
 
                         {checkoutData.city},{" "}
@@ -336,7 +401,10 @@ const ReviewOrder = () => {
                 </button>
               </section>
 
-              {/* PAYMENT */}
+              {/* =========================================
+                  PAYMENT
+              ========================================= */}
+
               <section className="review-card">
                 <div className="review-card-heading">
                   <div className="heading-icon">
@@ -370,7 +438,10 @@ const ReviewOrder = () => {
                 </div>
               </section>
 
-              {/* ITEMS */}
+              {/* =========================================
+                  ORDER ITEMS
+              ========================================= */}
+
               <section className="review-card">
                 <div className="review-card-heading">
                   <div className="heading-icon">
@@ -404,7 +475,11 @@ const ReviewOrder = () => {
                               item.product?.image ||
                               ""
                             }
-                            alt={item.name || "Product"}
+                            alt={
+                              item.name ||
+                              item.product?.name ||
+                              "Product"
+                            }
                           />
                         </div>
 
@@ -433,17 +508,21 @@ const ReviewOrder = () => {
               </section>
             </div>
 
-            {/* =========================
+            {/* =========================================
                 RIGHT SIDE
-            ========================= */}
+            ========================================= */}
 
             <aside className="review-summary-card">
+
+              {/* SUMMARY HEADER */}
 
               <div className="summary-top">
                 <span>ORDER SUMMARY</span>
 
                 <h2>Your Order</h2>
               </div>
+
+              {/* SUMMARY ITEMS */}
 
               <div className="summary-items">
                 {cart.map((item) => (
@@ -477,6 +556,7 @@ const ReviewOrder = () => {
               <div className="summary-divider" />
 
               {/* SUBTOTAL */}
+
               <div className="summary-row">
                 <span>Subtotal</span>
 
@@ -486,6 +566,7 @@ const ReviewOrder = () => {
               </div>
 
               {/* SHIPPING */}
+
               <div className="summary-row">
                 <span>Shipping</span>
 
@@ -501,6 +582,7 @@ const ReviewOrder = () => {
               <div className="summary-divider" />
 
               {/* TOTAL */}
+
               <div className="summary-total">
                 <span>Total</span>
 
@@ -509,12 +591,86 @@ const ReviewOrder = () => {
                 </strong>
               </div>
 
-              {/* PLACE ORDER */}
+              {/* =========================================
+                  CUSTOMER CONSENT
+              ========================================= */}
+
+              <div className="consent-box">
+                <label className="consent-label">
+
+                  <input
+                    type="checkbox"
+                    checked={consentAccepted}
+                    onChange={(e) => {
+                      setConsentAccepted(
+                        e.target.checked
+                      );
+
+                      if (e.target.checked) {
+                        setError("");
+                      }
+                    }}
+                  />
+
+                  <span className="custom-checkbox">
+                    {consentAccepted && (
+                      <Check
+                        size={13}
+                        strokeWidth={3}
+                      />
+                    )}
+                  </span>
+
+                  <span className="consent-text">
+                    I agree to the{" "}
+
+                    <button
+                      type="button"
+                      className="consent-link"
+                      onClick={() =>
+                        navigate("/terms")
+                      }
+                    >
+                      Terms & Conditions
+                    </button>{" "}
+
+                    and{" "}
+
+                    <button
+                      type="button"
+                      className="consent-link"
+                      onClick={() =>
+                        navigate("/privacy-policy")
+                      }
+                    >
+                      Privacy Policy
+                    </button>
+                    .
+                  </span>
+
+                </label>
+
+                <div className="consent-security">
+                  <ShieldCheck size={15} />
+
+                  <span>
+                    Your consent is recorded securely
+                    with your order.
+                  </span>
+                </div>
+              </div>
+
+              {/* =========================================
+                  PLACE ORDER
+              ========================================= */}
+
               <button
                 type="button"
                 className="confirm-order-btn"
                 onClick={handlePlaceOrder}
-                disabled={loading}
+                disabled={
+                  loading || !consentAccepted
+                }
               >
                 {loading ? (
                   <>
@@ -529,9 +685,11 @@ const ReviewOrder = () => {
                 )}
               </button>
 
+              {/* SECURE NOTE */}
+
               <p className="secure-note">
-                By placing this order, you confirm that all
-                the above information is correct.
+                By placing this order, you confirm that
+                all the above information is correct.
               </p>
 
             </aside>
@@ -543,4 +701,3 @@ const ReviewOrder = () => {
 };
 
 export default ReviewOrder;
-

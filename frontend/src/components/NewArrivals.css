@@ -1,25 +1,51 @@
+/* =========================================================
+   SADDLE & CREST
+   NEW ARRIVALS
+========================================================= */
+
 .new-arrivals {
+  position: relative;
+
   width: 100%;
+  max-width: 100%;
+
   padding: 130px 5%;
+
   background: #f0ebe1;
   color: #171410;
+
   overflow: hidden;
+
+  box-sizing: border-box;
 }
 
-/* =========================
+.new-arrivals *,
+.new-arrivals *::before,
+.new-arrivals *::after {
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
    HEADER
-========================= */
+========================================================= */
 
 .new-header {
   width: 100%;
   max-width: 1250px;
+
   margin: 0 auto 60px;
 
   display: flex;
-  justify-content: space-between;
   align-items: flex-end;
+  justify-content: space-between;
 
-  gap: 50px;
+  gap: 60px;
+}
+
+.new-heading {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .new-heading > span {
@@ -28,32 +54,39 @@
   color: #8d6b36;
 
   font-family: "Jost", sans-serif;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 500;
 
   letter-spacing: 3px;
+  line-height: 1.4;
+
   text-transform: uppercase;
 }
 
 .new-header h2 {
   margin: 18px 0 0;
 
+  color: #171410;
+
   font-family: "Cormorant Garamond", serif;
   font-size: clamp(55px, 6vw, 85px);
   font-weight: 400;
 
-  line-height: 0.8;
+  line-height: 0.82;
   letter-spacing: -1.5px;
 }
 
 .new-header h2 em {
   color: #6a3438;
+
   font-style: italic;
   font-weight: 400;
 }
 
 .new-header > p {
-  width: 100%;
+  flex: 0 0 330px;
+
+  width: 330px;
   max-width: 330px;
 
   margin: 0;
@@ -61,14 +94,17 @@
   color: #716b61;
 
   font-family: "Jost", sans-serif;
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 400;
+
   line-height: 1.9;
   letter-spacing: 0.2px;
 }
 
-/* =========================
+
+/* =========================================================
    PRODUCT GRID
-========================= */
+========================================================= */
 
 .arrival-grid {
   width: 100%;
@@ -77,48 +113,66 @@
   margin: 0 auto;
 
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
 
-  gap: 18px;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 22px;
+
+  align-items: start;
 }
 
-/* =========================
-   CARD
-========================= */
+
+/* =========================================================
+   PRODUCT CARD
+========================================================= */
 
 .arrival-card {
+  position: relative;
+
+  width: 100%;
   min-width: 0;
+
+  cursor: pointer;
 }
 
-/* =========================
-   IMAGE
-========================= */
+
+/* =========================================================
+   IMAGE WRAPPER
+========================================================= */
 
 .arrival-image {
   position: relative;
 
   width: 100%;
-  height: 520px;
+
+  aspect-ratio: 4 / 5;
+
+  min-height: 0;
 
   overflow: hidden;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
   background: #ddd6c9;
 }
 
+
+/* =========================================================
+   PRODUCT IMAGE
+========================================================= */
+
 .arrival-image img {
+  display: block;
+
   width: 100%;
   height: 100%;
 
-  display: block;
+  object-fit: cover;
+  object-position: center;
 
-  object-fit: contain;
+  transform: scale(1);
 
   transition:
-    transform 0.8s ease,
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
     filter 0.5s ease;
 }
 
@@ -126,9 +180,35 @@
   transform: scale(1.045);
 }
 
-/* =========================
+
+/* =========================================================
+   IMAGE OVERLAY
+========================================================= */
+
+.arrival-image::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(23, 20, 16, 0.08),
+    transparent 25%,
+    transparent 70%,
+    rgba(23, 20, 16, 0.08)
+  );
+
+  pointer-events: none;
+
+  z-index: 1;
+}
+
+
+/* =========================================================
    NUMBER
-========================= */
+========================================================= */
 
 .arrival-number {
   position: absolute;
@@ -136,31 +216,37 @@
   top: 20px;
   left: 20px;
 
-  z-index: 2;
+  z-index: 3;
 
-  color: #171410;
+  color: #f0ebe1;
 
   font-family: "Jost", sans-serif;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 500;
 
   letter-spacing: 2px;
+
+  text-shadow:
+    0 1px 8px rgba(0, 0, 0, 0.25);
 }
 
-/* =========================
-   ARROW BUTTON
-========================= */
 
-.arrival-image button {
+/* =========================================================
+   ARROW BUTTON
+========================================================= */
+
+.arrival-image .arrival-arrow {
   position: absolute;
 
   right: 20px;
   bottom: 20px;
 
-  z-index: 3;
+  z-index: 4;
 
-  width: 43px;
-  height: 43px;
+  width: 45px;
+  height: 45px;
+
+  padding: 0;
 
   display: flex;
   align-items: center;
@@ -180,28 +266,33 @@
     transform 0.3s ease;
 }
 
-.arrival-image button:hover {
+.arrival-image .arrival-arrow:hover {
   background: #6a3438;
   color: #f0ebe1;
 
   transform: translate(2px, -2px);
 }
 
-/* =========================
-   PRODUCT INFO
-========================= */
+
+/* =========================================================
+   PRODUCT INFORMATION
+========================================================= */
 
 .arrival-info {
+  width: 100%;
+
   padding-top: 20px;
 
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
 
   gap: 20px;
 }
 
 .arrival-details {
+  flex: 1 1 auto;
+
   min-width: 0;
 }
 
@@ -211,38 +302,122 @@
   color: #8d6b36;
 
   font-family: "Jost", sans-serif;
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 500;
 
   letter-spacing: 2px;
+  line-height: 1.4;
+
   text-transform: uppercase;
 }
 
 .arrival-info h3 {
+  width: 100%;
+
   margin: 7px 0 0;
 
+  color: #171410;
+
   font-family: "Cormorant Garamond", serif;
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 500;
 
   line-height: 1.1;
+
+  overflow-wrap: break-word;
 }
 
 .arrival-info strong {
-  flex-shrink: 0;
+  flex: 0 0 auto;
 
   padding-top: 1px;
 
   color: #171410;
 
   font-family: "Jost", sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
+
+  white-space: nowrap;
 }
 
-/* =========================
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.new-arrivals-loading,
+.new-arrivals-empty {
+  width: 100%;
+  max-width: 1250px;
+
+  min-height: 220px;
+
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  gap: 15px;
+
+  text-align: center;
+}
+
+.new-arrivals-loading {
+  color: #716b61;
+
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+
+  letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.new-arrivals-empty p {
+  margin: 0;
+
+  color: #716b61;
+
+  font-family: "Jost", sans-serif;
+  font-size: 12px;
+}
+
+.new-arrivals-empty button {
+  padding: 13px 24px;
+
+  border: 1px solid #171410;
+
+  background: #171410;
+  color: #f3eee3;
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.new-arrivals-empty button:hover {
+  background: transparent;
+  color: #171410;
+}
+
+
+/* =========================================================
    LARGE TABLET
-========================= */
+========================================================= */
 
 @media (max-width: 1100px) {
   .new-arrivals {
@@ -251,20 +426,28 @@
 
   .new-header {
     margin-bottom: 50px;
+
+    gap: 40px;
   }
 
-  .arrival-image {
-    height: 450px;
+  .new-header > p {
+    flex-basis: 290px;
+    width: 290px;
+  }
+
+  .arrival-grid {
+    gap: 18px;
   }
 
   .arrival-info h3 {
-    font-size: 20px;
+    font-size: 21px;
   }
 }
 
-/* =========================
+
+/* =========================================================
    TABLET
-========================= */
+========================================================= */
 
 @media (max-width: 800px) {
   .new-arrivals {
@@ -272,23 +455,25 @@
   }
 
   .new-header {
-    flex-direction: column;
     align-items: flex-start;
+    flex-direction: column;
 
     gap: 28px;
   }
 
   .new-header > p {
-    max-width: 450px;
+    width: 100%;
+    max-width: 480px;
+
+    flex-basis: auto;
   }
 
   .arrival-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 30px 16px;
-  }
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
 
-  .arrival-image {
-    height: 430px;
+    column-gap: 16px;
+    row-gap: 38px;
   }
 
   .arrival-info {
@@ -296,13 +481,18 @@
   }
 
   .arrival-info h3 {
-    font-size: 19px;
+    font-size: 20px;
+  }
+
+  .arrival-info strong {
+    font-size: 10px;
   }
 }
 
-/* =========================
+
+/* =========================================================
    MOBILE
-========================= */
+========================================================= */
 
 @media (max-width: 600px) {
   .new-arrivals {
@@ -311,16 +501,29 @@
 
   .new-header {
     margin-bottom: 40px;
+
     gap: 24px;
+  }
+
+  .new-heading > span {
+    font-size: 8px;
+    letter-spacing: 2.5px;
   }
 
   .new-header h2 {
     margin-top: 16px;
 
-    font-size: clamp(50px, 14vw, 65px);
+    font-size: clamp(
+      50px,
+      14vw,
+      65px
+    );
+
+    line-height: 0.84;
   }
 
   .new-header > p {
+    width: 100%;
     max-width: 100%;
 
     font-size: 10px;
@@ -328,20 +531,31 @@
   }
 
   .arrival-grid {
+    width: 100%;
+
     grid-template-columns: 1fr;
+
     gap: 45px;
   }
 
+  .arrival-card {
+    width: 100%;
+  }
+
   .arrival-image {
-    height: 450px;
+    width: 100%;
+
+    aspect-ratio: 4 / 5;
   }
 
   .arrival-number {
     top: 17px;
     left: 17px;
+
+    font-size: 8px;
   }
 
-  .arrival-image button {
+  .arrival-image .arrival-arrow {
     right: 17px;
     bottom: 17px;
 
@@ -351,6 +565,8 @@
 
   .arrival-info {
     padding-top: 16px;
+
+    gap: 14px;
   }
 
   .arrival-info h3 {
@@ -362,9 +578,10 @@
   }
 }
 
-/* =========================
+
+/* =========================================================
    SMALL MOBILE
-========================= */
+========================================================= */
 
 @media (max-width: 380px) {
   .new-arrivals {
@@ -376,7 +593,7 @@
   }
 
   .arrival-image {
-    height: 390px;
+    aspect-ratio: 4 / 5;
   }
 
   .arrival-info h3 {
@@ -393,13 +610,14 @@
   }
 }
 
-/* =========================
+
+/* =========================================================
    REDUCED MOTION
-========================= */
+========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   .arrival-image img,
-  .arrival-image button {
+  .arrival-image .arrival-arrow {
     transition: none;
   }
 
@@ -407,29 +625,7 @@
     transform: none;
   }
 
-  .arrival-image button:hover {
+  .arrival-image .arrival-arrow:hover {
     transform: none;
   }
-}
-.new-arrivals-loading,
-.new-arrivals-empty {
-  min-height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 15px;
-  text-align: center;
-}
-
-.new-arrivals-empty button {
-  padding: 12px 22px;
-  border: 1px solid #171410;
-  background: #171410;
-  color: #f3eee3;
-  cursor: pointer;
-}
-
-.arrival-card {
-  cursor: pointer;
 }
