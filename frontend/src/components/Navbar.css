@@ -1,7 +1,747 @@
 /* =====================================================
    SADDLE & CREST — NAVBAR
 ===================================================== */
+/* =====================================================
+   SEARCH OVERLAY
+   Existing Navbar colors/design untouched
+===================================================== */
 
+.navbar-search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
+
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.navbar-search-overlay.active {
+  visibility: visible;
+  pointer-events: auto;
+  opacity: 1;
+}
+
+
+/* =====================================================
+   SEARCH BACKDROP
+===================================================== */
+
+.navbar-search-backdrop {
+  position: absolute;
+  inset: 0;
+
+  background: rgba(13, 13, 12, 0.62);
+
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+
+/* =====================================================
+   SEARCH PANEL
+===================================================== */
+
+.navbar-search-panel {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  max-height: 86vh;
+  overflow-y: auto;
+
+  padding: 30px 5% 42px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(44, 38, 29, 0.98),
+      rgba(94, 60, 60, 0.97),
+      rgba(87, 70, 47, 0.98)
+    );
+
+  border-bottom: 1px solid
+    rgba(176, 141, 87, 0.45);
+
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.28);
+
+  transform: translateY(-105%);
+
+  transition:
+    transform 0.45s
+      cubic-bezier(0.77, 0, 0.18, 1);
+}
+
+.navbar-search-overlay.active
+  .navbar-search-panel {
+  transform: translateY(0);
+}
+
+
+/* =====================================================
+   SEARCH HEADER
+===================================================== */
+
+.navbar-search-header {
+  min-height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 18px;
+}
+
+.navbar-search-header > span {
+  color: #c5a46d;
+
+  font-family: "Jost", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+}
+
+.navbar-search-close {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid
+    rgba(233, 226, 213, 0.22);
+
+  background: transparent;
+
+  color: #e9e2d5;
+
+  cursor: pointer;
+
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.navbar-search-close:hover {
+  color: #c5a46d;
+
+  border-color: #c5a46d;
+
+  transform: rotate(90deg);
+}
+
+
+/* =====================================================
+   SEARCH FORM
+===================================================== */
+
+.navbar-search-form {
+  height: 66px;
+
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid
+    rgba(233, 226, 213, 0.35);
+
+  color: #e9e2d5;
+}
+
+.navbar-search-form > svg {
+  flex-shrink: 0;
+  margin-right: 17px;
+
+  color: #c5a46d;
+}
+
+.navbar-search-form input {
+  flex: 1;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #e9e2d5;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 30px;
+  font-weight: 400;
+
+  caret-color: #c5a46d;
+}
+
+.navbar-search-form input::placeholder {
+  color: rgba(233, 226, 213, 0.48);
+}
+
+.navbar-search-form input::-webkit-search-cancel-button {
+  display: none;
+}
+
+
+/* =====================================================
+   SEARCH CLEAR
+===================================================== */
+
+.navbar-search-clear {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+
+  margin-right: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  background: transparent;
+
+  color: rgba(233, 226, 213, 0.65);
+
+  cursor: pointer;
+
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.navbar-search-clear:hover {
+  color: #c5a46d;
+  transform: rotate(90deg);
+}
+
+
+/* =====================================================
+   SEARCH SUBMIT
+===================================================== */
+
+.navbar-search-submit {
+  min-width: 105px;
+  height: 38px;
+
+  padding: 0 18px;
+
+  border: 1px solid
+    rgba(197, 164, 109, 0.65);
+
+  background: transparent;
+
+  color: #e9e2d5;
+
+  font-family: "Jost", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.navbar-search-submit:hover {
+  background: #c5a46d;
+  border-color: #c5a46d;
+  color: #0d0d0c;
+}
+
+
+/* =====================================================
+   SEARCH CONTENT
+===================================================== */
+
+.navbar-search-content {
+  padding-top: 26px;
+}
+
+
+/* =====================================================
+   SEARCH EMPTY
+===================================================== */
+
+.navbar-search-empty {
+  padding: 15px 0 5px;
+}
+
+.navbar-search-empty span,
+.navbar-search-result-title span {
+  color: #c5a46d;
+
+  font-family: "Jost", sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 2.2px;
+}
+
+.navbar-search-empty p {
+  max-width: 500px;
+
+  margin: 8px 0 0;
+
+  color: rgba(233, 226, 213, 0.62);
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+}
+
+
+/* =====================================================
+   SEARCH LOADING
+===================================================== */
+
+.navbar-search-loading {
+  min-height: 100px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  color: rgba(233, 226, 213, 0.65);
+}
+
+.navbar-search-loading p {
+  margin: 0;
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+
+.search-loader {
+  width: 15px;
+  height: 15px;
+
+  border: 1px solid
+    rgba(233, 226, 213, 0.25);
+
+  border-top-color: #c5a46d;
+
+  border-radius: 50%;
+
+  animation:
+    navbarSearchSpin 0.75s linear infinite;
+}
+
+@keyframes navbarSearchSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =====================================================
+   RESULT TITLE
+===================================================== */
+
+.navbar-search-result-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 16px;
+}
+
+.navbar-search-result-title small {
+  color: rgba(233, 226, 213, 0.5);
+
+  font-family: "Jost", sans-serif;
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+
+/* =====================================================
+   SEARCH PRODUCT GRID
+===================================================== */
+
+.navbar-search-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 14px;
+}
+
+
+/* =====================================================
+   SEARCH PRODUCT
+===================================================== */
+
+.navbar-search-product {
+  min-width: 0;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  color: #e9e2d5;
+
+  font-family: inherit;
+
+  transition:
+    transform 0.3s ease;
+}
+
+.navbar-search-product:hover {
+  transform: translateY(-4px);
+}
+
+
+/* =====================================================
+   PRODUCT IMAGE
+===================================================== */
+
+.navbar-search-product-image {
+  position: relative;
+
+  width: 100%;
+  aspect-ratio: 1 / 1.05;
+
+  overflow: hidden;
+
+  background: #f3eee3;
+}
+
+.navbar-search-product-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  transition:
+    transform 0.5s
+      cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.navbar-search-product:hover
+  .navbar-search-product-image img {
+  transform: scale(1.05);
+}
+
+.navbar-search-product-image > span {
+  position: absolute;
+
+  top: 10px;
+  left: 10px;
+
+  padding: 5px 8px;
+
+  background: #c5a46d;
+
+  color: #0d0d0c;
+
+  font-family: "Jost", sans-serif;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+/* =====================================================
+   PRODUCT INFO
+===================================================== */
+
+.navbar-search-product-info {
+  padding: 11px 2px 0;
+}
+
+.navbar-search-product-info h4 {
+  margin: 0;
+
+  overflow: hidden;
+
+  color: #e9e2d5;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+  font-weight: 500;
+
+  line-height: 1.1;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.navbar-search-product-info p {
+  margin: 5px 0 0;
+
+  color: #c5a46d;
+
+  font-family: "Jost", sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+}
+
+
+/* =====================================================
+   NO RESULTS
+===================================================== */
+
+.navbar-search-no-results {
+  min-height: 180px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.navbar-search-no-results > svg {
+  margin-bottom: 13px;
+  color: #c5a46d;
+}
+
+.navbar-search-no-results > span {
+  color: #e9e2d5;
+
+  font-family: "Jost", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.navbar-search-no-results p {
+  max-width: 420px;
+
+  margin: 8px 0 18px;
+
+  color: rgba(233, 226, 213, 0.58);
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 17px;
+}
+
+.navbar-search-no-results button {
+  height: 36px;
+
+  padding: 0 17px;
+
+  border: 1px solid
+    rgba(197, 164, 109, 0.6);
+
+  background: transparent;
+
+  color: #e9e2d5;
+
+  font-family: "Jost", sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.navbar-search-no-results button:hover {
+  background: #c5a46d;
+  color: #0d0d0c;
+}
+
+
+/* =====================================================
+   SEARCH SCROLLBAR
+===================================================== */
+
+.navbar-search-panel::-webkit-scrollbar {
+  width: 5px;
+}
+
+.navbar-search-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.navbar-search-panel::-webkit-scrollbar-thumb {
+  background: rgba(197, 164, 109, 0.45);
+}
+
+
+/* =====================================================
+   SEARCH TABLET
+===================================================== */
+
+@media (max-width: 1000px) {
+  .navbar-search-panel {
+    padding-left: 4%;
+    padding-right: 4%;
+  }
+
+  .navbar-search-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+}
+
+
+/* =====================================================
+   SEARCH MOBILE
+===================================================== */
+
+@media (max-width: 760px) {
+  .navbar-search-panel {
+    padding: 22px 5% 30px;
+
+    max-height: 92vh;
+  }
+
+  .navbar-search-header {
+    margin-bottom: 10px;
+  }
+
+  .navbar-search-form {
+    height: 58px;
+  }
+
+  .navbar-search-form input {
+    font-size: 23px;
+  }
+
+  .navbar-search-form > svg {
+    width: 18px;
+    height: 18px;
+    margin-right: 11px;
+  }
+
+  .navbar-search-submit {
+    min-width: 75px;
+    height: 34px;
+
+    padding: 0 10px;
+
+    font-size: 8px;
+    letter-spacing: 1.2px;
+  }
+
+  .navbar-search-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 18px 10px;
+  }
+
+  .navbar-search-product-info h4 {
+    font-size: 16px;
+  }
+
+  .navbar-search-product-info p {
+    font-size: 8px;
+  }
+}
+
+
+/* =====================================================
+   SEARCH SMALL MOBILE
+===================================================== */
+
+@media (max-width: 480px) {
+  .navbar-search-panel {
+    padding: 18px 18px 25px;
+  }
+
+  .navbar-search-header > span {
+    font-size: 7px;
+    letter-spacing: 1.7px;
+  }
+
+  .navbar-search-close {
+    width: 31px;
+    height: 31px;
+  }
+
+  .navbar-search-form {
+    height: 53px;
+  }
+
+  .navbar-search-form input {
+    font-size: 20px;
+  }
+
+  .navbar-search-submit {
+    min-width: 65px;
+    height: 32px;
+
+    padding: 0 8px;
+
+    font-size: 7px;
+  }
+
+  .navbar-search-clear {
+    margin-right: 3px;
+  }
+
+  .navbar-search-content {
+    padding-top: 20px;
+  }
+
+  .navbar-search-empty p {
+    font-size: 16px;
+  }
+
+  .navbar-search-grid {
+    gap: 16px 9px;
+  }
+
+  .navbar-search-product-image {
+    aspect-ratio: 1 / 1.08;
+  }
+}
+
+
+/* =====================================================
+   REDUCED MOTION
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar-search-overlay,
+  .navbar-search-panel,
+  .navbar-search-product,
+  .navbar-search-product-image img,
+  .navbar-search-close,
+  .navbar-search-clear,
+  .search-loader {
+    transition: none;
+    animation: none;
+  }
+}
 .navbar {
   position: fixed;
   /* top: 36px; */

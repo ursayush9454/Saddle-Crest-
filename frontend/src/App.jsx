@@ -19,7 +19,6 @@ import Profile from "./pages/Profile";
 import ShippingDelivery from "./pages/ShippingDelivery";
 import ReturnsRefunds from "./pages/ReturnsRefunds";
 import CancellationPolicy from "./pages/CancellationPolicy";
-import PolicyPage from "./components/PolicyPage";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/Faq";
@@ -30,7 +29,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReviewOrder from "./pages/ReviewsOrder";
 import OrderDetails from "./pages/OrderDetails";
 
-
+// Protected Route
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Context
 import { ShopProvider } from "./ShopContext/ShopContext";
@@ -41,7 +41,6 @@ import ScrollToTop from "./components/Scrolltop";
 const App = () => {
   return (
     <ShopProvider>
-
       <ScrollToTop />
 
       <Routes>
@@ -54,8 +53,13 @@ const App = () => {
           element={<Home />}
         />
 
-            <Route path="/About"
-            element={<About/>}/>
+        {/* =========================================
+            ABOUT
+        ========================================= */}
+        <Route
+          path="/About"
+          element={<About />}
+        />
 
         {/* =========================================
             SHOP
@@ -119,84 +123,138 @@ const App = () => {
         />
 
         {/* =========================================
-            CART
+            PROTECTED - CART
         ========================================= */}
         <Route
           path="/cart"
-          element={<Cart />}
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
         />
 
         {/* =========================================
-            WISHLIST
+            PROTECTED - WISHLIST
         ========================================= */}
         <Route
           path="/wishlist"
-          element={<Wishlist />}
+          element={
+            <ProtectedRoute>
+              <Wishlist />
+            </ProtectedRoute>
+          }
         />
 
         {/* =========================================
-            CHECKOUT
+            PROTECTED - CHECKOUT
         ========================================= */}
         <Route
           path="/checkout"
-          element={<Checkout />}
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
         />
 
         {/* =========================================
-            ORDERS
+            PROTECTED - ORDERS
         ========================================= */}
-        <Route path="/orders"element={<Orders/>}/>
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/orders/:id" element={<OrderDetails />} />
+        <Route
+          path="/orders/:id"
+          element={
+            <ProtectedRoute>
+              <OrderDetails />
+            </ProtectedRoute>
+          }
+        />
+
         {/* =========================================
-            PROFILE
+            PROTECTED - PROFILE
         ========================================= */}
         <Route
           path="/profile"
-          element={<Profile />}
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
         />
 
+        {/* =========================================
+            PROTECTED - REVIEW ORDER
+        ========================================= */}
+        <Route
+          path="/review-order"
+          element={
+            <ProtectedRoute>
+              <ReviewOrder />
+            </ProtectedRoute>
+          }
+        />
 
-       
-<Route
-  path="/shipping-delivery"
-  element={<ShippingDelivery />}
-/>
+        {/* =========================================
+            PUBLIC POLICIES
+        ========================================= */}
+        <Route
+          path="/shipping-delivery"
+          element={<ShippingDelivery />}
+        />
 
-<Route
-  path="/returns-refunds"
-  element={<ReturnsRefunds />}
-/>
+        <Route
+          path="/returns-refunds"
+          element={<ReturnsRefunds />}
+        />
 
-<Route
-  path="/cancellation-policy"
-  element={<CancellationPolicy />}
-/>
+        <Route
+          path="/cancellation-policy"
+          element={<CancellationPolicy />}
+        />
 
-<Route
-  path="/terms"
-  element={<Terms />}
-/> 
+        <Route
+          path="/terms"
+          element={<Terms />}
+        />
 
+        <Route
+          path="/privacy-policy"
+          element={<PrivacyPolicy />}
+        />
 
-<Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        {/* =========================================
+            OTHER PUBLIC PAGES
+        ========================================= */}
+        <Route
+          path="/Contact"
+          element={<Contact />}
+        />
 
+        <Route
+          path="/Faq"
+          element={<FAQ />}
+        />
 
-<Route path="/Contact" element={<Contact/>}/>
-
-<Route path="/Faq" element={<FAQ/>}/>
-
- <Route
+        <Route
           path="/reviews"
-          element={<Reviews />}/>
+          element={<Reviews />}
+        />
 
-             <Route
+        <Route
           path="/story"
-          element={<Story />}/>
+          element={<Story />}
+        />
 
-<Route path="/review-order" element={<ReviewOrder />} />
       </Routes>
-
     </ShopProvider>
   );
 };

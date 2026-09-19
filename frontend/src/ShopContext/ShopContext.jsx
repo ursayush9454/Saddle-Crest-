@@ -1,10 +1,11 @@
-
 import React, {
   createContext,
   useContext,
   useEffect,
   useState,
 } from "react";
+
+import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   apiRequest,
@@ -58,12 +59,17 @@ const normalizeCartItems = (items = []) => {
 const normalizeWishlistItems = (items = []) => {
   return items
     .map((item) => {
-      return normalizeProduct(item.product || item);
+      return normalizeProduct(
+        item.product || item
+      );
     })
     .filter(Boolean);
 };
 
 export const ShopProvider = ({ children }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
 
@@ -74,25 +80,44 @@ export const ShopProvider = ({ children }) => {
   const [error, setError] = useState("");
 
   // =====================================================
+  // LOGIN REQUIRED HELPER
+  // =====================================================
+
+  const requireLogin = (message) => {
+    const token = getToken();
+
+    if (token) {
+      return true;
+    }
+
+    setError("");
+
+    navigate("/login", {
+      state: {
+        from:
+          location.pathname +
+          location.search,
+        message:
+          message ||
+          "Please login to continue.",
+      },
+    });
+
+    return false;
+  };
+
+  // =====================================================
   // GUEST CART
   // =====================================================
 
   const loadGuestCart = () => {
-    try {
-      const savedCart =
-        JSON.parse(
-          localStorage.getItem("saddleCart")
-        ) || [];
+    /*
+     * Guest cart is intentionally disabled.
+     *
+     * Users must login before using cart.
+     */
 
-      setCart(
-        savedCart.map((item) => ({
-          ...normalizeProduct(item),
-          quantity: Number(item.quantity || 1),
-        }))
-      );
-    } catch {
-      setCart([]);
-    }
+    setCart([]);
   };
 
   // =====================================================
@@ -100,20 +125,13 @@ export const ShopProvider = ({ children }) => {
   // =====================================================
 
   const loadGuestWishlist = () => {
-    try {
-      const savedWishlist =
-        JSON.parse(
-          localStorage.getItem("saddleWishlist")
-        ) || [];
+    /*
+     * Guest wishlist is intentionally disabled.
+     *
+     * Users must login before using wishlist.
+     */
 
-      setWishlist(
-        savedWishlist
-          .map(normalizeProduct)
-          .filter(Boolean)
-      );
-    } catch {
-      setWishlist([]);
-    }
+    setWishlist([]);
   };
 
   // =====================================================
@@ -141,14 +159,39 @@ export const ShopProvider = ({ children }) => {
 
       setCart(normalizeCartItems(items));
     } catch (err) {
-      console.error("Load Cart Error:", err);
+      console.error(
+        "Load Cart Error:",
+        err
+      );
 
-      if (err.message?.toLowerCase().includes("token")) {
+      if (
+        err.message
+          ?.toLowerCase()
+          .includes("token")
+      ) {
         clearAuth();
-        loadGuestCart();
+
+        setCart([]);
+        setWishlist([]);
+
+        navigate("/login", {
+          replace: true,
+          state: {
+            from:
+              location.pathname +
+              location.search,
+            message:
+              "Your session has expired. Please login again.",
+          },
+        });
+
+        return;
       }
 
-      setError(err.message || "Unable to load cart");
+      setError(
+        err.message ||
+          "Unable to load cart"
+      );
     } finally {
       setLoadingCart(false);
     }
@@ -170,7 +213,9 @@ export const ShopProvider = ({ children }) => {
       setLoadingWishlist(true);
       setError("");
 
-      const data = await apiRequest("/wishlist");
+      const data = await apiRequest(
+        "/wishlist"
+      );
 
       const items =
         data?.wishlist?.products ||
@@ -187,13 +232,33 @@ export const ShopProvider = ({ children }) => {
         err
       );
 
-      if (err.message?.toLowerCase().includes("token")) {
+      if (
+        err.message
+          ?.toLowerCase()
+          .includes("token")
+      ) {
         clearAuth();
-        loadGuestWishlist();
+
+        setCart([]);
+        setWishlist([]);
+
+        navigate("/login", {
+          replace: true,
+          state: {
+            from:
+              location.pathname +
+              location.search,
+            message:
+              "Your session has expired. Please login again.",
+          },
+        });
+
+        return;
       }
 
       setError(
-        err.message || "Unable to load wishlist"
+        err.message ||
+          "Unable to load wishlist"
       );
     } finally {
       setLoadingWishlist(false);
@@ -227,53 +292,50 @@ export const ShopProvider = ({ children }) => {
   }, []);
 
   // =====================================================
-  // GUEST LOCAL STORAGE
+  // REMOVE OLD GUEST STORAGE
   // =====================================================
 
   useEffect(() => {
-    if (!getToken()) {
-      localStorage.setItem(
-        "saddleCart",
-        JSON.stringify(cart)
-      );
-    }
-  }, [cart]);
+    /*
+     * Old guest cart/wishlist data should not remain
+     * after we switch to login-required behavior.
+     */
 
-  useEffect(() => {
     if (!getToken()) {
-      localStorage.setItem(
-        "saddleWishlist",
-        JSON.stringify(wishlist)
+      localStorage.removeItem(
+        "saddleCart"
+      );
+
+      localStorage.removeItem(
+        "saddleWishlist"
       );
     }
-  }, [wishlist]);
+  }, [cart, wishlist]);
 
   // =====================================================
   // ADD TO WISHLIST
   // =====================================================
 
   const addToWishlist = async (product) => {
-    const normalized = normalizeProduct(product);
+    /*
+     * LOGIN REQUIRED
+     */
 
-    if (!normalized?.id) {
-      throw new Error("Invalid product");
+    if (
+      !requireLogin(
+        "Please login to add products to your wishlist."
+      )
+    ) {
+      return;
     }
 
-    const token = getToken();
+    const normalized =
+      normalizeProduct(product);
 
-    // Guest
-    if (!token) {
-      setWishlist((prev) => {
-        const exists = prev.some(
-          (item) => item.id === normalized.id
-        );
-
-        if (exists) return prev;
-
-        return [...prev, normalized];
-      });
-
-      return;
+    if (!normalized?.id) {
+      throw new Error(
+        "Invalid product"
+      );
     }
 
     try {
@@ -295,7 +357,8 @@ export const ShopProvider = ({ children }) => {
       );
 
       setError(
-        err.message || "Unable to add to wishlist"
+        err.message ||
+          "Unable to add to wishlist"
       );
 
       throw err;
@@ -309,13 +372,15 @@ export const ShopProvider = ({ children }) => {
   // =====================================================
 
   const removeFromWishlist = async (id) => {
-    const token = getToken();
+    /*
+     * LOGIN REQUIRED
+     */
 
-    if (!token) {
-      setWishlist((prev) =>
-        prev.filter((item) => item.id !== id)
-      );
-
+    if (
+      !requireLogin(
+        "Please login to manage your wishlist."
+      )
+    ) {
       return;
     }
 
@@ -331,7 +396,9 @@ export const ShopProvider = ({ children }) => {
       );
 
       setWishlist((prev) =>
-        prev.filter((item) => item.id !== id)
+        prev.filter(
+          (item) => item.id !== id
+        )
       );
     } catch (err) {
       console.error(
@@ -354,17 +421,43 @@ export const ShopProvider = ({ children }) => {
   // TOGGLE WISHLIST
   // =====================================================
 
-  const toggleWishlist = async (product) => {
-    const normalized = normalizeProduct(product);
+  const toggleWishlist = async (
+    product
+  ) => {
+    /*
+     * LOGIN REQUIRED
+     */
+
+    if (
+      !requireLogin(
+        "Please login to use your wishlist."
+      )
+    ) {
+      return;
+    }
+
+    const normalized =
+      normalizeProduct(product);
+
+    if (!normalized?.id) {
+      throw new Error(
+        "Invalid product"
+      );
+    }
 
     const exists = wishlist.some(
-      (item) => item.id === normalized.id
+      (item) =>
+        item.id === normalized.id
     );
 
     if (exists) {
-      await removeFromWishlist(normalized.id);
+      await removeFromWishlist(
+        normalized.id
+      );
     } else {
-      await addToWishlist(normalized);
+      await addToWishlist(
+        normalized
+      );
     }
   };
 
@@ -386,62 +479,37 @@ export const ShopProvider = ({ children }) => {
     product,
     quantity = 1
   ) => {
-    const normalized = normalizeProduct(product);
+    /*
+     * LOGIN REQUIRED
+     */
+
+    if (
+      !requireLogin(
+        "Please login to add products to your cart."
+      )
+    ) {
+      return;
+    }
+
+    const normalized =
+      normalizeProduct(product);
 
     if (!normalized?.id) {
-      throw new Error("Invalid product");
+      throw new Error(
+        "Invalid product"
+      );
     }
 
     if (normalized.stock <= 0) {
-      throw new Error("Product is out of stock");
+      throw new Error(
+        "Product is out of stock"
+      );
     }
 
     const safeQuantity = Math.max(
       1,
       Number(quantity || 1)
     );
-
-    const token = getToken();
-
-    // Guest cart
-    if (!token) {
-      setCart((prev) => {
-        const exists = prev.find(
-          (item) => item.id === normalized.id
-        );
-
-        if (exists) {
-          const newQuantity =
-            exists.quantity + safeQuantity;
-
-          if (
-            normalized.stock &&
-            newQuantity > normalized.stock
-          ) {
-            return prev;
-          }
-
-          return prev.map((item) =>
-            item.id === normalized.id
-              ? {
-                  ...item,
-                  quantity: newQuantity,
-                }
-              : item
-          );
-        }
-
-        return [
-          ...prev,
-          {
-            ...normalized,
-            quantity: safeQuantity,
-          },
-        ];
-      });
-
-      return;
-    }
 
     try {
       setLoadingCart(true);
@@ -450,8 +518,10 @@ export const ShopProvider = ({ children }) => {
       await apiRequest("/cart", {
         method: "POST",
         body: JSON.stringify({
-          productId: normalized.id,
-          quantity: safeQuantity,
+          productId:
+            normalized.id,
+          quantity:
+            safeQuantity,
         }),
       });
 
@@ -463,7 +533,8 @@ export const ShopProvider = ({ children }) => {
       );
 
       setError(
-        err.message || "Unable to add to cart"
+        err.message ||
+          "Unable to add to cart"
       );
 
       throw err;
@@ -476,14 +547,18 @@ export const ShopProvider = ({ children }) => {
   // REMOVE FROM CART
   // =====================================================
 
-  const removeFromCart = async (id) => {
-    const token = getToken();
+  const removeFromCart = async (
+    id
+  ) => {
+    /*
+     * LOGIN REQUIRED
+     */
 
-    if (!token) {
-      setCart((prev) =>
-        prev.filter((item) => item.id !== id)
-      );
-
+    if (
+      !requireLogin(
+        "Please login to manage your cart."
+      )
+    ) {
       return;
     }
 
@@ -499,7 +574,9 @@ export const ShopProvider = ({ children }) => {
       );
 
       setCart((prev) =>
-        prev.filter((item) => item.id !== id)
+        prev.filter(
+          (item) => item.id !== id
+        )
       );
     } catch (err) {
       console.error(
@@ -526,9 +603,26 @@ export const ShopProvider = ({ children }) => {
     id,
     quantity
   ) => {
-    const safeQuantity = Number(quantity);
+    /*
+     * LOGIN REQUIRED
+     */
 
-    if (!Number.isFinite(safeQuantity)) {
+    if (
+      !requireLogin(
+        "Please login to update your cart."
+      )
+    ) {
+      return;
+    }
+
+    const safeQuantity =
+      Number(quantity);
+
+    if (
+      !Number.isFinite(
+        safeQuantity
+      )
+    ) {
       return;
     }
 
@@ -537,38 +631,21 @@ export const ShopProvider = ({ children }) => {
       return;
     }
 
-    const token = getToken();
-
-    // Guest
-    if (!token) {
-      setCart((prev) =>
-        prev.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                quantity: Math.min(
-                  safeQuantity,
-                  item.stock || safeQuantity
-                ),
-              }
-            : item
-        )
-      );
-
-      return;
-    }
-
     try {
       setLoadingCart(true);
       setError("");
 
-      await apiRequest("/cart/update", {
-        method: "PUT",
-        body: JSON.stringify({
-          productId: id,
-          quantity: safeQuantity,
-        }),
-      });
+      await apiRequest(
+        "/cart/update",
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            productId: id,
+            quantity:
+              safeQuantity,
+          }),
+        }
+      );
 
       await loadCart();
     } catch (err) {
@@ -592,9 +669,20 @@ export const ShopProvider = ({ children }) => {
   // INCREASE
   // =====================================================
 
-  const increaseQuantity = async (id) => {
+  const increaseQuantity = async (
+    id
+  ) => {
+    if (
+      !requireLogin(
+        "Please login to update your cart."
+      )
+    ) {
+      return;
+    }
+
     const item = cart.find(
-      (product) => product.id === id
+      (product) =>
+        product.id === id
     );
 
     if (!item) return;
@@ -616,9 +704,20 @@ export const ShopProvider = ({ children }) => {
   // DECREASE
   // =====================================================
 
-  const decreaseQuantity = async (id) => {
+  const decreaseQuantity = async (
+    id
+  ) => {
+    if (
+      !requireLogin(
+        "Please login to update your cart."
+      )
+    ) {
+      return;
+    }
+
     const item = cart.find(
-      (product) => product.id === id
+      (product) =>
+        product.id === id
     );
 
     if (!item) return;
@@ -638,10 +737,11 @@ export const ShopProvider = ({ children }) => {
   // =====================================================
 
   const clearCart = async () => {
-    const token = getToken();
-
-    if (!token) {
-      setCart([]);
+    if (
+      !requireLogin(
+        "Please login to manage your cart."
+      )
+    ) {
       return;
     }
 
@@ -649,9 +749,12 @@ export const ShopProvider = ({ children }) => {
       setLoadingCart(true);
       setError("");
 
-      await apiRequest("/cart/clear", {
-        method: "DELETE",
-      });
+      await apiRequest(
+        "/cart/clear",
+        {
+          method: "DELETE",
+        }
+      );
 
       setCart([]);
     } catch (err) {
@@ -661,7 +764,8 @@ export const ShopProvider = ({ children }) => {
       );
 
       setError(
-        err.message || "Unable to clear cart"
+        err.message ||
+          "Unable to clear cart"
       );
 
       throw err;
@@ -676,7 +780,10 @@ export const ShopProvider = ({ children }) => {
 
   const cartCount = cart.reduce(
     (total, item) =>
-      total + Number(item.quantity || 0),
+      total +
+      Number(
+        item.quantity || 0
+      ),
     0
   );
 
@@ -687,22 +794,25 @@ export const ShopProvider = ({ children }) => {
   // SUBTOTAL
   // =====================================================
 
-  const cartSubtotal = cart.reduce(
-    (total, item) => {
-      const price =
-        item.salePrice !== null &&
-        item.salePrice !== undefined
-          ? item.salePrice
-          : item.price;
+  const cartSubtotal =
+    cart.reduce(
+      (total, item) => {
+        const price =
+          item.salePrice !== null &&
+          item.salePrice !== undefined
+            ? item.salePrice
+            : item.price;
 
-      return (
-        total +
-        Number(price || 0) *
-          Number(item.quantity || 0)
-      );
-    },
-    0
-  );
+        return (
+          total +
+          Number(price || 0) *
+            Number(
+              item.quantity || 0
+            )
+        );
+      },
+      0
+    );
 
   // =====================================================
   // CLEAR ERROR
@@ -751,7 +861,8 @@ export const ShopProvider = ({ children }) => {
 };
 
 export const useShop = () => {
-  const context = useContext(ShopContext);
+  const context =
+    useContext(ShopContext);
 
   if (!context) {
     throw new Error(
@@ -763,4 +874,3 @@ export const useShop = () => {
 };
 
 export default ShopContext;
-

@@ -5,614 +5,389 @@ import {
   X,
   Loader2,
   FolderTree,
+  Trash2,
 } from "lucide-react";
-
 import { apiRequest } from "../services/api";
 import "./Categories.css";
 
-const initialForm = {
-  name: "",
-  slug: "",
-  description: "",
+const DEFAULT_CATEGORIES = [
+  {
+    name: "Saddles",
+    description: "Premium saddles for different riding disciplines.",
+  },
+  {
+    name: "Bridles",
+    description: "Premium bridles and headgear for horses.",
+  },
+  {
+    name: "Rider",
+    description: "Riding essentials, apparel and accessories.",
+  },
+  {
+    name: "Horse Care",
+    description: "Horse grooming and care essentials.",
+  },
+  {
+    name: "Leather Goods",
+    description: "Handcrafted premium leather products.",
+  },
+  {
+    name: "Custom",
+    description: "Custom-made equestrian products.",
+  },
+];
+
+const makeSlug = (value = "") =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const mergeCategories = (backendCategories = []) => {
+  const map = new Map();
+
+  DEFAULT_CATEGORIES.forEach((category) => {
+    map.set(category.name.toLowerCase(), {
+      ...category,
+      slug: makeSlug(category.name),
+    });
+  });
+
+  backendCategories.forEach((category) => {
+    if (!category?.name) return;
+
+    const key = category.name.toLowerCase();
+
+    map.set(key, {
+      ...category,
+      slug: category.slug || makeSlug(category.name),
+    });
+  });
+
+  return Array.from(map.values()).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 };
 
 const Categories = () => {
-  const [data, setData] = useState({
-    categories: [],
-  });
-
-  const [form, setForm] = useState(initialForm);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
 
   const [showForm, setShowForm] = useState(false);
 
-  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+  });
 
-  const [saving, setSaving] = useState(false);
-
-  const [error, setError] = useState("");
-
-  // =========================
-  // LOAD CATEGORIES
-  // =========================
-
-  const loadCategories = async () => {
+  const fetchCategories = async () => {
     try {
-      setError("");
+      setLoading(true);
 
       const result = await apiRequest("/categories");
 
-      setData({
-        categories: Array.isArray(result?.categories)
-          ? result.categories
-          : [],
-      });
-    } catch (err) {
-      console.error("Categories loading error:", err);
-
-      setError(
-        err?.message || "Failed to load categories."
+      setCategories(
+        mergeCategories(result?.categories || result || [])
       );
+    } catch (error) {
+      console.error("Category fetch error:", error);
+
+      // Even if backend fails, default categories will still show
+      setCategories(mergeCategories([]));
     } finally {
       setLoading(false);
     }
   };
 
-  // =========================
-  // INITIAL LOAD
-  // =========================
-
   useEffect(() => {
-    let mounted = true;
-
-    const load = async () => {
-      try {
-        setError("");
-
-        const result = await apiRequest("/categories");
-
-        if (!mounted) return;
-
-        setData({
-          categories: Array.isArray(result?.categories)
-            ? result.categories
-            : [],
-        });
-      } catch (err) {
-        console.error("Categories loading error:", err);
-
-        if (mounted) {
-          setError(
-            err?.message || "Failed to load categories."
-          );
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    load();
-
-    return () => {
-      mounted = false;
-    };
+    fetchCategories();
   }, []);
 
-  // =========================
-  // FORM FIELD UPDATE
-  // =========================
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-  const updateField = (field, value) => {
     setForm((prev) => ({
       ...prev,
-      [field]: value,
+      [name]: value,
     }));
-
-    if (error) {
-      setError("");
-    }
   };
 
-  // =========================
-  // CLOSE FORM
-  // =========================
+  const handleAddCategory = async (e) => {
+    e.preventDefault();
 
-  const closeForm = () => {
-    setShowForm(false);
-    setForm(initialForm);
-    setError("");
-  };
-
-  // =========================
-  // CREATE CATEGORY
-  // =========================
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    const categoryName = form.name.trim();
-
-    if (!categoryName) {
-      setError("Category name is required.");
+    if (!form.name.trim()) {
+      alert("Please enter category name.");
       return;
     }
 
     try {
       setSaving(true);
-      setError("");
 
-      const result = await apiRequest("/categories", {
+      await apiRequest("/categories", {
         method: "POST",
-
         body: JSON.stringify({
-          name: categoryName,
+          name: form.name.trim(),
+          slug: makeSlug(form.name),
           description: form.description.trim(),
         }),
       });
 
-      // Add newly created category immediately
-      if (result?.category) {
-        setData((prev) => ({
-          categories: [
-            ...prev.categories,
-            result.category,
-          ].sort((a, b) =>
-            (a.name || "").localeCompare(
-              b.name || ""
-            )
-          ),
-        }));
-      } else {
-        // Fallback: reload from backend
-        await loadCategories();
-      }
+      setForm({
+        name: "",
+        description: "",
+      });
 
-      setForm(initialForm);
       setShowForm(false);
-    } catch (err) {
-      console.error("Create category error:", err);
 
-      setError(
-        err?.message || "Failed to create category."
-      );
+      await fetchCategories();
+    } catch (error) {
+      alert(error.message || "Failed to add category.");
     } finally {
       setSaving(false);
     }
   };
 
-  // =========================
-  // REFRESH
-  // =========================
+  const handleDelete = async (category) => {
+    if (!category?._id) {
+      alert(
+        "This is a default category. Delete is available only for categories saved in the database."
+      );
+      return;
+    }
 
-  const handleRefresh = async () => {
-    setLoading(true);
-    await loadCategories();
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${category.name}"?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeleting(category._id);
+
+      await apiRequest(`/categories/${category._id}`, {
+        method: "DELETE",
+      });
+
+      await fetchCategories();
+    } catch (error) {
+      alert(error.message || "Failed to delete category.");
+    } finally {
+      setDeleting(null);
+    }
   };
 
-  // =========================
-  // LOADING
-  // =========================
-
-  if (loading) {
-    return (
-      <div className="categories-loading">
-        <Loader2
-          size={18}
-          className="category-spinner"
-        />
-
-        <span>Loading categories...</span>
-      </div>
-    );
-  }
-
-  // =========================
-  // UI
-  // =========================
-
   return (
-    <div className="categories-page">
-
-      {/* =========================
-          ERROR
-      ========================= */}
-
-      {error && (
-        <div className="categories-error">
-          <span>{error}</span>
-
-          <button
-            type="button"
-            onClick={() => setError("")}
-          >
-            <X size={14} />
-          </button>
-        </div>
-      )}
-
-      {/* =========================
-          HEADER
-      ========================= */}
-
-      <section className="categories-header">
-
-        <div className="categories-title-area">
-
-          <span className="categories-eyebrow">
-            CATALOGUE STRUCTURE
-          </span>
+    <section className="categories-page">
+      <div className="page-header">
+        <div>
+          <span className="page-eyebrow">Catalog</span>
 
           <h1>Categories</h1>
 
           <p>
-            Organise and manage your product catalogue.
+            Manage product categories for your Saddle & Crest store.
           </p>
-
         </div>
 
         <div className="categories-actions">
-
           <button
+            className="outline-button"
             type="button"
-            className="categories-refresh"
-            onClick={handleRefresh}
+            onClick={fetchCategories}
             disabled={loading}
           >
-            <RefreshCw size={15} />
-
+            <RefreshCw size={17} />
             Refresh
           </button>
 
           <button
+            className="primary-button"
             type="button"
-            className="categories-add"
-            onClick={() =>
-              setShowForm((prev) => !prev)
-            }
+            onClick={() => setShowForm(true)}
           >
-            {showForm ? (
-              <X size={15} />
-            ) : (
-              <Plus size={15} />
-            )}
-
-            {showForm
-              ? "Close"
-              : "Add Category"}
+            <Plus size={17} />
+            Add Category
           </button>
-
         </div>
-
-      </section>
-
-      {/* =========================
-          ADD CATEGORY FORM
-      ========================= */}
+      </div>
 
       {showForm && (
-        <section className="category-form-panel">
-
-          <div className="category-form-heading">
-
+        <div className="category-form-panel panel">
+          <div className="panel-heading">
             <div>
-
-              <span>NEW CATEGORY</span>
-
               <h2>Add Category</h2>
-
+              <p>Create a new product category.</p>
             </div>
 
+            <button
+              className="icon-button"
+              type="button"
+              onClick={() => setShowForm(false)}
+            >
+              <X size={18} />
+            </button>
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="category-form"
-          >
-
-            <div className="category-form-grid">
-
-              {/* NAME */}
-
-              <div className="category-field">
-
-                <label htmlFor="category-name">
-                  Category Name
-                </label>
+          <form onSubmit={handleAddCategory}>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Category Name</label>
 
                 <input
-                  id="category-name"
                   type="text"
+                  name="name"
                   value={form.name}
-                  onChange={(e) =>
-                    updateField(
-                      "name",
-                      e.target.value
-                    )
-                  }
-                  placeholder="Saddles"
-                  autoComplete="off"
+                  onChange={handleChange}
+                  placeholder="e.g. Riding Accessories"
                   required
                 />
-
               </div>
 
-              {/* SLUG */}
-
-              <div className="category-field">
-
-                <label htmlFor="category-slug">
-                  Slug
-                </label>
+              <div className="form-group">
+                <label>Description</label>
 
                 <input
-                  id="category-slug"
                   type="text"
-                  value={form.slug}
-                  onChange={(e) =>
-                    updateField(
-                      "slug",
-                      e.target.value
-                    )
-                  }
-                  placeholder="saddles"
-                  autoComplete="off"
-                />
-
-                <small>
-                  Slug is generated automatically from
-                  the category name.
-                </small>
-
-              </div>
-
-              {/* DESCRIPTION */}
-
-              <div className="category-field full">
-
-                <label htmlFor="category-description">
-                  Description
-                </label>
-
-                <textarea
-                  id="category-description"
-                  rows="4"
+                  name="description"
                   value={form.description}
-                  onChange={(e) =>
-                    updateField(
-                      "description",
-                      e.target.value
-                    )
-                  }
-                  placeholder="Describe this category..."
+                  onChange={handleChange}
+                  placeholder="Short category description"
                 />
-
               </div>
-
             </div>
 
-            {/* FORM ACTIONS */}
-
-            <div className="category-form-actions">
-
+            <div className="form-actions">
               <button
                 type="button"
-                className="category-cancel"
-                onClick={closeForm}
-                disabled={saving}
+                className="outline-button"
+                onClick={() => setShowForm(false)}
               >
-                <X size={15} />
-
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="category-save"
+                className="primary-button"
                 disabled={saving}
               >
-
                 {saving ? (
                   <>
-                    <Loader2
-                      size={15}
-                      className="category-spinner"
-                    />
-
+                    <Loader2 size={17} className="spin" />
                     Saving...
                   </>
                 ) : (
                   <>
-                    <Plus size={15} />
-
+                    <Plus size={17} />
                     Add Category
                   </>
                 )}
-
               </button>
-
             </div>
-
           </form>
-
-        </section>
+        </div>
       )}
 
-      {/* =========================
-          CATEGORY LIST
-      ========================= */}
-
-      <section className="categories-list-panel">
-
-        <div className="categories-list-heading">
-
+      <div className="panel">
+        <div className="panel-heading">
           <div>
-
-            <span>LIVE DATA</span>
-
             <h2>All Categories</h2>
 
+            <p>
+              {categories.length} categories available
+            </p>
           </div>
 
-          <div className="categories-count">
-
-            <FolderTree size={14} />
-
-            <strong>
-              {data.categories.length}
-            </strong>
-
-          </div>
-
+          <FolderTree size={22} />
         </div>
 
-        {/* =========================
-            EMPTY STATE
-        ========================= */}
-
-        {data.categories.length === 0 ? (
-          <div className="categories-empty-state">
-
-            <div className="categories-empty-icon">
-              <FolderTree size={25} />
-            </div>
-
-            <h3>No categories found</h3>
-
-            <p>
-              Create your first product category to
-              organise your catalogue.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => setShowForm(true)}
-            >
-              <Plus size={15} />
-
-              Add Category
-            </button>
-
+        {loading ? (
+          <div className="category-loading">
+            <Loader2 size={25} className="spin" />
+            <span>Loading categories...</span>
+          </div>
+        ) : categories.length === 0 ? (
+          <div className="empty-state">
+            No categories found.
           </div>
         ) : (
-
-          /* =========================
-             TABLE
-          ========================= */
-
-          <div className="categories-table-wrapper">
-
-            <table className="categories-table">
-
+          <div className="table-wrapper">
+            <table>
               <thead>
-
                 <tr>
                   <th>Category</th>
                   <th>Slug</th>
                   <th>Description</th>
                   <th>Status</th>
+                  <th>Action</th>
                 </tr>
-
               </thead>
 
               <tbody>
-
-                {data.categories.map(
-                  (category) => (
-
-                    <tr
-                      key={
-                        category._id ||
-                        category.id ||
-                        category.slug ||
-                        category.name
-                      }
-                    >
-
-                      {/* CATEGORY */}
-
-                      <td>
-
-                        <div className="category-name-cell">
-
-                          <div className="category-icon">
-                            <FolderTree size={15} />
-                          </div>
-
-                          <div>
-
-                            <strong>
-                              {category.name ||
-                                "Unnamed Category"}
-                            </strong>
-
-                            <span>
-                              Category
-                            </span>
-
-                          </div>
-
+                {categories.map((category, index) => (
+                  <tr key={category._id || `${category.name}-${index}`}>
+                    <td>
+                      <div className="category-name-cell">
+                        <div className="category-icon">
+                          <FolderTree size={16} />
                         </div>
 
-                      </td>
+                        <strong>{category.name}</strong>
+                      </div>
+                    </td>
 
-                      {/* SLUG */}
+                    <td>
+                      <span className="category-slug">
+                        {category.slug || makeSlug(category.name)}
+                      </span>
+                    </td>
 
-                      <td>
+                    <td>
+                      {category.description || "—"}
+                    </td>
 
-                        <span className="category-slug">
-                          {category.slug || "—"}
-                        </span>
+                    <td>
+                      <span className="status-pill active">
+                        Active
+                      </span>
+                    </td>
 
-                      </td>
+                    <td>
+                      <button
+                        type="button"
+                        className="category-delete-button"
+                        onClick={() => handleDelete(category)}
+                        disabled={
+                          deleting === category._id || !category._id
+                        }
+                        title={
+                          !category._id
+                            ? "Default category"
+                            : "Delete category"
+                        }
+                      >
+                        {deleting === category._id ? (
+                          <Loader2
+                            size={15}
+                            className="spin"
+                          />
+                        ) : (
+                          <Trash2 size={15} />
+                        )}
 
-                      {/* DESCRIPTION */}
-
-                      <td>
-
-                        <span className="category-description">
-
-                          {category.description ||
-                            "No description"}
-
-                        </span>
-
-                      </td>
-
-                      {/* STATUS */}
-
-                      <td>
-
-                        <span
-                          className={`category-status ${
-                            category.isActive === false
-                              ? "inactive"
-                              : "active"
-                          }`}
-                        >
-                          {category.isActive === false
-                            ? "Disabled"
-                            : "Active"}
-                        </span>
-
-                      </td>
-
-                    </tr>
-
-                  )
-                )}
-
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
-
             </table>
-
           </div>
-
         )}
-
-      </section>
-
-    </div>
+      </div>
+    </section>
   );
 };
 

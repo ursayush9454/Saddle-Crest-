@@ -8,6 +8,9 @@ import {
   Phone,
   User,
   ShieldCheck,
+  Tag,
+  X,
+  Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -29,6 +32,15 @@ const ReviewOrder = () => {
   const [consentAccepted, setConsentAccepted] = useState(false);
 
   // =========================================
+  // COUPON
+  // =========================================
+
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
+
+  // =========================================
   // CHECKOUT DATA
   // =========================================
 
@@ -42,16 +54,30 @@ const ReviewOrder = () => {
   }, []);
 
   // =========================================
+  // PRICE HELPER
+  // =========================================
+
+  const getItemPrice = (item) => {
+    return Number(
+      item.salePrice ??
+        item.product?.salePrice ??
+        item.price ??
+        item.product?.price ??
+        0
+    );
+  };
+
+  // =========================================
   // SUBTOTAL
   // =========================================
 
   const subtotal = useMemo(() => {
-    return cart.reduce(
-      (sum, item) =>
-        sum +
-        Number(item.price || 0) * Number(item.quantity || 1),
-      0
-    );
+    return cart.reduce((sum, item) => {
+      const price = getItemPrice(item);
+      const quantity = Number(item.quantity || 1);
+
+      return sum + price * quantity;
+    }, 0);
   }, [cart]);
 
   // =========================================
@@ -65,10 +91,149 @@ const ReviewOrder = () => {
   }, [subtotal]);
 
   // =========================================
-  // TOTAL
+  // DISCOUNT
   // =========================================
 
-  const total = subtotal + shipping;
+  const discount = Number(appliedCoupon?.discount || 0);
+
+  // Never allow discount to exceed subtotal
+  const safeDiscount = Math.min(discount, subtotal);
+
+  // =========================================
+  // FINAL TOTAL
+  // =========================================
+
+  const total = Math.max(
+    0,
+    subtotal + shipping - safeDiscount
+  );
+
+  // =========================================
+  // APPLY COUPON
+  // =========================================
+
+  const handleApplyCoupon = async () => {
+    const code = couponCode.trim().toUpperCase();
+
+    setCouponError("");
+    setError("");
+
+    if (!code) {
+      setCouponError("Please enter a coupon code.");
+      return;
+    }
+
+    if (!cart.length) {
+      setCouponError("Your cart is empty.");
+      return;
+    }
+
+    try {
+      setCouponLoading(true);
+
+      /*
+       * Backend should validate:
+       * - coupon exists
+       * - active status
+       * - expiry
+       * - minimum order
+       * - usage limit
+       * - discount rules
+       */
+
+      const response = await apiRequest(
+        "/coupons/validate",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            code,
+            cartTotal: subtotal,
+          }),
+        }
+      );
+
+      const validatedCoupon =
+        response?.coupon ||
+        response?.data?.coupon ||
+        null;
+
+      const validatedDiscount = Number(
+        response?.discount ??
+          response?.data?.discount ??
+          validatedCoupon?.discount ??
+          0
+      );
+
+      if (
+        response?.valid === false ||
+        response?.data?.valid === false
+      ) {
+        throw new Error(
+          response?.message ||
+            response?.data?.message ||
+            "This coupon is not valid."
+        );
+      }
+
+      if (validatedDiscount <= 0) {
+        throw new Error(
+          response?.message ||
+            response?.data?.message ||
+            "This coupon cannot be applied."
+        );
+      }
+
+      setAppliedCoupon({
+        code:
+          validatedCoupon?.code ||
+          response?.code ||
+          code,
+
+        discount: Math.min(
+          validatedDiscount,
+          subtotal
+        ),
+
+        discountType:
+          validatedCoupon?.discountType ||
+          response?.discountType ||
+          "",
+
+        discountValue:
+          validatedCoupon?.discountValue ??
+          response?.discountValue ??
+          null,
+      });
+
+      setCouponCode("");
+
+    } catch (err) {
+      console.error(
+        "Coupon validation error:",
+        err
+      );
+
+      setAppliedCoupon(null);
+
+      setCouponError(
+        err?.message ||
+          "Unable to validate this coupon."
+      );
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  // =========================================
+  // REMOVE COUPON
+  // =========================================
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    setCouponError("");
+    setError("");
+  };
 
   // =========================================
   // PLACE ORDER
@@ -102,11 +267,11 @@ const ReviewOrder = () => {
 
     try {
       /*
-       * Backend gets products/cart from the logged-in user's
-       * server-side cart.
+       * Coupon code is sent to backend.
        *
-       * Profile/Checkout uses `address`
-       * Backend Order model expects `addressLine1`
+       * IMPORTANT:
+       * Backend should validate the coupon again while
+       * creating the order. Frontend discount is only UI data.
        */
 
       const orderData = {
@@ -121,20 +286,25 @@ const ReviewOrder = () => {
           country: checkoutData.country || "India",
         },
 
-        paymentMethod: checkoutData.paymentMethod || "COD",
+        paymentMethod:
+          checkoutData.paymentMethod || "COD",
 
-        // =========================================
-        // CUSTOMER CONSENT
-        // =========================================
-
+        // Customer consent
         termsAccepted: consentAccepted,
         privacyPolicyAccepted: consentAccepted,
+
+        // Coupon
+        couponCode:
+          appliedCoupon?.code || null,
       };
 
-      const response = await apiRequest("/orders/place", {
-        method: "POST",
-        body: JSON.stringify(orderData),
-      });
+      const response = await apiRequest(
+        "/orders/place",
+        {
+          method: "POST",
+          body: JSON.stringify(orderData),
+        }
+      );
 
       // =========================================
       // GET CREATED ORDER ID
@@ -157,12 +327,18 @@ const ReviewOrder = () => {
       await clearCart();
 
       // Remove checkout session data
-      sessionStorage.removeItem("saddleCheckoutData");
+      sessionStorage.removeItem(
+        "saddleCheckoutData"
+      );
 
       // Show success screen
       setOrderSuccess(true);
+
     } catch (err) {
-      console.error("Place order error:", err);
+      console.error(
+        "Place order error:",
+        err
+      );
 
       setError(
         err?.message ||
@@ -184,6 +360,7 @@ const ReviewOrder = () => {
 
         <main className="review-success-page">
           <div className="review-success-card">
+
             <div className="success-icon">
               <Check size={34} />
             </div>
@@ -192,11 +369,14 @@ const ReviewOrder = () => {
               ORDER CONFIRMED
             </span>
 
-            <h1>Thank You For Your Order</h1>
+            <h1>
+              Thank You For Your Order
+            </h1>
 
             <p>
-              Your order has been successfully placed. We
-              will start preparing it shortly.
+              Your order has been successfully
+              placed. We will start preparing it
+              shortly.
             </p>
 
             {orderId && (
@@ -207,9 +387,12 @@ const ReviewOrder = () => {
             )}
 
             <div className="success-actions">
+
               <button
                 type="button"
-                onClick={() => navigate("/orders")}
+                onClick={() =>
+                  navigate("/orders")
+                }
               >
                 VIEW MY ORDERS
               </button>
@@ -217,11 +400,15 @@ const ReviewOrder = () => {
               <button
                 type="button"
                 className="secondary-success-btn"
-                onClick={() => navigate("/shop")}
+                onClick={() =>
+                  navigate("/shop")
+                }
               >
                 CONTINUE SHOPPING
               </button>
+
             </div>
+
           </div>
         </main>
       </>
@@ -239,25 +426,32 @@ const ReviewOrder = () => {
 
         <main className="review-empty-page">
           <div className="review-empty-card">
+
             <Package size={42} />
 
             <span className="review-eyebrow">
               CHECKOUT
             </span>
 
-            <h1>Review Details Not Found</h1>
+            <h1>
+              Review Details Not Found
+            </h1>
 
             <p>
-              Please return to checkout and enter your
-              delivery details before reviewing your order.
+              Please return to checkout and enter
+              your delivery details before
+              reviewing your order.
             </p>
 
             <button
               type="button"
-              onClick={() => navigate("/checkout")}
+              onClick={() =>
+                navigate("/checkout")
+              }
             >
               BACK TO CHECKOUT
             </button>
+
           </div>
         </main>
       </>
@@ -275,37 +469,42 @@ const ReviewOrder = () => {
       <main className="review-page">
         <div className="review-container">
 
-          {/* =========================================
-              HEADER
-          ========================================= */}
+          {/* HEADER */}
 
           <div className="review-header">
+
             <button
               type="button"
               className="back-checkout-btn"
-              onClick={() => navigate("/checkout")}
+              onClick={() =>
+                navigate("/checkout")
+              }
             >
               <ArrowLeft size={17} />
               Back to Checkout
             </button>
 
             <div className="review-title-wrap">
+
               <span className="review-eyebrow">
                 FINAL REVIEW
               </span>
 
-              <h1>Review Your Order</h1>
+              <h1>
+                Review Your Order
+              </h1>
 
               <p>
-                Please verify your delivery details and
-                order information before placing your order.
+                Please verify your delivery details
+                and order information before placing
+                your order.
               </p>
+
             </div>
+
           </div>
 
-          {/* =========================================
-              ERROR
-          ========================================= */}
+          {/* ERROR */}
 
           {error && (
             <div className="review-error">
@@ -315,31 +514,30 @@ const ReviewOrder = () => {
 
           <div className="review-layout">
 
-            {/* =========================================
-                LEFT SIDE
-            ========================================= */}
+            {/* LEFT SIDE */}
 
             <div className="review-main">
 
-              {/* =========================================
-                  DELIVERY
-              ========================================= */}
+              {/* DELIVERY */}
 
               <section className="review-card">
+
                 <div className="review-card-heading">
+
                   <div className="heading-icon">
                     <MapPin size={19} />
                   </div>
 
                   <div>
                     <span>DELIVERY</span>
-                    <h2>Delivery Details</h2>
+                    <h2>
+                      Delivery Details
+                    </h2>
                   </div>
+
                 </div>
 
                 <div className="delivery-details">
-
-                  {/* NAME */}
 
                   <div className="detail-row">
                     <User size={17} />
@@ -353,8 +551,6 @@ const ReviewOrder = () => {
                     </div>
                   </div>
 
-                  {/* PHONE */}
-
                   <div className="detail-row">
                     <Phone size={17} />
 
@@ -366,8 +562,6 @@ const ReviewOrder = () => {
                       </strong>
                     </div>
                   </div>
-
-                  {/* ADDRESS */}
 
                   <div className="detail-row address-row">
                     <MapPin size={17} />
@@ -395,80 +589,109 @@ const ReviewOrder = () => {
                 <button
                   type="button"
                   className="edit-details-btn"
-                  onClick={() => navigate("/checkout")}
+                  onClick={() =>
+                    navigate("/checkout")
+                  }
                 >
                   EDIT DETAILS
                 </button>
+
               </section>
 
-              {/* =========================================
-                  PAYMENT
-              ========================================= */}
+              {/* PAYMENT */}
 
               <section className="review-card">
+
                 <div className="review-card-heading">
+
                   <div className="heading-icon">
                     <CreditCard size={19} />
                   </div>
 
                   <div>
                     <span>PAYMENT</span>
-                    <h2>Payment Method</h2>
+
+                    <h2>
+                      Payment Method
+                    </h2>
                   </div>
+
                 </div>
 
                 <div className="payment-review">
+
                   <div className="payment-check">
                     <Check size={16} />
                   </div>
 
                   <div>
+
                     <strong>
-                      {checkoutData.paymentMethod === "COD"
+                      {checkoutData.paymentMethod ===
+                      "COD"
                         ? "Cash on Delivery"
                         : "Online Payment"}
                     </strong>
 
                     <p>
-                      {checkoutData.paymentMethod === "COD"
+                      {checkoutData.paymentMethod ===
+                      "COD"
                         ? "Pay when your order is delivered."
                         : "Payment will be processed through the available online payment method."}
                     </p>
+
                   </div>
+
                 </div>
+
               </section>
 
-              {/* =========================================
-                  ORDER ITEMS
-              ========================================= */}
+              {/* ORDER ITEMS */}
 
               <section className="review-card">
+
                 <div className="review-card-heading">
+
                   <div className="heading-icon">
                     <Package size={19} />
                   </div>
 
                   <div>
-                    <span>YOUR SELECTION</span>
-                    <h2>Order Items</h2>
+                    <span>
+                      YOUR SELECTION
+                    </span>
+
+                    <h2>
+                      Order Items
+                    </h2>
                   </div>
+
                 </div>
 
                 <div className="review-items">
+
                   {cart.map((item) => {
-                    const quantity = Number(
-                      item.quantity || 1
-                    );
+
+                    const quantity =
+                      Number(
+                        item.quantity || 1
+                      );
 
                     const itemTotal =
-                      Number(item.price || 0) * quantity;
+                      getItemPrice(item) *
+                      quantity;
 
                     return (
                       <div
                         className="review-item"
-                        key={item._id || item.id}
+                        key={
+                          item._id ||
+                          item.id
+                        }
                       >
+
                         <div className="review-item-image">
+
                           <img
                             src={
                               item.image ||
@@ -481,9 +704,11 @@ const ReviewOrder = () => {
                               "Product"
                             }
                           />
+
                         </div>
 
                         <div className="review-item-info">
+
                           <h3>
                             {item.name ||
                               item.product?.name ||
@@ -491,8 +716,10 @@ const ReviewOrder = () => {
                           </h3>
 
                           <span>
-                            Quantity: {quantity}
+                            Quantity:{" "}
+                            {quantity}
                           </span>
+
                         </div>
 
                         <strong className="review-item-price">
@@ -501,56 +728,86 @@ const ReviewOrder = () => {
                             "en-IN"
                           )}
                         </strong>
+
                       </div>
                     );
                   })}
+
                 </div>
+
               </section>
+
             </div>
 
-            {/* =========================================
-                RIGHT SIDE
-            ========================================= */}
+            {/* RIGHT SIDE */}
 
             <aside className="review-summary-card">
 
               {/* SUMMARY HEADER */}
 
               <div className="summary-top">
-                <span>ORDER SUMMARY</span>
 
-                <h2>Your Order</h2>
+                <span>
+                  ORDER SUMMARY
+                </span>
+
+                <h2>
+                  Your Order
+                </h2>
+
               </div>
 
               {/* SUMMARY ITEMS */}
 
               <div className="summary-items">
-                {cart.map((item) => (
-                  <div
-                    className="summary-item"
-                    key={item._id || item.id}
-                  >
-                    <div>
+
+                {cart.map((item) => {
+
+                  const itemPrice =
+                    getItemPrice(item);
+
+                  const itemQuantity =
+                    Number(
+                      item.quantity || 1
+                    );
+
+                  return (
+                    <div
+                      className="summary-item"
+                      key={
+                        item._id ||
+                        item.id
+                      }
+                    >
+
+                      <div>
+
+                        <strong>
+                          {item.name ||
+                            item.product?.name ||
+                            "Product"}
+                        </strong>
+
+                        <span>
+                          Qty {itemQuantity}
+                        </span>
+
+                      </div>
+
                       <strong>
-                        {item.name ||
-                          item.product?.name ||
-                          "Product"}
+                        ₹
+                        {(
+                          itemPrice *
+                          itemQuantity
+                        ).toLocaleString(
+                          "en-IN"
+                        )}
                       </strong>
 
-                      <span>
-                        Qty {item.quantity || 1}
-                      </span>
                     </div>
+                  );
+                })}
 
-                    <strong>
-                      ₹
-                      {(
-                        Number(item.price || 0) *
-                        Number(item.quantity || 1)
-                      ).toLocaleString("en-IN")}
-                    </strong>
-                  </div>
-                ))}
               </div>
 
               <div className="summary-divider" />
@@ -558,17 +815,27 @@ const ReviewOrder = () => {
               {/* SUBTOTAL */}
 
               <div className="summary-row">
-                <span>Subtotal</span>
+
+                <span>
+                  Subtotal
+                </span>
 
                 <strong>
-                  ₹{subtotal.toLocaleString("en-IN")}
+                  ₹
+                  {subtotal.toLocaleString(
+                    "en-IN"
+                  )}
                 </strong>
+
               </div>
 
               {/* SHIPPING */}
 
               <div className="summary-row">
-                <span>Shipping</span>
+
+                <span>
+                  Shipping
+                </span>
 
                 <strong>
                   {shipping === 0
@@ -577,31 +844,88 @@ const ReviewOrder = () => {
                         "en-IN"
                       )}`}
                 </strong>
+
               </div>
+
+              {/* COUPON DISCOUNT */}
+
+              {appliedCoupon && (
+                <div className="summary-row coupon-discount-row">
+
+                  <span>
+                    Discount
+                  </span>
+
+                  <strong>
+                    -₹
+                    {safeDiscount.toLocaleString(
+                      "en-IN"
+                    )}
+                  </strong>
+
+                </div>
+              )}
 
               <div className="summary-divider" />
 
               {/* TOTAL */}
 
               <div className="summary-total">
-                <span>Total</span>
 
-                <strong>
-                  ₹{total.toLocaleString("en-IN")}
-                </strong>
+                <span>
+                  Total
+                </span>
+
+                <div className="summary-total-price">
+
+                  {appliedCoupon && (
+                    <span className="original-total-price">
+                      ₹
+                      {(
+                        subtotal + shipping
+                      ).toLocaleString(
+                        "en-IN"
+                      )}
+                    </span>
+                  )}
+
+                  <strong>
+                    ₹
+                    {total.toLocaleString(
+                      "en-IN"
+                    )}
+                  </strong>
+
+                </div>
+
               </div>
+
+              {/* SAVINGS */}
+
+              {appliedCoupon &&
+                safeDiscount > 0 && (
+                  <div className="coupon-savings">
+                    You saved ₹
+                    {safeDiscount.toLocaleString(
+                      "en-IN"
+                    )}{" "}
+                    on this order
+                  </div>
+                )}
 
               {/* =========================================
                   CUSTOMER CONSENT
               ========================================= */}
 
               <div className="consent-box">
+
                 <label className="consent-label">
 
                   <input
                     type="checkbox"
                     checked={consentAccepted}
                     onChange={(e) => {
+
                       setConsentAccepted(
                         e.target.checked
                       );
@@ -609,19 +933,23 @@ const ReviewOrder = () => {
                       if (e.target.checked) {
                         setError("");
                       }
+
                     }}
                   />
 
                   <span className="custom-checkbox">
+
                     {consentAccepted && (
                       <Check
                         size={13}
                         strokeWidth={3}
                       />
                     )}
+
                   </span>
 
                   <span className="consent-text">
+
                     I agree to the{" "}
 
                     <button
@@ -640,24 +968,134 @@ const ReviewOrder = () => {
                       type="button"
                       className="consent-link"
                       onClick={() =>
-                        navigate("/privacy-policy")
+                        navigate(
+                          "/privacy-policy"
+                        )
                       }
                     >
                       Privacy Policy
                     </button>
                     .
+
                   </span>
 
                 </label>
 
-                <div className="consent-security">
-                  <ShieldCheck size={15} />
 
-                  <span>
-                    Your consent is recorded securely
-                    with your order.
-                  </span>
+              </div>
+
+              {/* =========================================
+                  COUPON
+              ========================================= */}
+
+              <div className="coupon-box">
+
+                <div className="coupon-heading">
+
+                  <div className="coupon-heading-icon">
+                    <Tag size={16} />
+                  </div>
+
+                  <div>
+                    <span>
+                      HAVE A COUPON?
+                    </span>
+
+                    <p>
+                      Apply your discount code
+                    </p>
+                  </div>
+
                 </div>
+
+                {!appliedCoupon ? (
+                  <>
+                    <div className="coupon-input-row">
+
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => {
+                          setCouponCode(
+                            e.target.value.toUpperCase()
+                          );
+                          setCouponError("");
+                        }}
+                        onKeyDown={(e) => {
+                          if (
+                            e.key === "Enter"
+                          ) {
+                            e.preventDefault();
+                            handleApplyCoupon();
+                          }
+                        }}
+                        placeholder="Enter coupon code"
+                        maxLength={30}
+                        disabled={couponLoading}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={
+                          handleApplyCoupon
+                        }
+                        disabled={couponLoading}
+                      >
+                        {couponLoading ? (
+                          <Loader2
+                            size={15}
+                            className="coupon-spinner"
+                          />
+                        ) : (
+                          "APPLY"
+                        )}
+                      </button>
+
+                    </div>
+
+                    {couponError && (
+                      <p className="coupon-error">
+                        {couponError}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <div className="coupon-applied">
+
+                    <div className="coupon-applied-left">
+
+                      <div className="coupon-success-icon">
+                        <Check size={14} />
+                      </div>
+
+                      <div>
+
+                        <strong>
+                          {appliedCoupon.code}
+                        </strong>
+
+                        <span>
+                          Coupon applied successfully
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                    <button
+                      type="button"
+                      className="remove-coupon-btn"
+                      onClick={
+                        handleRemoveCoupon
+                      }
+                      title="Remove coupon"
+                    >
+                      <X size={15} />
+                    </button>
+
+                  </div>
+                )}
+
               </div>
 
               {/* =========================================
@@ -669,9 +1107,11 @@ const ReviewOrder = () => {
                 className="confirm-order-btn"
                 onClick={handlePlaceOrder}
                 disabled={
-                  loading || !consentAccepted
+                  loading ||
+                  !consentAccepted
                 }
               >
+
                 {loading ? (
                   <>
                     <span className="review-spinner" />
@@ -683,16 +1123,19 @@ const ReviewOrder = () => {
                     <Check size={18} />
                   </>
                 )}
+
               </button>
 
               {/* SECURE NOTE */}
 
               <p className="secure-note">
-                By placing this order, you confirm that
-                all the above information is correct.
+                By placing this order, you confirm
+                that all the above information is
+                correct.
               </p>
 
             </aside>
+
           </div>
         </div>
       </main>

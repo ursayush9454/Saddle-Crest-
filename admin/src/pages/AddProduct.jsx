@@ -1,455 +1,1054 @@
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  ArrowLeft,
+  ImagePlus,
   Plus,
   Save,
+  Upload,
   X,
-  Loader2,
 } from "lucide-react";
-import {
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../services/api";
 import "./AddProduct.css";
+
+const DEFAULT_CATEGORIES = [
+  "Saddles",
+  "Bridles",
+  "Rider",
+  "Horse Care",
+  "Leather Goods",
+  "Custom",
+];
+
+const BADGES = [
+  "None",
+  "New",
+  "Best Seller",
+  "Featured",
+  "Limited",
+  "Sale",
+];
 
 const initialForm = {
   name: "",
   description: "",
   price: "",
-  salePrice: "",
+  comparePrice: "",
   category: "",
-  image: "",
-  stock: "",
-  lowStockThreshold: "5",
   badge: "",
+  sku: "",
+  stock: "",
+  images: [],
   featured: false,
   bestSeller: false,
   newArrival: false,
+  isActive: true,
 };
 
 const AddProduct = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const editingProduct =
-    location.state?.product || null;
+  const fileInputRef = useRef(null);
 
   const [form, setForm] = useState(initialForm);
+  const [categories, setCategories] =
+    useState(DEFAULT_CATEGORIES);
+
+  const [imageUrl, setImageUrl] = useState("");
+
+  const [loadingCategories, setLoadingCategories] =
+    useState(true);
 
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
-  const editingId =
-    editingProduct?._id || null;
+  // =========================
+  // FETCH CATEGORIES
+  // =========================
 
   useEffect(() => {
-    if (!editingProduct) {
-      setForm(initialForm);
-      return;
-    }
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
 
-    setForm({
-      name: editingProduct.name || "",
-      description:
-        editingProduct.description || "",
-      price: editingProduct.price ?? "",
-      salePrice:
-        editingProduct.salePrice ?? "",
-      category:
-        editingProduct.category || "",
-      image: editingProduct.image || "",
-      stock: editingProduct.stock ?? "",
-      lowStockThreshold:
-        editingProduct.lowStockThreshold ?? "5",
-      badge: editingProduct.badge || "",
-      featured: Boolean(
-        editingProduct.featured
-      ),
-      bestSeller: Boolean(
-        editingProduct.bestSeller
-      ),
-      newArrival: Boolean(
-        editingProduct.newArrival
-      ),
-    });
-  }, [editingProduct]);
+        const data = await apiRequest("/categories");
 
-  const updateField = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
+        const backendCategories =
+          Array.isArray(data?.categories)
+            ? data.categories
+            : Array.isArray(data)
+              ? data
+              : [];
+
+        const backendNames =
+          backendCategories
+            .map((category) =>
+              typeof category === "string"
+                ? category
+                : category?.name
+            )
+            .filter(Boolean);
+
+        const merged = [
+          ...DEFAULT_CATEGORIES,
+          ...backendNames,
+        ].filter(
+          (name, index, array) =>
+            array.findIndex(
+              (item) =>
+                item.toLowerCase() ===
+                name.toLowerCase()
+            ) === index
+        );
+
+        setCategories(merged);
+      } catch (error) {
+        console.error(
+          "Failed to fetch categories:",
+          error
+        );
+
+        setCategories(DEFAULT_CATEGORIES);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // =========================
+  // INPUT CHANGE
+  // =========================
+
+  const handleChange = (event) => {
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = event.target;
+
+    setForm((previous) => ({
+      ...previous,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
     }));
   };
 
-  const resetForm = () => {
-    setForm(initialForm);
+  // =========================
+  // IMAGE FILE SELECT
+  // =========================
 
-    navigate("/add-product", {
-      replace: true,
+  const handleFileSelect = (event) => {
+    const files = Array.from(
+      event.target.files || []
+    );
+
+    if (!files.length) {
+      return;
+    }
+
+    const imageFiles = files.filter((file) =>
+      file.type.startsWith("image/")
+    );
+
+    if (!imageFiles.length) {
+      alert(
+        "Please select valid image files."
+      );
+
+      event.target.value = "";
+      return;
+    }
+
+    const availableSlots =
+      10 - form.images.length;
+
+    if (availableSlots <= 0) {
+      alert(
+        "Maximum 10 images are allowed."
+      );
+
+      event.target.value = "";
+      return;
+    }
+
+    const selectedFiles =
+      imageFiles.slice(0, availableSlots);
+
+    const newImages = selectedFiles.map(
+      (file) => ({
+        type: "file",
+        file,
+        preview: URL.createObjectURL(file),
+      })
+    );
+
+    setForm((previous) => ({
+      ...previous,
+      images: [
+        ...previous.images,
+        ...newImages,
+      ],
+    }));
+
+    event.target.value = "";
+  };
+
+  // =========================
+  // ADD IMAGE URL
+  // =========================
+
+  const addImage = () => {
+    const url = imageUrl.trim();
+
+    if (!url) {
+      alert(
+        "Please enter an image URL."
+      );
+      return;
+    }
+
+    if (form.images.length >= 10) {
+      alert(
+        "Maximum 10 images are allowed."
+      );
+      return;
+    }
+
+    try {
+      new URL(url);
+    } catch {
+      alert(
+        "Please enter a valid image URL."
+      );
+      return;
+    }
+
+    const alreadyExists = form.images.some(
+      (image) =>
+        image.type === "url" &&
+        image.url === url
+    );
+
+    if (alreadyExists) {
+      alert(
+        "This image has already been added."
+      );
+      return;
+    }
+
+    setForm((previous) => ({
+      ...previous,
+      images: [
+        ...previous.images,
+        {
+          type: "url",
+          url,
+          preview: url,
+        },
+      ],
+    }));
+
+    setImageUrl("");
+  };
+
+  // =========================
+  // REMOVE IMAGE
+  // =========================
+
+  const removeImage = (index) => {
+    setForm((previous) => {
+      const image = previous.images[index];
+
+      if (
+        image?.type === "file" &&
+        image?.preview
+      ) {
+        URL.revokeObjectURL(image.preview);
+      }
+
+      return {
+        ...previous,
+        images: previous.images.filter(
+          (_, imageIndex) =>
+            imageIndex !== index
+        ),
+      };
     });
   };
+
+  // =========================
+  // CLEANUP PREVIEW URLS
+  // =========================
+
+  useEffect(() => {
+    return () => {
+      form.images.forEach((image) => {
+        if (
+          image.type === "file" &&
+          image.preview
+        ) {
+          URL.revokeObjectURL(
+            image.preview
+          );
+        }
+      });
+    };
+  }, []);
+
+  // =========================
+  // SUBMIT
+  // =========================
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setSaving(true);
-    setError("");
+    if (!form.name.trim()) {
+      alert(
+        "Product name is required."
+      );
+      return;
+    }
+
+    if (!form.description.trim()) {
+      alert(
+        "Product description is required."
+      );
+      return;
+    }
+
+    if (
+      !form.price ||
+      Number(form.price) <= 0
+    ) {
+      alert("Please enter a valid price.");
+      return;
+    }
+
+    if (!form.category) {
+      alert(
+        "Please select a category."
+      );
+      return;
+    }
+
+    if (!form.images.length) {
+      alert(
+        "Please add at least one product image."
+      );
+      return;
+    }
+
+    if (
+      form.stock !== "" &&
+      Number(form.stock) < 0
+    ) {
+      alert(
+        "Stock quantity cannot be negative."
+      );
+      return;
+    }
 
     try {
-      const body = {
-        name: form.name.trim(),
-        description: form.description.trim(),
-        price: Number(form.price),
+      setSaving(true);
 
-        salePrice:
-          form.salePrice === ""
-            ? null
-            : Number(form.salePrice),
+      // =========================
+      // FORM DATA
+      // =========================
 
-        category: form.category.trim(),
+      const formData = new FormData();
 
-        image: form.image.trim(),
+      formData.append(
+        "name",
+        form.name.trim()
+      );
 
-        stock: Number(form.stock),
+      formData.append(
+        "description",
+        form.description.trim()
+      );
 
-        lowStockThreshold: Number(
-          form.lowStockThreshold
-        ),
+      formData.append(
+        "price",
+        String(Number(form.price))
+      );
 
-        badge: form.badge.trim(),
-
-        featured: form.featured,
-
-        bestSeller: form.bestSeller,
-
-        newArrival: form.newArrival,
-      };
-
-      if (editingId) {
-        await apiRequest(
-          `/products/${editingId}`,
-          {
-            method: "PUT",
-            body: JSON.stringify(body),
-          }
+      /*
+       * Backend Product model uses `salePrice`.
+       *
+       * Your UI calls this:
+       * Compare at Price
+       *
+       * So send it as salePrice only when needed.
+       */
+      if (form.comparePrice) {
+        formData.append(
+          "salePrice",
+          String(Number(form.comparePrice))
         );
-      } else {
-        await apiRequest("/products", {
-          method: "POST",
-          body: JSON.stringify(body),
-        });
       }
 
+      formData.append(
+        "category",
+        form.category
+      );
+
+      if (
+        form.badge &&
+        form.badge !== "None"
+      ) {
+        formData.append(
+          "badge",
+          form.badge
+        );
+      }
+
+      if (form.sku.trim()) {
+        formData.append(
+          "sku",
+          form.sku.trim()
+        );
+      }
+
+      formData.append(
+        "stock",
+        String(
+          form.stock === ""
+            ? 0
+            : Number(form.stock)
+        )
+      );
+
+      formData.append(
+        "featured",
+        String(Boolean(form.featured))
+      );
+
+      formData.append(
+        "bestSeller",
+        String(Boolean(form.bestSeller))
+      );
+
+      formData.append(
+        "newArrival",
+        String(Boolean(form.newArrival))
+      );
+
+      formData.append(
+        "isActive",
+        String(Boolean(form.isActive))
+      );
+
+      // =========================
+      // IMAGES
+      // =========================
+
+      form.images.forEach((image) => {
+        if (image.type === "file") {
+          formData.append(
+            "images",
+            image.file
+          );
+        }
+
+        if (image.type === "url") {
+          formData.append(
+            "images",
+            image.url
+          );
+        }
+      });
+
+      /*
+       * Backend:
+       *
+       * POST /api/products
+       *
+       * multer:
+       *
+       * upload.array("images", 10)
+       *
+       * Therefore:
+       *
+       * /products
+       */
+
+      const data = await apiRequest(
+        "/products",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      console.log(
+        "Product created:",
+        data
+      );
+
+      alert(
+        "Product added successfully."
+      );
+
+      setForm({
+        ...initialForm,
+        images: [],
+      });
+
+      setImageUrl("");
+
       navigate("/products");
-    } catch (err) {
-      setError(err.message);
+    } catch (error) {
+      console.error(
+        "Add product error:",
+        error
+      );
+
+      alert(
+        error?.message ||
+          "Failed to add product. Please try again."
+      );
     } finally {
       setSaving(false);
     }
   };
 
+  // =========================
+  // BACK
+  // =========================
+
+  const handleBack = () => {
+    if (saving) {
+      return;
+    }
+
+    navigate("/products");
+  };
+
   return (
     <div className="add-product-page">
+      {/* =========================
+          HEADER
+      ========================= */}
 
-      <section className="add-product-header">
+      <div className="page-header">
         <div>
-          <span className="add-product-eyebrow">
-            CATALOGUE
-          </span>
+          <button
+            type="button"
+            className="outline-button back-button"
+            onClick={handleBack}
+            disabled={saving}
+          >
+            <ArrowLeft size={16} />
+            Back to Products
+          </button>
 
-          <h1>
-            {editingId
-              ? "Edit Product"
-              : "Add Product"}
-          </h1>
+          <h1>Add Product</h1>
 
           <p>
-            {editingId
-              ? "Update product information."
-              : "Add a new product to your catalogue."}
+            Create a new Saddle & Crest
+            product for your store.
           </p>
         </div>
+      </div>
 
-        <button
-          className="add-product-back"
-          onClick={() =>
-            navigate("/products")
-          }
-        >
-          <X size={15} />
-          Close
-        </button>
-      </section>
+      {/* =========================
+          FORM
+      ========================= */}
 
-      {error && (
-        <div className="add-product-error">
-          {error}
-        </div>
-      )}
+      <form
+        className="add-product-form"
+        onSubmit={handleSubmit}
+      >
+        {/* =========================
+            BASIC INFORMATION
+        ========================= */}
 
-      <section className="add-product-panel">
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Basic Information</h2>
 
-        <form
-          onSubmit={handleSubmit}
-          className="add-product-form"
-        >
+              <p>
+                Enter the main details of
+                your product.
+              </p>
+            </div>
+          </div>
 
-          <div className="add-product-grid">
+          <div className="form-grid">
+            {/* NAME */}
 
-            <div className="add-product-field">
-              <label>Product Name</label>
+            <div className="form-group full-width">
+              <label htmlFor="name">
+                Product Name{" "}
+                <span>*</span>
+              </label>
 
               <input
+                id="name"
+                name="name"
+                type="text"
                 value={form.name}
-                onChange={(e) =>
-                  updateField(
-                    "name",
-                    e.target.value
-                  )
-                }
-                placeholder="Premium English Saddle"
-                required
+                onChange={handleChange}
+                placeholder="e.g. The Heritage Saddle"
               />
             </div>
 
-            <div className="add-product-field">
-              <label>Category</label>
+            {/* DESCRIPTION */}
 
-              <input
+            <div className="form-group full-width">
+              <label htmlFor="description">
+                Description{" "}
+                <span>*</span>
+              </label>
+
+              <textarea
+                id="description"
+                name="description"
+                rows="6"
+                value={form.description}
+                onChange={handleChange}
+                placeholder="Write a detailed description of the product..."
+              />
+            </div>
+
+            {/* PRICE */}
+
+            <div className="form-group">
+              <label htmlFor="price">
+                Price (INR){" "}
+                <span>*</span>
+              </label>
+
+              <div className="price-input">
+                <span>₹</span>
+
+                <input
+                  id="price"
+                  name="price"
+                  type="number"
+                  min="0"
+                  value={form.price}
+                  onChange={handleChange}
+                  placeholder="48500"
+                />
+              </div>
+            </div>
+
+            {/* COMPARE PRICE */}
+
+            <div className="form-group">
+              <label htmlFor="comparePrice">
+                Compare at Price (INR)
+              </label>
+
+              <div className="price-input">
+                <span>₹</span>
+
+                <input
+                  id="comparePrice"
+                  name="comparePrice"
+                  type="number"
+                  min="0"
+                  value={form.comparePrice}
+                  onChange={handleChange}
+                  placeholder="55000"
+                />
+              </div>
+            </div>
+
+            {/* CATEGORY */}
+
+            <div className="form-group">
+              <label htmlFor="category">
+                Category{" "}
+                <span>*</span>
+              </label>
+
+              <select
+                id="category"
+                name="category"
                 value={form.category}
-                onChange={(e) =>
-                  updateField(
-                    "category",
-                    e.target.value
-                  )
+                onChange={handleChange}
+                disabled={
+                  loadingCategories
                 }
-                placeholder="Saddles"
-                required
+              >
+                <option value="">
+                  {loadingCategories
+                    ? "Loading categories..."
+                    : "Select category"}
+                </option>
+
+                {categories.map(
+                  (category) => (
+                    <option
+                      key={category}
+                      value={category}
+                    >
+                      {category}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+
+            {/* BADGE */}
+
+            <div className="form-group">
+              <label htmlFor="badge">
+                Badge
+              </label>
+
+              <select
+                id="badge"
+                name="badge"
+                value={form.badge}
+                onChange={handleChange}
+              >
+                {BADGES.map(
+                  (badge) => (
+                    <option
+                      key={badge}
+                      value={
+                        badge === "None"
+                          ? ""
+                          : badge
+                      }
+                    >
+                      {badge}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+
+            {/* SKU */}
+
+            <div className="form-group">
+              <label htmlFor="sku">
+                SKU
+              </label>
+
+              <input
+                id="sku"
+                name="sku"
+                type="text"
+                value={form.sku}
+                onChange={handleChange}
+                placeholder="SC-HS-001"
               />
             </div>
 
-            <div className="add-product-field">
-              <label>Price</label>
+            {/* STOCK */}
+
+            <div className="form-group">
+              <label htmlFor="stock">
+                Stock Quantity
+              </label>
 
               <input
-                type="number"
-                min="0"
-                value={form.price}
-                onChange={(e) =>
-                  updateField(
-                    "price",
-                    e.target.value
-                  )
-                }
-                placeholder="48500"
-                required
-              />
-            </div>
-
-            <div className="add-product-field">
-              <label>Sale Price</label>
-
-              <input
-                type="number"
-                min="0"
-                value={form.salePrice}
-                onChange={(e) =>
-                  updateField(
-                    "salePrice",
-                    e.target.value
-                  )
-                }
-                placeholder="45000"
-              />
-            </div>
-
-            <div className="add-product-field">
-              <label>Stock</label>
-
-              <input
+                id="stock"
+                name="stock"
                 type="number"
                 min="0"
                 value={form.stock}
-                onChange={(e) =>
-                  updateField(
-                    "stock",
-                    e.target.value
-                  )
-                }
+                onChange={handleChange}
                 placeholder="10"
-                required
               />
             </div>
+          </div>
+        </section>
 
-            <div className="add-product-field">
-              <label>Low Stock Threshold</label>
+        {/* =========================
+            PRODUCT IMAGES
+        ========================= */}
 
-              <input
-                type="number"
-                min="0"
-                value={
-                  form.lowStockThreshold
-                }
-                onChange={(e) =>
-                  updateField(
-                    "lowStockThreshold",
-                    e.target.value
-                  )
-                }
-              />
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Product Images</h2>
+
+              <p>
+                Upload product images or
+                add them using an image URL.
+              </p>
             </div>
-
-            <div className="add-product-field full">
-              <label>Main Image URL</label>
-
-              <input
-                value={form.image}
-                onChange={(e) =>
-                  updateField(
-                    "image",
-                    e.target.value
-                  )
-                }
-                placeholder="https://..."
-                required
-              />
-            </div>
-
-            <div className="add-product-field full">
-              <label>Badge</label>
-
-              <input
-                value={form.badge}
-                onChange={(e) =>
-                  updateField(
-                    "badge",
-                    e.target.value
-                  )
-                }
-                placeholder="New / Bestseller / Premium"
-              />
-            </div>
-
-            <div className="add-product-field full">
-              <label>Description</label>
-
-              <textarea
-                rows="6"
-                value={form.description}
-                onChange={(e) =>
-                  updateField(
-                    "description",
-                    e.target.value
-                  )
-                }
-                placeholder="Product description..."
-                required
-              />
-            </div>
-
           </div>
 
-          <div className="add-product-options">
+          {/* HIDDEN FILE INPUT */}
 
-            <label>
-              <input
-                type="checkbox"
-                checked={form.featured}
-                onChange={(e) =>
-                  updateField(
-                    "featured",
-                    e.target.checked
-                  )
-                }
-              />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            onChange={handleFileSelect}
+          />
 
-              Featured
-            </label>
+          {/* UPLOAD BUTTON */}
 
-            <label>
-              <input
-                type="checkbox"
-                checked={form.bestSeller}
-                onChange={(e) =>
-                  updateField(
-                    "bestSeller",
-                    e.target.checked
-                  )
-                }
-              />
+          <button
+            type="button"
+            className="image-upload-box"
+            onClick={() =>
+              fileInputRef.current?.click()
+            }
+            disabled={saving}
+          >
+            <div className="image-upload-icon">
+              <Upload size={21} />
+            </div>
 
-              Best Seller
-            </label>
+            <div>
+              <strong>
+                Add Image
+              </strong>
 
-            <label>
-              <input
-                type="checkbox"
-                checked={form.newArrival}
-                onChange={(e) =>
-                  updateField(
-                    "newArrival",
-                    e.target.checked
-                  )
-                }
-              />
+              <span>
+                Click to upload product
+                images
+              </span>
+            </div>
+          </button>
 
-              New Arrival
-            </label>
+          {/* IMAGE URL */}
 
-          </div>
-
-          <div className="add-product-actions">
+          <div className="image-url-row">
+            <input
+              type="url"
+              value={imageUrl}
+              onChange={(event) =>
+                setImageUrl(
+                  event.target.value
+                )
+              }
+              placeholder="Or paste image URL..."
+              disabled={saving}
+            />
 
             <button
               type="button"
-              className="add-product-cancel"
-              onClick={() =>
-                navigate("/products")
-              }
-            >
-              <X size={15} />
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              className="add-product-save"
+              className="add-image-button"
+              onClick={addImage}
               disabled={saving}
             >
-              {saving ? (
-                <>
-                  <Loader2
-                    size={15}
-                    className="add-product-spinner"
-                  />
-
-                  Saving...
-                </>
-              ) : (
-                <>
-                  {editingId ? (
-                    <Save size={15} />
-                  ) : (
-                    <Plus size={15} />
-                  )}
-
-                  {editingId
-                    ? "Update Product"
-                    : "Create Product"}
-                </>
-              )}
+              <Plus size={16} />
+              Add URL
             </button>
-
           </div>
 
-        </form>
+          {/* IMAGE COUNT */}
 
-      </section>
+          {form.images.length > 0 && (
+            <div className="image-count">
+              {form.images.length} / 10
+              images added
+            </div>
+          )}
+
+          {/* IMAGE PREVIEWS */}
+
+          {form.images.length > 0 && (
+            <div className="image-preview-list">
+              {form.images.map(
+                (image, index) => (
+                  <div
+                    className="image-preview-item"
+                    key={`${image.type}-${index}-${image.preview}`}
+                  >
+                    <img
+                      src={image.preview}
+                      alt={`Product ${
+                        index + 1
+                      }`}
+                    />
+
+                    <button
+                      type="button"
+                      className="remove-image-button"
+                      onClick={() =>
+                        removeImage(index)
+                      }
+                      disabled={saving}
+                      aria-label={`Remove image ${
+                        index + 1
+                      }`}
+                    >
+                      <X size={15} />
+                    </button>
+
+                    {index === 0 && (
+                      <span className="primary-image-label">
+                        Main Image
+                      </span>
+                    )}
+                  </div>
+                )
+              )}
+            </div>
+          )}
+
+          {form.images.length === 0 && (
+            <div className="empty-image-state">
+              <ImagePlus size={22} />
+
+              <span>
+                No product images
+                added yet.
+              </span>
+            </div>
+          )}
+        </section>
+
+        {/* =========================
+            PRODUCT STATUS
+        ========================= */}
+
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Product Settings</h2>
+
+              <p>
+                Choose where and how this
+                product should appear.
+              </p>
+            </div>
+          </div>
+
+          <div className="settings-grid">
+            {/* FEATURED */}
+
+            <label className="checkbox-card">
+              <input
+                type="checkbox"
+                name="featured"
+                checked={
+                  form.featured
+                }
+                onChange={handleChange}
+              />
+
+              <div>
+                <strong>
+                  Featured Product
+                </strong>
+
+                <span>
+                  Show this product in
+                  the featured collection.
+                </span>
+              </div>
+            </label>
+
+            {/* BEST SELLER */}
+
+            <label className="checkbox-card">
+              <input
+                type="checkbox"
+                name="bestSeller"
+                checked={
+                  form.bestSeller
+                }
+                onChange={handleChange}
+              />
+
+              <div>
+                <strong>
+                  Best Seller
+                </strong>
+
+                <span>
+                  Show this product in
+                  the best sellers section.
+                </span>
+              </div>
+            </label>
+
+            {/* NEW ARRIVAL */}
+
+            <label className="checkbox-card">
+              <input
+                type="checkbox"
+                name="newArrival"
+                checked={
+                  form.newArrival
+                }
+                onChange={handleChange}
+              />
+
+              <div>
+                <strong>
+                  New Arrival
+                </strong>
+
+                <span>
+                  Show this product in
+                  new arrivals.
+                </span>
+              </div>
+            </label>
+
+            {/* ACTIVE */}
+
+            <label className="checkbox-card">
+              <input
+                type="checkbox"
+                name="isActive"
+                checked={
+                  form.isActive
+                }
+                onChange={handleChange}
+              />
+
+              <div>
+                <strong>
+                  Active Product
+                </strong>
+
+                <span>
+                  Make this product
+                  visible in the store.
+                </span>
+              </div>
+            </label>
+          </div>
+        </section>
+
+        {/* =========================
+            ACTIONS
+        ========================= */}
+
+        <div className="form-actions">
+          <button
+            type="button"
+            className="outline-button"
+            onClick={handleBack}
+            disabled={saving}
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            className="primary-button"
+            disabled={saving}
+          >
+            <Save size={17} />
+
+            {saving
+              ? "Adding Product..."
+              : "Add Product"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
 
 export default AddProduct;
-

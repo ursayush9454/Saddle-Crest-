@@ -1,4 +1,3 @@
-
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -8,6 +7,7 @@ import {
   Users,
   Tags,
   PlusCircle,
+  TicketPercent,
   LogOut,
   X,
 } from "lucide-react";
@@ -45,6 +45,11 @@ const links = [
     label: "Categories",
     icon: Tags,
   },
+  {
+    path: "/coupons",
+    label: "Coupons",
+    icon: TicketPercent,
+  },
 ];
 
 const Sidebar = ({ open, setOpen }) => {
@@ -62,9 +67,15 @@ const Sidebar = ({ open, setOpen }) => {
         onClick={() => setOpen(false)}
       />
 
-      <aside className={`sidebar ${open ? "open" : ""}`}>
+      <aside
+        className={`sidebar ${open ? "open" : ""}`}
+      >
+        {/* BRAND */}
+
         <div className="sidebar-brand">
-          <div className="brand-mark">S&C</div>
+          <div className="brand-mark">
+            S&C
+          </div>
 
           <div className="brand-info">
             <strong>Saddle & Crest</strong>
@@ -74,27 +85,47 @@ const Sidebar = ({ open, setOpen }) => {
           <button
             className="sidebar-close"
             onClick={() => setOpen(false)}
+            aria-label="Close sidebar"
           >
             <X size={18} />
           </button>
         </div>
 
+        {/* NAVIGATION */}
+
         <nav className="sidebar-nav">
-          {links.map(({ path, label, icon: Icon }) => (
-            <NavLink
-              key={path}
-              to={path}
-              end={path === "/"}
-              onClick={() => setOpen(false)}
-              className={({ isActive }) =>
-                `sidebar-link ${isActive ? "active" : ""}`
-              }
-            >
-              <Icon size={17} />
-              <span>{label}</span>
-            </NavLink>
-          ))}
+          {links.map(
+            ({
+              path,
+              label,
+              icon: Icon,
+            }) => (
+              <NavLink
+                key={path}
+                to={path}
+                end={path === "/"}
+                onClick={() =>
+                  setOpen(false)
+                }
+                className={({
+                  isActive,
+                }) =>
+                  `sidebar-link ${
+                    isActive
+                      ? "active"
+                      : ""
+                  }`
+                }
+              >
+                <Icon size={17} />
+
+                <span>{label}</span>
+              </NavLink>
+            )
+          )}
         </nav>
+
+        {/* LOGOUT */}
 
         <div className="sidebar-bottom">
           <button
@@ -102,6 +133,7 @@ const Sidebar = ({ open, setOpen }) => {
             onClick={logout}
           >
             <LogOut size={17} />
+
             <span>Sign out</span>
           </button>
         </div>
@@ -111,4 +143,3 @@ const Sidebar = ({ open, setOpen }) => {
 };
 
 export default Sidebar;
-

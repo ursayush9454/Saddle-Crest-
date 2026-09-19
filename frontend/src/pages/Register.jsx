@@ -8,10 +8,10 @@ import {
   Check,
 } from "lucide-react";
 
-
 import { registerUser, setAuth } from "../services/api";
 
 import "./Register.css";
+import Navbar from "../components/Navbar";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -24,11 +24,18 @@ const Register = () => {
     confirmPassword: "",
   });
 
+  const [agreeTerms, setAgreeTerms] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  /* =========================================================
+     INPUT CHANGE
+  ========================================================= */
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,15 +45,39 @@ const Register = () => {
       [name]: value,
     }));
 
-    if (error) setError("");
+    if (error) {
+      setError("");
+    }
   };
+
+  /* =========================================================
+     TERMS CHANGE
+  ========================================================= */
+
+  const handleTermsChange = (e) => {
+    setAgreeTerms(e.target.checked);
+
+    if (error) {
+      setError("");
+    }
+  };
+
+  /* =========================================================
+     VALIDATE FORM
+  ========================================================= */
 
   const validateForm = () => {
     const name = form.name.trim();
     const email = form.email.trim().toLowerCase();
     const phone = form.phone.trim();
 
-    if (!name || !email || !phone || !form.password || !form.confirmPassword) {
+    if (
+      !name ||
+      !email ||
+      !phone ||
+      !form.password ||
+      !form.confirmPassword
+    ) {
       return "Please fill in all fields.";
     }
 
@@ -70,8 +101,16 @@ const Register = () => {
       return "Passwords do not match.";
     }
 
+    if (!agreeTerms) {
+      return "Please agree to the Terms & Conditions and Privacy Policy.";
+    }
+
     return "";
   };
+
+  /* =========================================================
+     SUBMIT
+  ========================================================= */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,16 +135,23 @@ const Register = () => {
       });
 
       /*
-        Depending on backend response, registration may either:
-        1. Return token + user
-        2. Return only success message
-      */
+       * If backend returns token,
+       * login user directly.
+       */
 
       if (data?.token) {
         setAuth(data.token, data.user);
-        navigate("/", { replace: true });
+
+        navigate("/", {
+          replace: true,
+        });
+
         return;
       }
+
+      /*
+       * Otherwise send user to login.
+       */
 
       navigate("/login", {
         replace: true,
@@ -114,7 +160,10 @@ const Register = () => {
         },
       });
     } catch (err) {
-      setError(err.message || "Unable to create your account.");
+      setError(
+        err?.message ||
+          "Unable to create your account."
+      );
     } finally {
       setLoading(false);
     }
@@ -122,14 +171,23 @@ const Register = () => {
 
   return (
     <div className="auth-page register-page">
-      
+      <Navbar/>
 
       <main className="auth-main">
+
         <div className="auth-wrapper register-wrapper">
-          {/* LEFT */}
+
+          {/* =================================================
+              LEFT BRAND PANEL
+          ================================================= */}
+
           <section className="auth-brand-panel register-brand-panel">
+
             <div className="auth-brand-content">
-              <span className="auth-eyebrow">JOIN THE CREST</span>
+
+              <span className="auth-eyebrow">
+                JOIN THE CREST
+              </span>
 
               <h1>
                 Your
@@ -140,37 +198,55 @@ const Register = () => {
               </h1>
 
               <p>
-                Create your Saddle & Crest account and discover carefully
-                crafted essentials for every ride.
+                Create your Saddle & Crest account
+                and discover carefully crafted
+                essentials for every ride.
               </p>
 
               <div className="register-perks">
+
                 <div>
                   <span className="perk-icon">
                     <Check size={13} />
                   </span>
-                  <span>Save your favourite pieces</span>
+
+                  <span>
+                    Save your favourite pieces
+                  </span>
                 </div>
 
                 <div>
                   <span className="perk-icon">
                     <Check size={13} />
                   </span>
-                  <span>Track every order</span>
+
+                  <span>
+                    Track every order
+                  </span>
                 </div>
 
                 <div>
                   <span className="perk-icon">
                     <Check size={13} />
                   </span>
-                  <span>Faster checkout</span>
+
+                  <span>
+                    Faster checkout
+                  </span>
                 </div>
+
               </div>
+
             </div>
+
           </section>
 
-          {/* RIGHT */}
+          {/* =================================================
+              RIGHT FORM PANEL
+          ================================================= */}
+
           <section className="auth-form-panel register-form-panel">
+
             <button
               type="button"
               className="auth-back"
@@ -181,22 +257,56 @@ const Register = () => {
             </button>
 
             <div className="auth-form-container">
-              <div className="auth-heading">
-                <span>CREATE YOUR ACCOUNT</span>
 
-                <h2>Join us.</h2>
+              {/* =================================================
+                  HEADING
+              ================================================= */}
+
+              <div className="auth-heading">
+
+                <span>
+                  CREATE YOUR ACCOUNT
+                </span>
+
+                <h2>
+                  Join us.
+                </h2>
 
                 <p>
-                  Become part of the Saddle & Crest community.
+                  Become part of the Saddle & Crest
+                  community.
                 </p>
+
               </div>
 
-              {error && <div className="auth-error">{error}</div>}
+              {/* =================================================
+                  ERROR
+              ================================================= */}
 
-              <form onSubmit={handleSubmit} className="auth-form register-form">
+              {error && (
+                <div className="auth-error">
+                  {error}
+                </div>
+              )}
+
+              {/* =================================================
+                  FORM
+              ================================================= */}
+
+              <form
+                onSubmit={handleSubmit}
+                className="auth-form register-form"
+              >
+
+                {/* NAME + PHONE */}
+
                 <div className="register-two-column">
+
                   <div className="auth-field">
-                    <label htmlFor="register-name">Full Name</label>
+
+                    <label htmlFor="register-name">
+                      Full Name
+                    </label>
 
                     <input
                       id="register-name"
@@ -208,10 +318,14 @@ const Register = () => {
                       autoComplete="name"
                       disabled={loading}
                     />
+
                   </div>
 
                   <div className="auth-field">
-                    <label htmlFor="register-phone">Phone</label>
+
+                    <label htmlFor="register-phone">
+                      Phone
+                    </label>
 
                     <input
                       id="register-phone"
@@ -224,11 +338,18 @@ const Register = () => {
                       autoComplete="tel"
                       disabled={loading}
                     />
+
                   </div>
+
                 </div>
 
+                {/* EMAIL */}
+
                 <div className="auth-field">
-                  <label htmlFor="register-email">Email Address</label>
+
+                  <label htmlFor="register-email">
+                    Email Address
+                  </label>
 
                   <input
                     id="register-email"
@@ -240,15 +361,26 @@ const Register = () => {
                     autoComplete="email"
                     disabled={loading}
                   />
+
                 </div>
 
+                {/* PASSWORD */}
+
                 <div className="auth-field">
-                  <label htmlFor="register-password">Password</label>
+
+                  <label htmlFor="register-password">
+                    Password
+                  </label>
 
                   <div className="password-input">
+
                     <input
                       id="register-password"
-                      type={showPassword ? "text" : "password"}
+                      type={
+                        showPassword
+                          ? "text"
+                          : "password"
+                      }
                       name="password"
                       value={form.password}
                       onChange={handleChange}
@@ -261,7 +393,9 @@ const Register = () => {
                       type="button"
                       className="password-toggle"
                       onClick={() =>
-                        setShowPassword((prev) => !prev)
+                        setShowPassword(
+                          (prev) => !prev
+                        )
                       }
                     >
                       {showPassword ? (
@@ -270,18 +404,28 @@ const Register = () => {
                         <Eye size={18} />
                       )}
                     </button>
+
                   </div>
+
                 </div>
 
+                {/* CONFIRM PASSWORD */}
+
                 <div className="auth-field">
+
                   <label htmlFor="register-confirm-password">
                     Confirm Password
                   </label>
 
                   <div className="password-input">
+
                     <input
                       id="register-confirm-password"
-                      type={showConfirmPassword ? "text" : "password"}
+                      type={
+                        showConfirmPassword
+                          ? "text"
+                          : "password"
+                      }
                       name="confirmPassword"
                       value={form.confirmPassword}
                       onChange={handleChange}
@@ -294,7 +438,9 @@ const Register = () => {
                       type="button"
                       className="password-toggle"
                       onClick={() =>
-                        setShowConfirmPassword((prev) => !prev)
+                        setShowConfirmPassword(
+                          (prev) => !prev
+                        )
                       }
                     >
                       {showConfirmPassword ? (
@@ -303,39 +449,117 @@ const Register = () => {
                         <Eye size={18} />
                       )}
                     </button>
+
                   </div>
+
                 </div>
 
-                <p className="register-terms">
-                  By creating an account, you agree to our terms and privacy
-                  policy.
-                </p>
+                {/* =================================================
+                    TERMS CHECKBOX
+                ================================================= */}
+
+                <label
+                  className={`register-terms-checkbox ${
+                    agreeTerms
+                      ? "checked"
+                      : ""
+                  }`}
+                >
+
+                  <input
+                    type="checkbox"
+                    checked={agreeTerms}
+                    onChange={handleTermsChange}
+                    disabled={loading}
+                  />
+
+                  <span className="custom-checkbox">
+                    {agreeTerms && (
+                      <Check size={13} />
+                    )}
+                  </span>
+
+                  <span className="terms-checkbox-text">
+                    I agree to the{" "}
+
+                    <Link
+                      to="/terms"
+                      onClick={(e) =>
+                        e.stopPropagation()
+                      }
+                    >
+                      Terms & Conditions
+                    </Link>
+
+                    {" "}and{" "}
+
+                    <Link
+                      to="/privacy-policy"
+                      onClick={(e) =>
+                        e.stopPropagation()
+                      }
+                    >
+                      Privacy Policy
+                    </Link>
+                    .
+                  </span>
+
+                </label>
+
+                {/* =================================================
+                    OLD TERMS TEXT REMOVED
+                ================================================= */}
+
+                {/* SUBMIT */}
 
                 <button
                   type="submit"
                   className="auth-submit"
-                  disabled={loading}
+                  disabled={
+                    loading ||
+                    !agreeTerms
+                  }
                 >
                   {loading ? (
                     <>
-                      <LoaderCircle className="auth-spinner" size={18} />
+                      <LoaderCircle
+                        className="auth-spinner"
+                        size={18}
+                      />
+
                       Creating account...
                     </>
                   ) : (
                     "Create Account"
                   )}
                 </button>
+
               </form>
 
-              <div className="auth-switch">
-                <span>Already have an account?</span>
+              {/* =================================================
+                  LOGIN
+              ================================================= */}
 
-                <Link to="/login">Sign in</Link>
+              <div className="auth-switch">
+
+                <span>
+                  Already have an account?
+                </span>
+
+                <Link to="/login">
+                  Sign in
+                </Link>
+
               </div>
+
             </div>
+
           </section>
+
         </div>
+
       </main>
+
     </div>
   );
 };

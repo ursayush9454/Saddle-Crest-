@@ -786,3 +786,321 @@
     min-width: 19px;
   }
 }
+/* =========================================================
+   COMPACT CONSENT BOX
+========================================================= */
+
+.consent-box {
+  padding: 14px 15px !important;
+  margin-top: 4px;
+}
+
+.consent-label {
+  gap: 9px !important;
+}
+
+.consent-security {
+  margin-top: 10px !important;
+  padding-top: 9px !important;
+}
+
+
+/* =========================================================
+   COUPON BOX
+========================================================= */
+
+.coupon-box {
+  margin-top: 12px;
+  padding: 14px 0 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.coupon-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 11px;
+}
+
+.coupon-heading-icon {
+  width: 29px;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(176, 141, 87, 0.14);
+  color: #b08d57;
+  flex-shrink: 0;
+}
+
+.coupon-heading > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.coupon-heading span {
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #b08d57;
+}
+
+.coupon-heading p {
+  margin: 0;
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+
+/* =========================================================
+   COUPON INPUT
+========================================================= */
+
+.coupon-input-row {
+  display: flex;
+  width: 100%;
+  height: 42px;
+}
+
+.coupon-input-row input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-right: 0;
+  outline: none;
+  background: rgba(255, 255, 255, 0.045);
+  color: #f3eee3;
+  font-family: "Jost", sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.coupon-input-row input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+  text-transform: none;
+}
+
+.coupon-input-row input:focus {
+  border-color: rgba(176, 141, 87, 0.7);
+}
+
+.coupon-input-row button {
+  width: 76px;
+  height: 42px;
+  border: 1px solid #b08d57;
+  background: #b08d57;
+  color: #171410;
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.coupon-input-row button:hover {
+  background: #c09b62;
+}
+
+.coupon-input-row button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.coupon-spinner {
+  animation: couponSpin 0.8s linear infinite;
+}
+
+@keyframes couponSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   COUPON ERROR
+========================================================= */
+
+.coupon-error {
+  margin: 7px 0 0;
+  color: #d88b8b;
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   APPLIED COUPON
+========================================================= */
+
+.coupon-applied {
+  min-height: 48px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid rgba(176, 141, 87, 0.4);
+  background: rgba(176, 141, 87, 0.08);
+}
+
+.coupon-applied-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.coupon-success-icon {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #b08d57;
+  color: #171410;
+}
+
+.coupon-applied-left > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.coupon-applied-left strong {
+  color: #f3eee3;
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.coupon-applied-left span {
+  color: rgba(255, 255, 255, 0.52);
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+}
+
+.remove-coupon-btn {
+  width: 27px;
+  height: 27px;
+  min-width: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.remove-coupon-btn:hover {
+  color: #f3eee3;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+
+/* =========================================================
+   DISCOUNT ROW
+========================================================= */
+
+.coupon-discount-row strong {
+  color: #b08d57 !important;
+}
+
+
+/* =========================================================
+   TOTAL WITH ORIGINAL PRICE
+========================================================= */
+
+.summary-total-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.original-total-price {
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.38);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.summary-total-price > strong {
+  color: #b08d57;
+}
+
+
+/* =========================================================
+   SAVINGS MESSAGE
+========================================================= */
+
+.coupon-savings {
+  margin-top: 7px;
+  text-align: right;
+  color: #b08d57;
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.25px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .consent-box {
+    padding: 12px 13px !important;
+  }
+
+  .coupon-box {
+    margin-top: 10px;
+    padding-top: 12px;
+  }
+
+  .coupon-input-row {
+    height: 40px;
+  }
+
+  .coupon-input-row input {
+    height: 40px;
+    font-size: 11px;
+  }
+
+  .coupon-input-row button {
+    width: 70px;
+    height: 40px;
+    font-size: 9px;
+  }
+
+  .coupon-heading {
+    margin-bottom: 9px;
+  }
+
+  .summary-total-price {
+    gap: 6px;
+  }
+
+  .original-total-price {
+    font-size: 12px;
+  }
+
+  .coupon-savings {
+    font-size: 9px;
+  }
+}

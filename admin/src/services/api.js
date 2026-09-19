@@ -28,8 +28,15 @@ export const apiRequest = async (
 ) => {
   const token = getToken();
 
+  const isFormData =
+    options.body instanceof FormData;
+
   const headers = {
-    "Content-Type": "application/json",
+    ...(isFormData
+      ? {}
+      : {
+          "Content-Type": "application/json",
+        }),
     ...(options.headers || {}),
   };
 
@@ -49,9 +56,15 @@ export const apiRequest = async (
     .json()
     .catch(() => ({}));
 
+  if (response.status === 401) {
+    removeToken();
+  }
+
   if (!response.ok) {
     throw new Error(
-      data.message || "Something went wrong"
+      data.message ||
+        data.error ||
+        "Something went wrong"
     );
   }
 

@@ -1,0 +1,355 @@
+/* =========================================================
+   SADDLE & CREST — TOPBAR
+========================================================= */
+
+.topbar {
+  position: sticky;
+
+  z-index: 50;
+
+  top: 0;
+
+  width: 100%;
+  min-height: 68px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding: 0 28px;
+
+  border-bottom: 1px solid var(--border);
+
+  background: rgba(250, 248, 243, 0.96);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.topbar-title {
+  flex: 1;
+
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.topbar-title .eyebrow {
+  margin-bottom: 4px;
+
+  color: var(--gold);
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  letter-spacing: 0.2em;
+
+  text-transform: uppercase;
+}
+
+.topbar-title h2 {
+  margin: 0;
+
+  color: var(--dark);
+
+  font-family: "Cormorant Garamond", serif;
+
+  font-size: 27px;
+  font-weight: 600;
+
+  line-height: 1;
+}
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+.mobile-menu-button {
+  display: none;
+
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid var(--border);
+  border-radius: 7px;
+
+  background: var(--white);
+  color: var(--dark);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.mobile-menu-button:hover {
+  border-color: var(--dark);
+
+  background: var(--dark);
+  color: var(--cream);
+}
+
+.mobile-menu-button:active {
+  transform: scale(0.95);
+}
+
+
+/* =========================================================
+   TOPBAR REFRESH BUTTON
+   Unique class so style.css cannot overwrite it
+========================================================= */
+
+.topbar-refresh-button {
+  min-width: 96px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 0 14px;
+
+  border: 1px solid var(--border);
+  border-radius: 7px;
+
+  background: var(--white);
+  color: var(--dark);
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.topbar-refresh-button svg {
+  flex-shrink: 0;
+
+  transition: transform 0.4s ease;
+}
+
+.topbar-refresh-button:hover {
+  border-color: var(--dark);
+
+  background: var(--dark);
+  color: var(--cream);
+
+  box-shadow: 0 6px 18px rgba(23, 20, 16, 0.12);
+}
+
+.topbar-refresh-button:hover svg {
+  transform: rotate(180deg);
+}
+
+.topbar-refresh-button:active {
+  transform: scale(0.96);
+}
+
+.topbar-refresh-button:disabled {
+  opacity: 0.7;
+
+  cursor: wait;
+}
+
+.topbar-refresh-button.is-refreshing svg {
+  animation: topbarRefreshSpin 0.7s linear infinite;
+}
+
+@keyframes topbarRefreshSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+  .topbar {
+    padding: 0 23px;
+  }
+
+  .topbar-title h2 {
+    font-size: 25px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 850px) {
+  .topbar {
+    min-height: 62px;
+
+    padding: 0 18px;
+
+    gap: 12px;
+  }
+
+  .mobile-menu-button {
+    display: flex;
+  }
+
+  .topbar-title {
+    overflow: hidden;
+  }
+
+  .topbar-title .eyebrow {
+    font-size: 8px;
+
+    letter-spacing: 0.16em;
+  }
+
+  .topbar-title h2 {
+    font-size: 23px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+  }
+
+  .topbar-refresh-button {
+    width: 40px;
+    min-width: 40px;
+
+    height: 40px;
+
+    padding: 0;
+  }
+
+  .topbar-refresh-button span {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .topbar {
+    padding: 0 12px;
+  }
+
+  .topbar-title h2 {
+    font-size: 21px;
+  }
+
+  .topbar-refresh-button {
+    width: 39px;
+    min-width: 39px;
+
+    height: 39px;
+  }
+
+  .mobile-menu-button {
+    width: 39px;
+    height: 39px;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+  .topbar {
+    padding: 0 9px;
+
+    gap: 8px;
+  }
+
+  .topbar-title h2 {
+    font-size: 19px;
+  }
+
+  .topbar-title .eyebrow {
+    font-size: 7px;
+  }
+
+  .topbar-refresh-button,
+  .mobile-menu-button {
+    width: 37px;
+    min-width: 37px;
+
+    height: 37px;
+  }
+}
+
+
+/* =========================================================
+   TOUCH DEVICES
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .topbar-refresh-button,
+  .mobile-menu-button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .topbar-refresh-button:hover {
+    background: var(--white);
+    border-color: var(--border);
+    color: var(--dark);
+
+    box-shadow: none;
+  }
+
+  .topbar-refresh-button:hover svg {
+    transform: none;
+  }
+
+  .mobile-menu-button:hover {
+    background: var(--white);
+    border-color: var(--border);
+    color: var(--dark);
+  }
+}
