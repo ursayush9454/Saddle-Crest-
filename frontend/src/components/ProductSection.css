@@ -1,42 +1,96 @@
-/* =========================================
-   BEST SELLERS
-========================================= */
+/* =========================================================
+   SADDLE & CREST — BEST SELLERS
+   ========================================================= */
 
 .products-section {
   width: 100%;
-  padding: 120px 4%;
-  background: #f0ebe1;
-  box-sizing: border-box;
+  padding: 110px 5.5% 120px;
+  background: #f3eee3;
+  color: #171410;
+  overflow: hidden;
 }
 
-/* ---------- HEADER ---------- */
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .products-header {
   width: 100%;
-  max-width: 1450px;
-  margin: 0 auto 55px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 30px;
+  margin-bottom: 55px;
 }
 
-.products-heading {
+.products-header > div > span {
+  display: block;
+  margin-bottom: 17px;
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+
+  color: #5c2a2a;
+}
+
+.products-header h2 {
   margin: 0;
+
   font-family: "Cormorant Garamond", serif;
-  font-size: clamp(48px, 5vw, 76px);
+  font-size: clamp(48px, 5vw, 78px);
   font-weight: 400;
-  line-height: 0.95;
+  line-height: 0.9;
+  letter-spacing: -2px;
+
   color: #171410;
 }
 
-.products-subtitle {
-  margin: 0;
-  max-width: 420px;
+.products-header h2 em {
+  font-style: italic;
+  color: #5c2a2a;
+}
+
+/* =========================================================
+   VIEW ALL
+   ========================================================= */
+
+.products-view-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  min-width: 125px;
+  padding: 12px 0;
+
+  border: 0;
+  border-bottom: 1px solid rgba(23, 20, 16, 0.45);
+
+  background: transparent;
+
+  color: #171410;
+
   font-family: "Jost", sans-serif;
-  font-size: 14px;
-  line-height: 1.7;
-  color: #6d665c;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease,
+    gap 0.3s ease;
+}
+
+.products-view-all:hover {
+  color: #5c2a2a;
+  border-color: #5c2a2a;
+  gap: 17px;
 }
 
 /* ---------- GRID ---------- */
