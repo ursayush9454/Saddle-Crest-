@@ -8,6 +8,16 @@ const {
 } = require("../middleware/auth");
 
 // =========================
+// CUSTOMER COUPON VALIDATION
+// =========================
+
+r.post(
+  "/validate",
+  auth,
+  c.validateCoupon
+);
+
+// =========================
 // ADMIN COUPON ROUTES
 // =========================
 

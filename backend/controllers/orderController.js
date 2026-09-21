@@ -1,6 +1,138 @@
 const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
+const Coupon = require("../models/Coupon");
+
+// =========================
+// HELPER: VALIDATE COUPON
+// =========================
+
+const calculateCouponDiscount = async ({
+  code,
+  cartTotal,
+  userId,
+}) => {
+  if (!code?.trim()) {
+    return {
+      coupon: null,
+      discount: 0,
+    };
+  }
+
+  const normalizedCode = code.trim().toUpperCase();
+
+  const coupon = await Coupon.findOne({
+    code: normalizedCode,
+  });
+
+  if (!coupon) {
+    throw new Error("Invalid coupon code");
+  }
+
+  // =========================
+  // ACTIVE
+  // =========================
+
+  if (!coupon.active) {
+    throw new Error("This coupon is currently inactive");
+  }
+
+  // =========================
+  // DATE
+  // =========================
+
+  const now = new Date();
+
+  if (coupon.startDate && now < coupon.startDate) {
+    throw new Error("This coupon is not active yet");
+  }
+
+  if (coupon.expiryDate && now > coupon.expiryDate) {
+    throw new Error("This coupon has expired");
+  }
+
+  // =========================
+  // GLOBAL USAGE LIMIT
+  // =========================
+
+  if (
+    coupon.usageLimit > 0 &&
+    coupon.usedCount >= coupon.usageLimit
+  ) {
+    throw new Error("This coupon usage limit has been reached");
+  }
+
+  // =========================
+  // MINIMUM ORDER
+  // =========================
+
+  if (cartTotal < coupon.minimumOrder) {
+    throw new Error(
+      `Minimum order value for this coupon is ₹${coupon.minimumOrder}`
+    );
+  }
+
+  // =========================
+  // PER USER LIMIT
+  // =========================
+
+  if (userId && coupon.perUserLimit > 0) {
+    const userUsageCount = await Order.countDocuments({
+      user: userId,
+      couponCode: normalizedCode,
+      status: {
+        $ne: "Cancelled",
+      },
+    });
+
+    if (userUsageCount >= coupon.perUserLimit) {
+      throw new Error(
+        "You have already used this coupon the maximum number of times"
+      );
+    }
+  }
+
+  // =========================
+  // DISCOUNT
+  // =========================
+
+  let discount = 0;
+
+  if (coupon.discountType === "percentage") {
+    discount =
+      (cartTotal * coupon.discountValue) / 100;
+  } else {
+    discount = coupon.discountValue;
+  }
+
+  // =========================
+  // MAXIMUM DISCOUNT
+  // =========================
+
+  if (
+    coupon.maximumDiscount > 0 &&
+    discount > coupon.maximumDiscount
+  ) {
+    discount = coupon.maximumDiscount;
+  }
+
+  // Never discount more than subtotal
+  discount = Math.min(discount, cartTotal);
+
+  // Round
+  discount = Math.round(
+    (discount + Number.EPSILON) * 100
+  ) / 100;
+
+  return {
+    coupon,
+    discount,
+  };
+};
+
+// =========================
+// PLACE ORDER
+// =========================
 
 exports.place = async (req, res) => {
   try {
@@ -8,12 +140,12 @@ exports.place = async (req, res) => {
       shippingAddress,
       paymentMethod = "COD",
 
-      // =========================
+      // Coupon
+      couponCode,
+
       // CUSTOMER CONSENT
-      // =========================
       termsAccepted,
       privacyPolicyAccepted,
-      consentAcceptedAt,
     } = req.body;
 
     // =========================
@@ -22,18 +154,19 @@ exports.place = async (req, res) => {
 
     if (termsAccepted !== true) {
       return res.status(400).json({
-        message: "You must accept the Terms & Conditions.",
+        message:
+          "You must accept the Terms & Conditions.",
       });
     }
 
     if (privacyPolicyAccepted !== true) {
       return res.status(400).json({
-        message: "You must accept the Privacy Policy.",
+        message:
+          "You must accept the Privacy Policy.",
       });
     }
 
-    // Backend should create the timestamp itself.
-    // Do not trust the timestamp sent by frontend.
+    // Backend creates timestamp
     const consentDate = new Date();
 
     // =========================
@@ -51,55 +184,128 @@ exports.place = async (req, res) => {
     }
 
     // =========================
-    // CREATE ORDER ITEMS
+    // CHECK PRODUCTS + CALCULATE SUBTOTAL
+    // BEFORE STOCK UPDATE
     // =========================
 
-    const items = [];
     let subtotal = 0;
 
-    for (const i of cart.items) {
-      const p = await Product.findOneAndUpdate(
-        {
-          _id: i.product._id,
-          isActive: true,
-          stock: {
-            $gte: i.quantity,
-          },
-        },
-        {
-          $inc: {
-            stock: -i.quantity,
-          },
-        },
-        {
-          new: true,
-        }
-      );
+    const availableProducts = [];
 
-      if (!p) {
+    for (const i of cart.items) {
+      const product = await Product.findOne({
+        _id: i.product._id,
+        isActive: true,
+      });
+
+      if (!product) {
         return res.status(400).json({
-          message: `Insufficient stock for ${i.product.name}`,
+          message: `Product ${i.product.name} is no longer available`,
         });
       }
 
-      const price = p.salePrice ?? p.price;
+      if (product.stock < i.quantity) {
+        return res.status(400).json({
+          message: `Insufficient stock for ${product.name}`,
+        });
+      }
 
-      items.push({
-        product: p._id,
-        name: p.name,
-        image: p.image,
-        quantity: i.quantity,
-        price,
-      });
+      const price =
+        product.salePrice ?? product.price;
 
       subtotal += price * i.quantity;
+
+      availableProducts.push({
+        cartItem: i,
+        product,
+        price,
+      });
     }
 
     // =========================
     // SHIPPING
     // =========================
 
-    const shipping = subtotal >= 10000 ? 0 : 450;
+    const shipping =
+      subtotal >= 10000 ? 0 : 450;
+
+    // =========================
+    // COUPON VALIDATION
+    // =========================
+
+    let coupon = null;
+    let discount = 0;
+    let normalizedCouponCode = null;
+
+    if (couponCode?.trim()) {
+      try {
+        const result =
+          await calculateCouponDiscount({
+            code: couponCode,
+            cartTotal: subtotal,
+            userId: req.user._id,
+          });
+
+        coupon = result.coupon;
+        discount = result.discount;
+        normalizedCouponCode =
+          coupon.code;
+      } catch (couponError) {
+        return res.status(400).json({
+          message: couponError.message,
+        });
+      }
+    }
+
+    // =========================
+    // FINAL TOTAL
+    // =========================
+
+    const totalAmount = Math.max(
+      0,
+      subtotal + shipping - discount
+    );
+
+    // =========================
+    // NOW DECREMENT STOCK
+    // =========================
+
+    const items = [];
+
+    for (const item of availableProducts) {
+      const updatedProduct =
+        await Product.findOneAndUpdate(
+          {
+            _id: item.product._id,
+            isActive: true,
+            stock: {
+              $gte: item.cartItem.quantity,
+            },
+          },
+          {
+            $inc: {
+              stock: -item.cartItem.quantity,
+            },
+          },
+          {
+            new: true,
+          }
+        );
+
+      if (!updatedProduct) {
+        return res.status(400).json({
+          message: `Insufficient stock for ${item.product.name}`,
+        });
+      }
+
+      items.push({
+        product: updatedProduct._id,
+        name: updatedProduct.name,
+        image: updatedProduct.image,
+        quantity: item.cartItem.quantity,
+        price: item.price,
+      });
+    }
 
     // =========================
     // CREATE ORDER
@@ -114,20 +320,36 @@ exports.place = async (req, res) => {
 
       shipping,
 
-      totalAmount: subtotal + shipping,
+      discount,
+
+      couponCode: normalizedCouponCode,
+
+      totalAmount,
 
       shippingAddress,
 
       paymentMethod,
 
-      // =========================
-      // CONSENT RECORD
-      // =========================
-
+      // CONSENT
       termsAccepted: true,
       privacyPolicyAccepted: true,
       consentAcceptedAt: consentDate,
     });
+
+    // =========================
+    // INCREMENT COUPON USAGE
+    // =========================
+
+    if (coupon) {
+      await Coupon.findByIdAndUpdate(
+        coupon._id,
+        {
+          $inc: {
+            usedCount: 1,
+          },
+        }
+      );
+    }
 
     // =========================
     // CLEAR CART
@@ -145,13 +367,21 @@ exports.place = async (req, res) => {
       order,
     });
   } catch (error) {
-    console.error("Place order error:", error);
+    console.error(
+      "Place order error:",
+      error
+    );
 
     return res.status(500).json({
-      message: "Unable to place order right now.",
+      message:
+        "Unable to place order right now.",
     });
   }
 };
+
+// =========================
+// MY ORDERS
+// =========================
 
 exports.mine = async (req, res) => {
   try {
@@ -165,13 +395,21 @@ exports.mine = async (req, res) => {
       orders,
     });
   } catch (error) {
-    console.error("Get orders error:", error);
+    console.error(
+      "Get orders error:",
+      error
+    );
 
     res.status(500).json({
-      message: "Unable to fetch orders.",
+      message:
+        "Unable to fetch orders.",
     });
   }
 };
+
+// =========================
+// SINGLE ORDER
+// =========================
 
 exports.one = async (req, res) => {
   try {
@@ -190,13 +428,21 @@ exports.one = async (req, res) => {
       order,
     });
   } catch (error) {
-    console.error("Get order error:", error);
+    console.error(
+      "Get order error:",
+      error
+    );
 
     res.status(500).json({
-      message: "Unable to fetch order.",
+      message:
+        "Unable to fetch order.",
     });
   }
 };
+
+// =========================
+// CANCEL ORDER
+// =========================
 
 exports.cancel = async (req, res) => {
   try {
@@ -212,15 +458,19 @@ exports.cancel = async (req, res) => {
     }
 
     if (
-      ["Delivered", "Shipped", "Cancelled"].includes(
-        order.status
-      )
+      [
+        "Delivered",
+        "Shipped",
+        "Cancelled",
+      ].includes(order.status)
     ) {
       return res.status(400).json({
-        message: "Order cannot be cancelled now",
+        message:
+          "Order cannot be cancelled now",
       });
     }
 
+    // Restore product stock
     for (const item of order.items) {
       await Product.findByIdAndUpdate(
         item.product,
@@ -232,20 +482,42 @@ exports.cancel = async (req, res) => {
       );
     }
 
+    // Restore coupon usage
+    if (order.couponCode) {
+      await Coupon.findOneAndUpdate(
+        {
+          code: order.couponCode,
+          usedCount: {
+            $gt: 0,
+          },
+        },
+        {
+          $inc: {
+            usedCount: -1,
+          },
+        }
+      );
+    }
+
     order.status = "Cancelled";
     order.cancelledAt = new Date();
 
     await order.save();
 
     res.json({
-      message: "Order cancelled successfully",
+      message:
+        "Order cancelled successfully",
       order,
     });
   } catch (error) {
-    console.error("Cancel order error:", error);
+    console.error(
+      "Cancel order error:",
+      error
+    );
 
     res.status(500).json({
-      message: "Unable to cancel order.",
+      message:
+        "Unable to cancel order.",
     });
   }
 };

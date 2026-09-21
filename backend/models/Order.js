@@ -49,6 +49,13 @@ const schema = new mongoose.Schema(
       min: 0,
     },
 
+    couponCode: {
+      type: String,
+      default: null,
+      trim: true,
+      uppercase: true,
+    },
+
     totalAmount: {
       type: Number,
       required: true,
@@ -81,6 +88,7 @@ const schema = new mongoose.Schema(
     // =========================
     // CUSTOMER CONSENT
     // =========================
+
     termsAccepted: {
       type: Boolean,
       required: true,
