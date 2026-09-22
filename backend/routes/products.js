@@ -10,12 +10,11 @@ const upload = require("../middleware/upload");
 |--------------------------------------------------------------------------
 */
 
-// Get all products
+// Get all active products
 r.get("/", c.list);
 
-// Get single product
+// Get single active product
 r.get("/:id", c.getOne);
-
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +23,6 @@ r.get("/:id", c.getOne);
 */
 
 // Create product
-// Images are uploaded using field name: "images"
 r.post(
   "/",
   auth,
@@ -34,7 +32,6 @@ r.post(
 );
 
 // Update product
-// New images can again be uploaded using "images"
 r.put(
   "/:id",
   auth,

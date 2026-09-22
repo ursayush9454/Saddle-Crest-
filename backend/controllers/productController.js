@@ -95,7 +95,9 @@ exports.list = async (req, res, next) => {
     };
 
     /*
+    |--------------------------------------------------------------------------
     | Search
+    |--------------------------------------------------------------------------
     */
 
     if (search) {
@@ -113,7 +115,9 @@ exports.list = async (req, res, next) => {
     }
 
     /*
+    |--------------------------------------------------------------------------
     | Category
+    |--------------------------------------------------------------------------
     */
 
     if (category) {
@@ -121,34 +125,39 @@ exports.list = async (req, res, next) => {
     }
 
     /*
+    |--------------------------------------------------------------------------
     | Featured
+    |--------------------------------------------------------------------------
     */
 
     if (featured !== undefined) {
-      query.featured =
-        featured === "true";
+      query.featured = featured === "true";
     }
 
     /*
+    |--------------------------------------------------------------------------
     | Best Seller
+    |--------------------------------------------------------------------------
     */
 
     if (bestSeller !== undefined) {
-      query.bestSeller =
-        bestSeller === "true";
+      query.bestSeller = bestSeller === "true";
     }
 
     /*
+    |--------------------------------------------------------------------------
     | New Arrival
+    |--------------------------------------------------------------------------
     */
 
     if (newArrival !== undefined) {
-      query.newArrival =
-        newArrival === "true";
+      query.newArrival = newArrival === "true";
     }
 
     /*
+    |--------------------------------------------------------------------------
     | Price Filter
+    |--------------------------------------------------------------------------
     */
 
     if (minPrice || maxPrice) {
@@ -168,7 +177,9 @@ exports.list = async (req, res, next) => {
     }
 
     /*
+    |--------------------------------------------------------------------------
     | Sorting
+    |--------------------------------------------------------------------------
     */
 
     const sorts = {
@@ -190,7 +201,9 @@ exports.list = async (req, res, next) => {
     };
 
     /*
+    |--------------------------------------------------------------------------
     | Pagination
+    |--------------------------------------------------------------------------
     */
 
     const currentPage = Math.max(
@@ -229,7 +242,6 @@ exports.list = async (req, res, next) => {
         page: currentPage,
         limit: perPage,
         total,
-
         pages: Math.ceil(
           total / perPage
         ),
@@ -297,7 +309,9 @@ exports.create = async (
     );
 
     /*
+    |--------------------------------------------------------------------------
     | Upload selected files to Cloudinary
+    |--------------------------------------------------------------------------
     */
 
     let uploadedImages = [];
@@ -317,7 +331,9 @@ exports.create = async (
     }
 
     /*
-    | Support image URLs if provided
+    |--------------------------------------------------------------------------
+    | Support image URLs
+    |--------------------------------------------------------------------------
     */
 
     const urlImages =
@@ -326,8 +342,9 @@ exports.create = async (
       );
 
     /*
-    | Combine Cloudinary images
-    | and image URLs
+    |--------------------------------------------------------------------------
+    | Combine images
+    |--------------------------------------------------------------------------
     */
 
     const imageUrls = [
@@ -336,7 +353,9 @@ exports.create = async (
     ];
 
     /*
+    |--------------------------------------------------------------------------
     | Image required
+    |--------------------------------------------------------------------------
     */
 
     if (imageUrls.length === 0) {
@@ -347,7 +366,9 @@ exports.create = async (
     }
 
     /*
+    |--------------------------------------------------------------------------
     | Product data
+    |--------------------------------------------------------------------------
     */
 
     const productData = {
@@ -386,16 +407,7 @@ exports.create = async (
         req.body.categoryId ||
         null,
 
-      /*
-      | First image becomes
-      | main product image
-      */
-
       image: imageUrls[0],
-
-      /*
-      | All images
-      */
 
       images: imageUrls,
 
@@ -444,7 +456,9 @@ exports.create = async (
     };
 
     /*
+    |--------------------------------------------------------------------------
     | Save product
+    |--------------------------------------------------------------------------
     */
 
     const product =
@@ -498,7 +512,9 @@ exports.update = async (
     }
 
     /*
+    |--------------------------------------------------------------------------
     | Upload new files
+    |--------------------------------------------------------------------------
     */
 
     let uploadedImages = [];
@@ -518,8 +534,9 @@ exports.update = async (
     }
 
     /*
-    | Existing images sent
-    | from frontend
+    |--------------------------------------------------------------------------
+    | Existing images
+    |--------------------------------------------------------------------------
     */
 
     const existingImages =
@@ -528,7 +545,9 @@ exports.update = async (
       );
 
     /*
+    |--------------------------------------------------------------------------
     | URL images
+    |--------------------------------------------------------------------------
     */
 
     const urlImages =
@@ -537,7 +556,9 @@ exports.update = async (
       );
 
     /*
+    |--------------------------------------------------------------------------
     | Combine images
+    |--------------------------------------------------------------------------
     */
 
     let imageUrls = [
@@ -547,8 +568,9 @@ exports.update = async (
     ];
 
     /*
-    | If no images were sent,
-    | keep old images
+    |--------------------------------------------------------------------------
+    | Keep old images if none sent
+    |--------------------------------------------------------------------------
     */
 
     if (imageUrls.length === 0) {
@@ -556,12 +578,14 @@ exports.update = async (
         product.images?.length
           ? product.images
           : product.image
-            ? [product.image]
-            : [];
+          ? [product.image]
+          : [];
     }
 
     /*
+    |--------------------------------------------------------------------------
     | Still no image
+    |--------------------------------------------------------------------------
     */
 
     if (imageUrls.length === 0) {
@@ -572,7 +596,9 @@ exports.update = async (
     }
 
     /*
+    |--------------------------------------------------------------------------
     | Update data
+    |--------------------------------------------------------------------------
     */
 
     const updateData = {
@@ -666,7 +692,9 @@ exports.update = async (
     };
 
     /*
+    |--------------------------------------------------------------------------
     | Update database
+    |--------------------------------------------------------------------------
     */
 
     const updatedProduct =
@@ -674,10 +702,17 @@ exports.update = async (
         req.params.id,
         updateData,
         {
-          new: true,
+          returnDocument: "after",
           runValidators: true,
         }
       );
+
+    if (!updatedProduct) {
+      return res.status(404).json({
+        message:
+          "Product not found",
+      });
+    }
 
     res.json({
       message:
@@ -700,6 +735,15 @@ exports.update = async (
 |--------------------------------------------------------------------------
 | DELETE / ARCHIVE PRODUCT
 |--------------------------------------------------------------------------
+|
+| Admin delete = soft delete/archive.
+|
+| Product is NOT physically removed from
+| MongoDB. isActive becomes false.
+|
+| Public product API already returns only
+| isActive: true products.
+|--------------------------------------------------------------------------
 */
 
 exports.remove = async (
@@ -708,6 +752,11 @@ exports.remove = async (
   next
 ) => {
   try {
+    console.log(
+      "Archive product request:",
+      req.params.id
+    );
+
     const product =
       await Product.findByIdAndUpdate(
         req.params.id,
@@ -715,7 +764,8 @@ exports.remove = async (
           isActive: false,
         },
         {
-          new: true,
+          returnDocument: "after",
+          runValidators: true,
         }
       );
 
@@ -726,13 +776,23 @@ exports.remove = async (
       });
     }
 
-    res.json({
+    console.log(
+      "Product archived successfully:",
+      product._id
+    );
+
+    return res.status(200).json({
+      success: true,
       message:
         "Product archived successfully",
-
       product,
     });
   } catch (error) {
+    console.error(
+      "Archive product error:",
+      error
+    );
+
     next(error);
   }
 };

@@ -1,8 +1,172 @@
-const User=require("../models/User"),Product=require("../models/Product"),Order=require("../models/Order"),Category=require("../models/Category");
-exports.dashboard=async(req,res)=>{const [users,products,orders,categories,revenueAgg,pending,lowStock]=await Promise.all([User.countDocuments({role:"user"}),Product.countDocuments({isActive:true}),Order.countDocuments(),Category.countDocuments({isActive:true}),Order.aggregate([{$match:{status:{$ne:"Cancelled"}}},{$group:{_id:null,total:{$sum:"$totalAmount"}}}]),Order.countDocuments({status:"Pending"}),Product.countDocuments({isActive:true,$expr:{$lte:["$stock","$lowStockThreshold"]}})]);res.json({stats:{customers:users,products,orders,categories,revenue:revenueAgg[0]?.total||0,pendingOrders:pending,lowStock}});};
-exports.products=async(req,res)=>{const products=await Product.find().sort({createdAt:-1});res.json({products});};
-exports.categories=async(req,res)=>{res.json({categories:await Category.find().sort({createdAt:-1})});};
-exports.orders=async(req,res)=>{const orders=await Order.find().populate("user","name email phone").sort({createdAt:-1});res.json({orders});};
-exports.customers=async(req,res)=>{const customers=await User.find({role:"user"}).select("-password").sort({createdAt:-1});res.json({customers});};
-exports.updateOrder=async(req,res)=>{const allowed=["Pending","Processing","Shipped","Delivered","Cancelled"];if(!allowed.includes(req.body.status))return res.status(400).json({message:"Invalid order status"});const o=await Order.findByIdAndUpdate(req.params.id,{status:req.body.status},{new:true}).populate("user","name email");if(!o)return res.status(404).json({message:"Order not found"});res.json({message:"Order status updated",order:o});};
-exports.deleteCustomer=async(req,res)=>{const u=await User.findOneAndUpdate({_id:req.params.id,role:"user"},{isActive:false},{new:true}).select("-password");if(!u)return res.status(404).json({message:"Customer not found"});res.json({message:"Customer disabled",customer:u});};
+const User = require("../models/User");
+const Product = require("../models/Product");
+const Order = require("../models/Order");
+const Category = require("../models/Category");
+
+exports.dashboard = async (req, res) => {
+  const [
+    users,
+    products,
+    orders,
+    categories,
+    revenueAgg,
+    pending,
+    lowStock,
+  ] = await Promise.all([
+    User.countDocuments({ role: "user" }),
+
+    Product.countDocuments({ isActive: true }),
+
+    Order.countDocuments(),
+
+    Category.countDocuments({ isActive: true }),
+
+    Order.aggregate([
+      {
+        $match: {
+          status: { $ne: "Cancelled" },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: {
+            $sum: "$totalAmount",
+          },
+        },
+      },
+    ]),
+
+    Order.countDocuments({
+      status: "Pending",
+    }),
+
+    Product.countDocuments({
+      isActive: true,
+      $expr: {
+        $lte: ["$stock", "$lowStockThreshold"],
+      },
+    }),
+  ]);
+
+  res.json({
+    stats: {
+      customers: users,
+      products,
+      orders,
+      categories,
+      revenue: revenueAgg[0]?.total || 0,
+      pendingOrders: pending,
+      lowStock,
+    },
+  });
+};
+
+exports.products = async (req, res) => {
+  const products = await Product.find({
+    isActive: true,
+  }).sort({
+    createdAt: -1,
+  });
+
+  res.json({
+    products,
+  });
+};
+
+exports.categories = async (req, res) => {
+  res.json({
+    categories: await Category.find().sort({
+      createdAt: -1,
+    }),
+  });
+};
+
+exports.orders = async (req, res) => {
+  const orders = await Order.find()
+    .populate("user", "name email phone")
+    .sort({
+      createdAt: -1,
+    });
+
+  res.json({
+    orders,
+  });
+};
+
+exports.customers = async (req, res) => {
+  const customers = await User.find({
+    role: "user",
+  })
+    .select("-password")
+    .sort({
+      createdAt: -1,
+    });
+
+  res.json({
+    customers,
+  });
+};
+
+exports.updateOrder = async (req, res) => {
+  const allowed = [
+    "Pending",
+    "Processing",
+    "Shipped",
+    "Delivered",
+    "Cancelled",
+  ];
+
+  if (!allowed.includes(req.body.status)) {
+    return res.status(400).json({
+      message: "Invalid order status",
+    });
+  }
+
+  const o = await Order.findByIdAndUpdate(
+    req.params.id,
+    {
+      status: req.body.status,
+    },
+    {
+      new: true,
+    }
+  ).populate("user", "name email");
+
+  if (!o) {
+    return res.status(404).json({
+      message: "Order not found",
+    });
+  }
+
+  res.json({
+    message: "Order status updated",
+    order: o,
+  });
+};
+
+exports.deleteCustomer = async (req, res) => {
+  const u = await User.findOneAndUpdate(
+    {
+      _id: req.params.id,
+      role: "user",
+    },
+    {
+      isActive: false,
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+
+  if (!u) {
+    return res.status(404).json({
+      message: "Customer not found",
+    });
+  }
+
+  res.json({
+    message: "Customer disabled",
+    customer: u,
+  });
+};
