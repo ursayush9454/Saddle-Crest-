@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   RefreshCw,
@@ -8,6 +9,8 @@ import {
   MapPin,
   CreditCard,
   CalendarDays,
+  Search,
+  SlidersHorizontal,
 } from "lucide-react";
 import { apiRequest } from "../services/api";
 import "./Orders.css";
@@ -133,6 +136,10 @@ const Orders = () => {
   const [error, setError] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
 
+  // Search + filter
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+
   const loadOrders = async () => {
     try {
       setError("");
@@ -224,6 +231,42 @@ const Orders = () => {
     setSelectedOrder(null);
   };
 
+  // Search + status filter
+  const filteredOrders = (data.orders || []).filter((order) => {
+    const search = searchTerm.trim().toLowerCase();
+
+    const orderId = order?._id
+      ? order._id.toLowerCase()
+      : "";
+
+    const shortOrderId = order?._id
+      ? order._id.slice(-8).toLowerCase()
+      : "";
+
+    const customerName =
+      getCustomerName(order).toLowerCase();
+
+    const customerEmail =
+      getCustomerEmail(order).toLowerCase();
+
+    const customerPhone =
+      getCustomerPhone(order).toLowerCase();
+
+    const matchesSearch =
+      !search ||
+      orderId.includes(search) ||
+      shortOrderId.includes(search) ||
+      customerName.includes(search) ||
+      customerEmail.includes(search) ||
+      customerPhone.includes(search);
+
+    const matchesStatus =
+      statusFilter === "All" ||
+      (order?.status || "Pending") === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
   if (loading) {
     return (
       <div className="loading-state">
@@ -291,6 +334,81 @@ const Orders = () => {
             </button>
           </div>
 
+          {/* SEARCH + FILTER */}
+          <div className="orders-toolbar">
+            <div className="orders-search">
+              <Search size={17} />
+
+              <input
+                type="text"
+                placeholder="Search by order ID, customer, email or phone..."
+                value={searchTerm}
+                onChange={(event) =>
+                  setSearchTerm(event.target.value)
+                }
+              />
+
+              {searchTerm && (
+                <button
+                  type="button"
+                  className="orders-search-clear"
+                  onClick={() => setSearchTerm("")}
+                  aria-label="Clear search"
+                >
+                  <X size={15} />
+                </button>
+              )}
+            </div>
+
+            <div className="orders-filter">
+              <SlidersHorizontal size={17} />
+
+              <select
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value)
+                }
+              >
+                <option value="All">
+                  All Orders
+                </option>
+
+                {statuses.map((status) => (
+                  <option
+                    key={status}
+                    value={status}
+                  >
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* RESULT COUNT */}
+          <div className="orders-results-info">
+            <span>
+              Showing{" "}
+              <strong>{filteredOrders.length}</strong>{" "}
+              of{" "}
+              <strong>{data.orders?.length || 0}</strong>{" "}
+              orders
+            </span>
+
+            {(searchTerm || statusFilter !== "All") && (
+              <button
+                type="button"
+                className="clear-orders-filter"
+                onClick={() => {
+                  setSearchTerm("");
+                  setStatusFilter("All");
+                }}
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+
           <div className="table-wrapper">
             <table>
               <thead>
@@ -308,8 +426,8 @@ const Orders = () => {
               </thead>
 
               <tbody>
-                {data.orders?.length ? (
-                  data.orders.map((order) => (
+                {filteredOrders.length ? (
+                  filteredOrders.map((order) => (
                     <tr key={order._id}>
                       <td>
                         <strong>
@@ -396,7 +514,10 @@ const Orders = () => {
                   <tr>
                     <td colSpan="7">
                       <div className="empty-state">
-                        No orders found.
+                        {searchTerm ||
+                        statusFilter !== "All"
+                          ? "No orders match your search or filter."
+                          : "No orders found."}
                       </div>
                     </td>
                   </tr>
@@ -537,7 +658,8 @@ const Orders = () => {
 
                   <div className="order-detail-content">
                     <span>
-                      {address || "Address not available"}
+                      {address ||
+                        "Address not available"}
                     </span>
                   </div>
                 </div>
