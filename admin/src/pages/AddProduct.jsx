@@ -7,7 +7,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { apiRequest } from "../services/api";
 import "./AddProduct.css";
 
@@ -47,9 +47,19 @@ const initialForm = {
 
 const AddProduct = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const fileInputRef = useRef(null);
 
+  /*
+   * If Products page sends a product through
+   * navigate("/add-product", { state: { product } })
+   * then we are in EDIT mode.
+   */
+  const editingProduct = location.state?.product || null;
+  const isEditMode = Boolean(editingProduct?._id);
+
   const [form, setForm] = useState(initialForm);
+
   const [categories, setCategories] =
     useState(DEFAULT_CATEGORIES);
 
@@ -60,9 +70,36 @@ const AddProduct = () => {
 
   const [saving, setSaving] = useState(false);
 
-  // =========================
-  // FETCH CATEGORIES
-  // =========================
+  /*
+   * ==========================================
+   * NORMALIZE EXISTING PRODUCT IMAGES
+   * ==========================================
+   */
+  const getExistingImages = (product) => {
+    if (!product) {
+      return [];
+    }
+
+    const images = Array.isArray(product.images)
+      ? product.images.filter(Boolean)
+      : [];
+
+    /*
+     * If images[] is empty but main image exists,
+     * use main image.
+     */
+    if (!images.length && product.image) {
+      return [product.image];
+    }
+
+    return images;
+  };
+
+  /*
+   * ==========================================
+   * FETCH CATEGORIES
+   * ==========================================
+   */
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -78,14 +115,13 @@ const AddProduct = () => {
               ? data
               : [];
 
-        const backendNames =
-          backendCategories
-            .map((category) =>
-              typeof category === "string"
-                ? category
-                : category?.name
-            )
-            .filter(Boolean);
+        const backendNames = backendCategories
+          .map((category) =>
+            typeof category === "string"
+              ? category
+              : category?.name
+          )
+          .filter(Boolean);
 
         const merged = [
           ...DEFAULT_CATEGORIES,
@@ -115,9 +151,91 @@ const AddProduct = () => {
     fetchCategories();
   }, []);
 
-  // =========================
-  // INPUT CHANGE
-  // =========================
+  /*
+   * ==========================================
+   * POPULATE FORM FOR EDIT MODE
+   * ==========================================
+   */
+
+  useEffect(() => {
+    if (!editingProduct) {
+      setForm(initialForm);
+      return;
+    }
+
+    const existingImages =
+      getExistingImages(editingProduct);
+
+    setForm({
+      name: editingProduct.name || "",
+
+      description:
+        editingProduct.description || "",
+
+      price:
+        editingProduct.price !== undefined &&
+        editingProduct.price !== null
+          ? String(editingProduct.price)
+          : "",
+
+      /*
+       * Backend field is salePrice.
+       * UI field is comparePrice.
+       */
+      comparePrice:
+        editingProduct.salePrice !== undefined &&
+        editingProduct.salePrice !== null
+          ? String(editingProduct.salePrice)
+          : "",
+
+      category:
+        editingProduct.category || "",
+
+      badge:
+        editingProduct.badge || "",
+
+      sku:
+        editingProduct.sku || "",
+
+      stock:
+        editingProduct.stock !== undefined &&
+        editingProduct.stock !== null
+          ? String(editingProduct.stock)
+          : "",
+
+      /*
+       * Existing backend URLs are represented
+       * as URL images so they remain visible.
+       */
+      images: existingImages.map((url) => ({
+        type: "url",
+        url,
+        preview: url,
+      })),
+
+      featured:
+        Boolean(editingProduct.featured),
+
+      bestSeller:
+        Boolean(editingProduct.bestSeller),
+
+      newArrival:
+        Boolean(editingProduct.newArrival),
+
+      isActive:
+        editingProduct.isActive !== undefined
+          ? Boolean(editingProduct.isActive)
+          : true,
+    });
+
+    setImageUrl("");
+  }, [editingProduct]);
+
+  /*
+   * ==========================================
+   * INPUT CHANGE
+   * ==========================================
+   */
 
   const handleChange = (event) => {
     const {
@@ -136,9 +254,11 @@ const AddProduct = () => {
     }));
   };
 
-  // =========================
-  // IMAGE FILE SELECT
-  // =========================
+  /*
+   * ==========================================
+   * IMAGE FILE SELECT
+   * ==========================================
+   */
 
   const handleFileSelect = (event) => {
     const files = Array.from(
@@ -196,17 +316,17 @@ const AddProduct = () => {
     event.target.value = "";
   };
 
-  // =========================
-  // ADD IMAGE URL
-  // =========================
+  /*
+   * ==========================================
+   * ADD IMAGE URL
+   * ==========================================
+   */
 
   const addImage = () => {
     const url = imageUrl.trim();
 
     if (!url) {
-      alert(
-        "Please enter an image URL."
-      );
+      alert("Please enter an image URL.");
       return;
     }
 
@@ -254,9 +374,11 @@ const AddProduct = () => {
     setImageUrl("");
   };
 
-  // =========================
-  // REMOVE IMAGE
-  // =========================
+  /*
+   * ==========================================
+   * REMOVE IMAGE
+   * ==========================================
+   */
 
   const removeImage = (index) => {
     setForm((previous) => {
@@ -266,7 +388,9 @@ const AddProduct = () => {
         image?.type === "file" &&
         image?.preview
       ) {
-        URL.revokeObjectURL(image.preview);
+        URL.revokeObjectURL(
+          image.preview
+        );
       }
 
       return {
@@ -279,9 +403,11 @@ const AddProduct = () => {
     });
   };
 
-  // =========================
-  // CLEANUP PREVIEW URLS
-  // =========================
+  /*
+   * ==========================================
+   * CLEANUP PREVIEW URLS
+   * ==========================================
+   */
 
   useEffect(() => {
     return () => {
@@ -298,9 +424,11 @@ const AddProduct = () => {
     };
   }, []);
 
-  // =========================
-  // SUBMIT
-  // =========================
+  /*
+   * ==========================================
+   * SUBMIT
+   * ==========================================
+   */
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -354,11 +482,13 @@ const AddProduct = () => {
     try {
       setSaving(true);
 
-      // =========================
-      // FORM DATA
-      // =========================
-
       const formData = new FormData();
+
+      /*
+       * ======================================
+       * BASIC FIELDS
+       * ======================================
+       */
 
       formData.append(
         "name",
@@ -376,17 +506,21 @@ const AddProduct = () => {
       );
 
       /*
-       * Backend Product model uses `salePrice`.
-       *
-       * Your UI calls this:
-       * Compare at Price
-       *
-       * So send it as salePrice only when needed.
+       * Backend expects salePrice.
        */
-      if (form.comparePrice) {
+      if (form.comparePrice !== "") {
         formData.append(
           "salePrice",
           String(Number(form.comparePrice))
+        );
+      } else if (isEditMode) {
+        /*
+         * Explicitly clear old sale price
+         * when editing and field is empty.
+         */
+        formData.append(
+          "salePrice",
+          ""
         );
       }
 
@@ -403,6 +537,8 @@ const AddProduct = () => {
           "badge",
           form.badge
         );
+      } else {
+        formData.append("badge", "");
       }
 
       if (form.sku.trim()) {
@@ -410,6 +546,8 @@ const AddProduct = () => {
           "sku",
           form.sku.trim()
         );
+      } else if (isEditMode) {
+        formData.append("sku", "");
       }
 
       formData.append(
@@ -441,57 +579,110 @@ const AddProduct = () => {
         String(Boolean(form.isActive))
       );
 
-      // =========================
-      // IMAGES
-      // =========================
-
-      form.images.forEach((image) => {
-        if (image.type === "file") {
-          formData.append(
-            "images",
-            image.file
-          );
-        }
-
-        if (image.type === "url") {
-          formData.append(
-            "images",
-            image.url
-          );
-        }
-      });
-
       /*
-       * Backend:
+       * ======================================
+       * IMAGES
+       * ======================================
        *
-       * POST /api/products
+       * EDIT MODE:
+       * Existing URL images -> existingImages
        *
-       * multer:
+       * New URL images -> images
        *
-       * upload.array("images", 10)
+       * New uploaded files -> images
        *
-       * Therefore:
-       *
-       * /products
+       * This matches your backend update
+       * controller.
        */
 
-      const data = await apiRequest(
-        "/products",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      if (isEditMode) {
+        form.images.forEach((image) => {
+          if (image.type === "url") {
+            /*
+             * Existing Cloudinary/image URL
+             * is kept as existingImages.
+             */
+            formData.append(
+              "existingImages",
+              image.url
+            );
+          }
 
-      console.log(
-        "Product created:",
-        data
-      );
+          if (image.type === "file") {
+            formData.append(
+              "images",
+              image.file
+            );
+          }
+        });
+      } else {
+        /*
+         * ADD MODE
+         */
+        form.images.forEach((image) => {
+          if (image.type === "file") {
+            formData.append(
+              "images",
+              image.file
+            );
+          }
 
-      alert(
-        "Product added successfully."
-      );
+          if (image.type === "url") {
+            formData.append(
+              "images",
+              image.url
+            );
+          }
+        });
+      }
 
+      /*
+       * ======================================
+       * API REQUEST
+       * ======================================
+       */
+
+      let data;
+
+      if (isEditMode) {
+        data = await apiRequest(
+          `/products/${editingProduct._id}`,
+          {
+            method: "PUT",
+            body: formData,
+          }
+        );
+
+        console.log(
+          "Product updated:",
+          data
+        );
+
+        alert(
+          "Product updated successfully."
+        );
+      } else {
+        data = await apiRequest(
+          "/products",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        console.log(
+          "Product created:",
+          data
+        );
+
+        alert(
+          "Product added successfully."
+        );
+      }
+
+      /*
+       * Reset only after successful request.
+       */
       setForm({
         ...initialForm,
         images: [],
@@ -502,22 +693,30 @@ const AddProduct = () => {
       navigate("/products");
     } catch (error) {
       console.error(
-        "Add product error:",
+        isEditMode
+          ? "Update product error:"
+          : "Add product error:",
         error
       );
 
       alert(
         error?.message ||
-          "Failed to add product. Please try again."
+          (
+            isEditMode
+              ? "Failed to update product. Please try again."
+              : "Failed to add product. Please try again."
+          )
       );
     } finally {
       setSaving(false);
     }
   };
 
-  // =========================
-  // BACK
-  // =========================
+  /*
+   * ==========================================
+   * BACK
+   * ==========================================
+   */
 
   const handleBack = () => {
     if (saving) {
@@ -545,11 +744,16 @@ const AddProduct = () => {
             Back to Products
           </button>
 
-          <h1>Add Product</h1>
+          <h1>
+            {isEditMode
+              ? "Edit Product"
+              : "Add Product"}
+          </h1>
 
           <p>
-            Create a new Saddle & Crest
-            product for your store.
+            {isEditMode
+              ? "Update your Saddle & Crest product details."
+              : "Create a new Saddle & Crest product for your store."}
           </p>
         </div>
       </div>
@@ -779,8 +983,6 @@ const AddProduct = () => {
             </div>
           </div>
 
-          {/* HIDDEN FILE INPUT */}
-
           <input
             ref={fileInputRef}
             type="file"
@@ -789,8 +991,6 @@ const AddProduct = () => {
             hidden
             onChange={handleFileSelect}
           />
-
-          {/* UPLOAD BUTTON */}
 
           <button
             type="button"
@@ -816,8 +1016,6 @@ const AddProduct = () => {
             </div>
           </button>
 
-          {/* IMAGE URL */}
-
           <div className="image-url-row">
             <input
               type="url"
@@ -842,16 +1040,12 @@ const AddProduct = () => {
             </button>
           </div>
 
-          {/* IMAGE COUNT */}
-
           {form.images.length > 0 && (
             <div className="image-count">
               {form.images.length} / 10
               images added
             </div>
           )}
-
-          {/* IMAGE PREVIEWS */}
 
           {form.images.length > 0 && (
             <div className="image-preview-list">
@@ -1042,8 +1236,12 @@ const AddProduct = () => {
             <Save size={17} />
 
             {saving
-              ? "Adding Product..."
-              : "Add Product"}
+              ? isEditMode
+                ? "Updating Product..."
+                : "Adding Product..."
+              : isEditMode
+                ? "Update Product"
+                : "Add Product"}
           </button>
         </div>
       </form>
