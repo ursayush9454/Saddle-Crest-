@@ -21,11 +21,18 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Delete loading
+  const [deletingId, setDeletingId] = useState(null);
+
   // Filters
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [stockFilter, setStockFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+
+  /* =========================================================
+     LOAD PRODUCTS
+  ========================================================= */
 
   const loadProducts = async () => {
     try {
@@ -36,17 +43,27 @@ const Products = () => {
 
       setProducts(result?.products || []);
     } catch (err) {
-      setError(err.message || "Failed to load products.");
+      console.error("Load products error:", err);
+
+      setError(
+        err.message || "Failed to load products."
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  /* =========================================================
+     INITIAL LOAD
+  ========================================================= */
 
   useEffect(() => {
     let mounted = true;
 
     const load = async () => {
       try {
+        setError("");
+
         const result = await apiRequest("/admin/products");
 
         if (mounted) {
@@ -54,8 +71,13 @@ const Products = () => {
           setLoading(false);
         }
       } catch (err) {
+        console.error("Initial products load error:", err);
+
         if (mounted) {
-          setError(err.message || "Failed to load products.");
+          setError(
+            err.message || "Failed to load products."
+          );
+
           setLoading(false);
         }
       }
@@ -68,9 +90,9 @@ const Products = () => {
     };
   }, []);
 
-  /* =========================
+  /* =========================================================
      UNIQUE CATEGORIES
-  ========================= */
+  ========================================================= */
 
   const categories = useMemo(() => {
     const categorySet = new Set();
@@ -88,9 +110,9 @@ const Products = () => {
     );
   }, [products]);
 
-  /* =========================
+  /* =========================================================
      FILTER PRODUCTS
-  ========================= */
+  ========================================================= */
 
   const filteredProducts = useMemo(() => {
     const searchValue = search.trim().toLowerCase();
@@ -100,14 +122,21 @@ const Products = () => {
 
       const matchesSearch =
         !searchValue ||
-        product.name?.toLowerCase().includes(searchValue) ||
-        product.category?.toLowerCase().includes(searchValue) ||
-        product.sku?.toLowerCase().includes(searchValue);
+        product.name
+          ?.toLowerCase()
+          .includes(searchValue) ||
+        product.category
+          ?.toLowerCase()
+          .includes(searchValue) ||
+        product.sku
+          ?.toLowerCase()
+          .includes(searchValue);
 
       /* Category */
 
       const productCategory =
-        product.category?.trim() || "Uncategorized";
+        product.category?.trim() ||
+        "Uncategorized";
 
       const matchesCategory =
         categoryFilter === "all" ||
@@ -167,28 +196,32 @@ const Products = () => {
     typeFilter,
   ]);
 
-  /* =========================
-     GROUP FILTERED PRODUCTS
-  ========================= */
+  /* =========================================================
+     GROUP PRODUCTS BY CATEGORY
+  ========================================================= */
 
   const groupedProducts = useMemo(() => {
-    return filteredProducts.reduce((groups, product) => {
-      const category =
-        product.category?.trim() || "Uncategorized";
+    return filteredProducts.reduce(
+      (groups, product) => {
+        const category =
+          product.category?.trim() ||
+          "Uncategorized";
 
-      if (!groups[category]) {
-        groups[category] = [];
-      }
+        if (!groups[category]) {
+          groups[category] = [];
+        }
 
-      groups[category].push(product);
+        groups[category].push(product);
 
-      return groups;
-    }, {});
+        return groups;
+      },
+      {}
+    );
   }, [filteredProducts]);
 
-  /* =========================
+  /* =========================================================
      CLEAR FILTERS
-  ========================= */
+  ========================================================= */
 
   const clearFilters = () => {
     setSearch("");
@@ -203,9 +236,9 @@ const Products = () => {
     stockFilter !== "all" ||
     typeFilter !== "all";
 
-  /* =========================
-     EDIT
-  ========================= */
+  /* =========================================================
+     EDIT PRODUCT
+  ========================================================= */
 
   const editProduct = (product) => {
     navigate("/add-product", {
@@ -215,11 +248,16 @@ const Products = () => {
     });
   };
 
-  /* =========================
-     DELETE
-  ========================= */
+  /* =========================================================
+     DELETE / ARCHIVE PRODUCT
+  ========================================================= */
 
   const removeProduct = async (id) => {
+    if (!id) {
+      setError("Product ID is missing.");
+      return;
+    }
+
     const confirmed = window.confirm(
       "Are you sure you want to archive this product?"
     );
@@ -227,21 +265,66 @@ const Products = () => {
     if (!confirmed) return;
 
     try {
+      setError("");
+      setDeletingId(id);
+
+      /*
+       IMPORTANT:
+
+       Backend route is mounted as:
+
+       /api/products/:id
+
+       apiRequest already contains:
+
+       http://localhost:5000/api
+
+       Therefore endpoint must be:
+
+       /products/:id
+
+       NOT:
+
+       /admin/products/:id
+      */
+
       await apiRequest(`/products/${id}`, {
         method: "DELETE",
       });
 
+      /*
+       Remove immediately from UI
+      */
+
+      setProducts((currentProducts) =>
+        currentProducts.filter(
+          (product) => product._id !== id
+        )
+      );
+
+      /*
+       Sync with backend
+      */
+
       await loadProducts();
     } catch (err) {
-      setError(
-        err.message || "Failed to delete product."
+      console.error(
+        "Delete product error:",
+        err
       );
+
+      setError(
+        err.message ||
+          "Failed to archive product."
+      );
+    } finally {
+      setDeletingId(null);
     }
   };
 
-  /* =========================
+  /* =========================================================
      LOADING
-  ========================= */
+  ========================================================= */
 
   if (loading) {
     return (
@@ -250,6 +333,10 @@ const Products = () => {
       </div>
     );
   }
+
+  /* =========================================================
+     UI
+  ========================================================= */
 
   return (
     <div className="products-page">
@@ -261,9 +348,9 @@ const Products = () => {
         </div>
       )}
 
-      {/* =========================
+      {/* =====================================================
           HEADER
-      ========================= */}
+      ===================================================== */}
 
       <section className="products-header">
         <div>
@@ -282,23 +369,27 @@ const Products = () => {
           <button
             className="products-refresh-btn"
             onClick={loadProducts}
+            disabled={deletingId !== null}
           >
             <RefreshCw size={15} />
+
             Refresh
           </button>
 
           <button
             className="products-add-btn"
-            onClick={() => navigate("/add-product")}
+            onClick={() =>
+              navigate("/add-product")
+            }
           >
             + Add Product
           </button>
         </div>
       </section>
 
-      {/* =========================
+      {/* =====================================================
           FILTERS
-      ========================= */}
+      ===================================================== */}
 
       {products.length > 0 && (
         <section className="products-filter-panel">
@@ -306,14 +397,20 @@ const Products = () => {
             <div className="products-filter-title">
               <SlidersHorizontal size={15} />
 
-              <span>FILTER PRODUCTS</span>
+              <span>
+                FILTER PRODUCTS
+              </span>
             </div>
 
             <div className="products-result-count">
               Showing{" "}
-              <strong>{filteredProducts.length}</strong>{" "}
+              <strong>
+                {filteredProducts.length}
+              </strong>{" "}
               of{" "}
-              <strong>{products.length}</strong>
+              <strong>
+                {products.length}
+              </strong>
             </div>
           </div>
 
@@ -335,7 +432,9 @@ const Products = () => {
               {search && (
                 <button
                   type="button"
-                  onClick={() => setSearch("")}
+                  onClick={() =>
+                    setSearch("")
+                  }
                   className="product-search-clear"
                 >
                   <X size={14} />
@@ -351,21 +450,25 @@ const Products = () => {
               <select
                 value={categoryFilter}
                 onChange={(e) =>
-                  setCategoryFilter(e.target.value)
+                  setCategoryFilter(
+                    e.target.value
+                  )
                 }
               >
                 <option value="all">
                   All Categories
                 </option>
 
-                {categories.map((category) => (
-                  <option
-                    value={category}
-                    key={category}
-                  >
-                    {category}
-                  </option>
-                ))}
+                {categories.map(
+                  (category) => (
+                    <option
+                      value={category}
+                      key={category}
+                    >
+                      {category}
+                    </option>
+                  )
+                )}
 
                 {products.some(
                   (product) =>
@@ -386,7 +489,9 @@ const Products = () => {
               <select
                 value={stockFilter}
                 onChange={(e) =>
-                  setStockFilter(e.target.value)
+                  setStockFilter(
+                    e.target.value
+                  )
                 }
               >
                 <option value="all">
@@ -410,12 +515,16 @@ const Products = () => {
             {/* TYPE */}
 
             <div className="product-filter-control">
-              <label>Product Type</label>
+              <label>
+                Product Type
+              </label>
 
               <select
                 value={typeFilter}
                 onChange={(e) =>
-                  setTypeFilter(e.target.value)
+                  setTypeFilter(
+                    e.target.value
+                  )
                 }
               >
                 <option value="all">
@@ -444,6 +553,7 @@ const Products = () => {
                 onClick={clearFilters}
               >
                 <X size={14} />
+
                 Clear
               </button>
             )}
@@ -451,22 +561,27 @@ const Products = () => {
         </section>
       )}
 
-      {/* =========================
+      {/* =====================================================
           EMPTY
-      ========================= */}
+      ===================================================== */}
 
       {!products.length ? (
         <section className="products-empty">
           <Package size={35} />
 
-          <h3>No products found</h3>
+          <h3>
+            No products found
+          </h3>
 
           <p>
-            Start adding products to your catalogue.
+            Start adding products to
+            your catalogue.
           </p>
 
           <button
-            onClick={() => navigate("/add-product")}
+            onClick={() =>
+              navigate("/add-product")
+            }
             className="products-add-btn"
           >
             + Add Product
@@ -476,10 +591,13 @@ const Products = () => {
         <section className="products-empty products-no-results">
           <Search size={35} />
 
-          <h3>No matching products</h3>
+          <h3>
+            No matching products
+          </h3>
 
           <p>
-            Try changing your search or filters.
+            Try changing your search
+            or filters.
           </p>
 
           <button
@@ -490,13 +608,18 @@ const Products = () => {
           </button>
         </section>
       ) : (
-        /* =========================
+        /* ===================================================
            CATEGORY LIST
-        ========================= */
+        =================================================== */
 
         <div className="products-category-list">
-          {Object.entries(groupedProducts).map(
-            ([category, categoryProducts]) => (
+          {Object.entries(
+            groupedProducts
+          ).map(
+            ([
+              category,
+              categoryProducts,
+            ]) => (
               <section
                 className="product-category-section"
                 key={category}
@@ -505,14 +628,21 @@ const Products = () => {
 
                 <div className="product-category-heading">
                   <div>
-                    <span>CATEGORY</span>
+                    <span>
+                      CATEGORY
+                    </span>
 
-                    <h2>{category}</h2>
+                    <h2>
+                      {category}
+                    </h2>
                   </div>
 
                   <strong>
-                    {categoryProducts.length}{" "}
-                    {categoryProducts.length === 1
+                    {
+                      categoryProducts.length
+                    }{" "}
+                    {categoryProducts.length ===
+                    1
                       ? "Product"
                       : "Products"}
                   </strong>
@@ -524,65 +654,99 @@ const Products = () => {
                   <table className="products-table">
                     <thead>
                       <tr>
-                        <th>Product</th>
+                        <th>
+                          Product
+                        </th>
 
-                        {/* NEW CATEGORY COLUMN */}
+                        <th>
+                          Category
+                        </th>
 
-                        <th>Category</th>
+                        <th>
+                          Price
+                        </th>
 
-                        <th>Price</th>
+                        <th>
+                          Stock
+                        </th>
 
-                        <th>Stock</th>
+                        <th>
+                          Flags
+                        </th>
 
-                        <th>Flags</th>
-
-                        <th>Actions</th>
+                        <th>
+                          Actions
+                        </th>
                       </tr>
                     </thead>
 
                     <tbody>
                       {categoryProducts.map(
                         (product) => {
-                          const stock = Number(
-                            product.stock ?? 0
-                          );
+                          const stock =
+                            Number(
+                              product.stock ??
+                                0
+                            );
 
-                          const threshold = Number(
-                            product.lowStockThreshold ||
-                              5
-                          );
+                          const threshold =
+                            Number(
+                              product.lowStockThreshold ||
+                                5
+                            );
 
                           const stockClass =
-                            stock <= threshold
+                            stock <=
+                            threshold
                               ? "product-stock-low"
                               : "product-stock-ok";
 
+                          const isDeleting =
+                            deletingId ===
+                            product._id;
+
                           return (
-                            <tr key={product._id}>
+                            <tr
+                              key={
+                                product._id
+                              }
+                            >
                               {/* PRODUCT */}
 
                               <td>
                                 <div className="product-info">
                                   {product.image ? (
                                     <img
-                                      src={product.image}
-                                      alt={product.name}
+                                      src={
+                                        product.image
+                                      }
+                                      alt={
+                                        product.name
+                                      }
                                     />
                                   ) : (
                                     <div className="product-placeholder">
-                                      <Package size={18} />
+                                      <Package
+                                        size={
+                                          18
+                                        }
+                                      />
                                     </div>
                                   )}
 
                                   <div>
                                     <strong>
-                                      {product.name}
+                                      {
+                                        product.name
+                                      }
                                     </strong>
 
                                     {product.sku && (
                                       <small>
                                         SKU:{" "}
-                                        {product.sku}
+                                        {
+                                          product.sku
+                                        }
                                       </small>
                                     )}
                                   </div>
@@ -681,31 +845,60 @@ const Products = () => {
 
                               <td>
                                 <div className="product-actions">
+                                  {/* EDIT */}
+
                                   <button
+                                    type="button"
                                     onClick={() =>
                                       editProduct(
                                         product
                                       )
                                     }
                                     title="Edit product"
+                                    disabled={
+                                      isDeleting
+                                    }
                                   >
                                     <Edit3
-                                      size={14}
+                                      size={
+                                        14
+                                      }
                                     />
                                   </button>
 
+                                  {/* DELETE */}
+
                                   <button
+                                    type="button"
                                     className="delete"
                                     onClick={() =>
                                       removeProduct(
                                         product._id
                                       )
                                     }
-                                    title="Delete product"
+                                    title={
+                                      isDeleting
+                                        ? "Archiving..."
+                                        : "Archive product"
+                                    }
+                                    disabled={
+                                      isDeleting
+                                    }
                                   >
-                                    <Trash2
-                                      size={14}
-                                    />
+                                    {isDeleting ? (
+                                      <RefreshCw
+                                        size={
+                                          14
+                                        }
+                                        className="spin"
+                                      />
+                                    ) : (
+                                      <Trash2
+                                        size={
+                                          14
+                                        }
+                                      />
+                                    )}
                                   </button>
                                 </div>
                               </td>

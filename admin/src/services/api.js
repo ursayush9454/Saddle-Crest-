@@ -2,25 +2,36 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000/api";
 
-// =========================
-// TOKEN
-// =========================
+/*
+|--------------------------------------------------------------------------
+| TOKEN
+|--------------------------------------------------------------------------
+*/
 
 export const getToken = () => {
-  return localStorage.getItem("adminToken");
+  return localStorage.getItem(
+    "adminToken"
+  );
 };
 
 export const setToken = (token) => {
-  localStorage.setItem("adminToken", token);
+  localStorage.setItem(
+    "adminToken",
+    token
+  );
 };
 
 export const removeToken = () => {
-  localStorage.removeItem("adminToken");
+  localStorage.removeItem(
+    "adminToken"
+  );
 };
 
-// =========================
-// API REQUEST
-// =========================
+/*
+|--------------------------------------------------------------------------
+| API REQUEST
+|--------------------------------------------------------------------------
+*/
 
 export const apiRequest = async (
   endpoint,
@@ -29,19 +40,23 @@ export const apiRequest = async (
   const token = getToken();
 
   const isFormData =
-    options.body instanceof FormData;
+    options.body instanceof
+    FormData;
 
   const headers = {
     ...(isFormData
       ? {}
       : {
-          "Content-Type": "application/json",
+          "Content-Type":
+            "application/json",
         }),
+
     ...(options.headers || {}),
   };
 
   if (token) {
-    headers.Authorization = `Bearer ${token}`;
+    headers.Authorization =
+      `Bearer ${token}`;
   }
 
   const response = await fetch(
@@ -52,13 +67,26 @@ export const apiRequest = async (
     }
   );
 
-  const data = await response
-    .json()
-    .catch(() => ({}));
+  const data =
+    await response
+      .json()
+      .catch(() => ({}));
+
+  /*
+  |--------------------------------------------------------------------------
+  | Unauthorized
+  |--------------------------------------------------------------------------
+  */
 
   if (response.status === 401) {
     removeToken();
   }
+
+  /*
+  |--------------------------------------------------------------------------
+  | API ERROR
+  |--------------------------------------------------------------------------
+  */
 
   if (!response.ok) {
     throw new Error(
