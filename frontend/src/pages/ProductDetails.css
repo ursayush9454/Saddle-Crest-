@@ -1,9 +1,10 @@
+
 /* =========================================================
    SADDLE & CREST — PRODUCT DETAILS
    Scoped CSS to avoid conflicts with other project styles
    ========================================================= */
-*{
-  
+
+* {
   --cream: #f3eee3;
   --dark: #171410;
   --green: #2b4433;
@@ -11,18 +12,20 @@
   --gold: #b08d57;
   --muted: #71695f;
 }
-.product-details-page {
 
-  
+.product-details-page {
   --cream: #f3eee3;
   --dark: #171410;
   --green: #2b4433;
   --burgundy: #5c2a2a;
   --gold: #b08d57;
   --muted: #71695f;
-margin-top: 5.5rem;
+
+  margin-top: 5.5rem;
+
   width: 100%;
   min-height: 100vh;
+
   background: var(--cream);
   color: var(--dark);
 
@@ -106,7 +109,10 @@ margin-top: 5.5rem;
   width: min(1280px, calc(100% - 80px));
 
   display: grid !important;
-  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr) !important;
+
+  grid-template-columns:
+    minmax(0, 1.15fr)
+    minmax(380px, 0.85fr) !important;
 
   gap: 65px !important;
 
@@ -149,9 +155,6 @@ margin-top: 5.5rem;
 
   min-width: 0 !important;
 }
-/* .product-details-container{
-  margin-top: 3rem;
-} */
 
 .product-details-page .thumbnail {
   display: block !important;
@@ -200,6 +203,7 @@ margin-top: 5.5rem;
   position: relative !important;
 
   width: 100% !important;
+
   height: 650px !important;
   min-height: 650px !important;
 
@@ -228,6 +232,7 @@ margin-top: 5.5rem;
   height: 650px !important;
 
   display: flex !important;
+
   align-items: center !important;
   justify-content: center !important;
 
@@ -251,13 +256,12 @@ margin-top: 5.5rem;
   font-weight: 600 !important;
 
   letter-spacing: 1.3px !important;
+
   text-transform: uppercase;
 }
 
 /* =========================================================
-   IMPORTANT:
-   RESET PRODUCT INFO
-   This fixes the overlap visible in your screenshot.
+   PRODUCT INFO
    ========================================================= */
 
 .product-details-page .product-info {
@@ -297,6 +301,7 @@ margin-top: 5.5rem;
   font-weight: 600 !important;
 
   letter-spacing: 2px !important;
+
   text-transform: uppercase;
 }
 
@@ -335,7 +340,9 @@ margin-top: 5.5rem;
   width: 100% !important;
 
   display: flex !important;
+
   align-items: center !important;
+
   flex-wrap: wrap !important;
 
   gap: 12px !important;
@@ -439,6 +446,7 @@ margin-top: 5.5rem;
   color: #6b6359 !important;
 
   font-size: 13px !important;
+
   line-height: 1.8 !important;
 }
 
@@ -473,6 +481,7 @@ margin-top: 5.5rem;
   font-weight: 600 !important;
 
   letter-spacing: 1.4px !important;
+
   text-transform: uppercase;
 }
 
@@ -484,6 +493,7 @@ margin-top: 5.5rem;
   width: 100% !important;
 
   display: flex !important;
+
   flex-wrap: wrap !important;
 
   gap: 8px !important;
@@ -491,6 +501,7 @@ margin-top: 5.5rem;
 
 .product-details-page .size-options button {
   width: auto !important;
+
   min-width: 48px !important;
   height: 40px !important;
 
@@ -511,7 +522,9 @@ margin-top: 5.5rem;
 
 .product-details-page .size-options button:hover {
   background: var(--green) !important;
+
   border-color: var(--green) !important;
+
   color: #fff !important;
 }
 
@@ -523,6 +536,7 @@ margin-top: 5.5rem;
   width: 100% !important;
 
   display: flex !important;
+
   flex-wrap: wrap !important;
 
   gap: 8px !important;
@@ -554,6 +568,7 @@ margin-top: 5.5rem;
   display: flex !important;
 
   align-items: center !important;
+
   gap: 7px !important;
 
   margin: 24px 0 0 !important;
@@ -578,6 +593,7 @@ margin-top: 5.5rem;
   justify-content: space-between !important;
 
   margin: 22px 0 0 !important;
+
   padding: 15px 0 !important;
 
   border-top: 1px solid rgba(23, 20, 16, 0.1) !important;
@@ -591,6 +607,7 @@ margin-top: 5.5rem;
   font-weight: 600 !important;
 
   letter-spacing: 1.2px !important;
+
   text-transform: uppercase;
 }
 
@@ -626,11 +643,13 @@ margin-top: 5.5rem;
 
 .product-details-page .quantity-control button:hover:not(:disabled) {
   background: var(--green) !important;
+
   color: #fff !important;
 }
 
 .product-details-page .quantity-control button:disabled {
   opacity: 0.35 !important;
+
   cursor: not-allowed !important;
 }
 
@@ -655,6 +674,7 @@ margin-top: 5.5rem;
   width: 100% !important;
 
   display: grid !important;
+
   grid-template-columns: minmax(0, 1fr) 58px !important;
 
   gap: 9px !important;
@@ -667,6 +687,7 @@ margin-top: 5.5rem;
 
 .product-details-page .add-cart-btn {
   width: 100% !important;
+
   min-width: 0 !important;
   min-height: 56px !important;
 
@@ -683,12 +704,14 @@ margin-top: 5.5rem;
   border: 1px solid var(--green) !important;
 
   background: var(--green) !important;
+
   color: #fff !important;
 
   font-size: 12px !important;
   font-weight: 600 !important;
 
   letter-spacing: 1px !important;
+
   text-transform: uppercase;
 
   cursor: pointer;
@@ -698,16 +721,19 @@ margin-top: 5.5rem;
 
 .product-details-page .add-cart-btn:hover:not(:disabled) {
   background: var(--dark) !important;
+
   border-color: var(--dark) !important;
 }
 
 .product-details-page .add-cart-btn:disabled {
   opacity: 0.5 !important;
+
   cursor: not-allowed !important;
 }
 
 .product-details-page .wishlist-btn {
   width: 58px !important;
+
   min-width: 58px !important;
   min-height: 56px !important;
 
@@ -722,6 +748,7 @@ margin-top: 5.5rem;
   border: 1px solid rgba(23, 20, 16, 0.25) !important;
 
   background: transparent !important;
+
   color: var(--dark) !important;
 
   cursor: pointer;
@@ -731,12 +758,15 @@ margin-top: 5.5rem;
 
 .product-details-page .wishlist-btn:hover {
   border-color: var(--burgundy) !important;
+
   color: var(--burgundy) !important;
 }
 
 .product-details-page .wishlist-btn.active {
   background: var(--burgundy) !important;
+
   border-color: var(--burgundy) !important;
+
   color: #fff !important;
 }
 
@@ -765,6 +795,7 @@ margin-top: 5.5rem;
   gap: 13px !important;
 
   margin: 0 !important;
+
   padding: 17px 0 !important;
 
   border-bottom: 1px solid rgba(23, 20, 16, 0.1) !important;
@@ -789,6 +820,7 @@ margin-top: 5.5rem;
   font-weight: 600 !important;
 
   letter-spacing: 0.8px !important;
+
   text-transform: uppercase;
 }
 
@@ -798,6 +830,7 @@ margin-top: 5.5rem;
   color: #71695f !important;
 
   font-size: 11px !important;
+
   line-height: 1.6 !important;
 }
 
@@ -807,9 +840,11 @@ margin-top: 5.5rem;
 
 .product-details-page .product-details-loading {
   width: 100%;
+
   min-height: 70vh;
 
   display: flex !important;
+
   flex-direction: column !important;
 
   align-items: center !important;
@@ -825,6 +860,7 @@ margin-top: 5.5rem;
   height: 40px;
 
   border: 2px solid rgba(43, 68, 51, 0.15);
+
   border-top-color: var(--green);
 
   border-radius: 50%;
@@ -852,9 +888,11 @@ margin-top: 5.5rem;
 
 .product-details-page .product-details-error {
   width: 100%;
+
   min-height: 70vh;
 
   display: flex !important;
+
   flex-direction: column !important;
 
   align-items: center !important;
@@ -873,6 +911,7 @@ margin-top: 5.5rem;
   font-family: "Cormorant Garamond", Georgia, serif;
 
   font-size: 48px;
+
   font-weight: 500;
 }
 
@@ -884,6 +923,7 @@ margin-top: 5.5rem;
   color: var(--muted);
 
   font-size: 13px;
+
   line-height: 1.7;
 }
 
@@ -892,6 +932,7 @@ margin-top: 5.5rem;
 
   align-items: center !important;
   justify-content: center !important;
+
   gap: 8px !important;
 
   min-height: 48px;
@@ -901,6 +942,7 @@ margin-top: 5.5rem;
   border: none !important;
 
   background: var(--green) !important;
+
   color: #fff !important;
 
   cursor: pointer;
@@ -917,12 +959,17 @@ margin-top: 5.5rem;
   }
 
   .product-details-page .product-main {
-    grid-template-columns: minmax(0, 1fr) minmax(330px, 0.8fr) !important;
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(330px, 0.8fr) !important;
+
     gap: 40px !important;
   }
 
   .product-details-page .product-gallery {
-    grid-template-columns: 68px minmax(0, 1fr) !important;
+    grid-template-columns:
+      68px
+      minmax(0, 1fr) !important;
   }
 
   .product-details-page .product-thumbnails {
@@ -931,8 +978,11 @@ margin-top: 5.5rem;
 
   .product-details-page .thumbnail {
     width: 68px !important;
+
     min-width: 68px !important;
+
     height: 82px !important;
+
     min-height: 82px !important;
   }
 
@@ -940,6 +990,7 @@ margin-top: 5.5rem;
   .product-details-page .product-main-image img,
   .product-details-page .no-product-image {
     height: 560px !important;
+
     min-height: 560px !important;
   }
 
@@ -970,6 +1021,7 @@ margin-top: 5.5rem;
 
   .product-details-page .product-info {
     width: 100% !important;
+
     display: block !important;
   }
 
@@ -977,6 +1029,7 @@ margin-top: 5.5rem;
   .product-details-page .product-main-image img,
   .product-details-page .no-product-image {
     height: 600px !important;
+
     min-height: 600px !important;
   }
 }
@@ -998,6 +1051,7 @@ margin-top: 5.5rem;
   .product-details-page
     > .product-details-container:first-child {
     padding-top: 18px;
+
     padding-bottom: 18px;
   }
 
@@ -1019,17 +1073,21 @@ margin-top: 5.5rem;
 
   .product-details-page .product-main-image {
     width: 100% !important;
+
     height: 460px !important;
+
     min-height: 460px !important;
   }
 
   .product-details-page .product-main-image img {
     width: 100% !important;
+
     height: 460px !important;
   }
 
   .product-details-page .no-product-image {
     height: 460px !important;
+
     min-height: 460px !important;
   }
 
@@ -1039,6 +1097,7 @@ margin-top: 5.5rem;
     width: 100% !important;
 
     display: flex !important;
+
     flex-direction: row !important;
 
     gap: 8px !important;
@@ -1054,9 +1113,11 @@ margin-top: 5.5rem;
 
   .product-details-page .thumbnail {
     width: 64px !important;
+
     min-width: 64px !important;
 
     height: 72px !important;
+
     min-height: 72px !important;
   }
 
@@ -1090,6 +1151,7 @@ margin-top: 5.5rem;
 
   .product-details-page .product-description {
     margin-top: 22px !important;
+
     padding-top: 19px !important;
   }
 
@@ -1106,18 +1168,24 @@ margin-top: 5.5rem;
   }
 
   .product-details-page .product-actions {
-    grid-template-columns: minmax(0, 1fr) 52px !important;
+    grid-template-columns:
+      minmax(0, 1fr)
+      52px !important;
+
     gap: 7px !important;
   }
 
   .product-details-page .add-cart-btn {
     min-height: 54px !important;
+
     font-size: 11px !important;
   }
 
   .product-details-page .wishlist-btn {
     width: 52px !important;
+
     min-width: 52px !important;
+
     min-height: 54px !important;
   }
 
@@ -1135,6 +1203,7 @@ margin-top: 5.5rem;
   .product-details-page .product-main-image img,
   .product-details-page .no-product-image {
     height: 400px !important;
+
     min-height: 400px !important;
   }
 
@@ -1142,23 +1211,28 @@ margin-top: 5.5rem;
     font-size: 37px !important;
   }
 }
+
 /* =========================================================
-   REVIEWS SECTION - SADDLE & CREST
+   REVIEWS SECTION — SADDLE & CREST
    ========================================================= */
 
 .reviews-section {
   width: 100%;
+
   margin-top: 90px;
+
   padding: 80px 0 100px;
+
   background: #f3eee3;
+
   border-top: 1px solid rgba(23, 20, 16, 0.1);
 }
 
 .reviews-container {
   width: min(1180px, calc(100% - 60px));
+
   margin: 0 auto;
 }
-
 
 /* =========================================================
    REVIEW HEADING
@@ -1170,33 +1244,48 @@ margin-top: 5.5rem;
 
 .reviews-eyebrow {
   display: block;
+
   margin-bottom: 12px;
+
   color: #b08d57;
+
   font-family: "Jost", sans-serif;
+
   font-size: 10px;
   font-weight: 600;
+
   letter-spacing: 2.5px;
+
   text-transform: uppercase;
 }
 
 .reviews-heading h2 {
   margin: 0;
+
   color: #171410;
+
   font-family: "Cormorant Garamond", serif;
+
   font-size: clamp(42px, 5vw, 64px);
+
   font-weight: 500;
+
   line-height: 0.95;
 }
 
 .reviews-heading p {
   max-width: 620px;
+
   margin: 18px 0 0;
+
   color: #68635b;
+
   font-family: "Jost", sans-serif;
+
   font-size: 13px;
+
   line-height: 1.8;
 }
-
 
 /* =========================================================
    RATING OVERVIEW
@@ -1204,14 +1293,19 @@ margin-top: 5.5rem;
 
 .reviews-overview {
   display: grid;
+
   grid-template-columns: 280px 1fr;
+
   gap: 75px;
+
   align-items: center;
+
   padding: 42px 0;
+
   border-top: 1px solid rgba(23, 20, 16, 0.14);
+
   border-bottom: 1px solid rgba(23, 20, 16, 0.14);
 }
-
 
 /* =========================================================
    OVERALL RATING
@@ -1219,24 +1313,35 @@ margin-top: 5.5rem;
 
 .overall-rating {
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   justify-content: center;
+
   text-align: center;
 }
 
 .overall-rating > strong {
   color: #171410;
+
   font-family: "Cormorant Garamond", serif;
+
   font-size: 78px;
+
   font-weight: 500;
+
   line-height: 0.85;
 }
 
 .large-stars {
   display: flex;
+
   align-items: center;
+
   gap: 5px;
+
   margin: 17px 0 10px;
 }
 
@@ -1246,11 +1351,13 @@ margin-top: 5.5rem;
 
 .overall-rating > span {
   color: #777168;
+
   font-family: "Jost", sans-serif;
+
   font-size: 11px;
+
   letter-spacing: 0.3px;
 }
-
 
 /* =========================================================
    RATING DISTRIBUTION
@@ -1258,22 +1365,31 @@ margin-top: 5.5rem;
 
 .rating-distribution {
   display: flex;
+
   flex-direction: column;
+
   gap: 13px;
+
   width: 100%;
 }
 
 .rating-row {
   display: grid;
+
   grid-template-columns: 18px 18px 1fr 28px;
+
   align-items: center;
+
   gap: 9px;
 }
 
 .rating-row > span {
   color: #171410;
+
   font-family: "Jost", sans-serif;
+
   font-size: 12px;
+
   text-align: center;
 }
 
@@ -1283,107 +1399,156 @@ margin-top: 5.5rem;
 
 .rating-bar {
   width: 100%;
+
   height: 7px;
+
   overflow: hidden;
+
   background: #ddd5c7;
+
   border-radius: 20px;
 }
 
 .rating-bar span {
   display: block;
+
   width: 0;
+
   height: 100%;
+
   background: #b08d57;
+
   border-radius: 20px;
+
   transition: width 0.5s ease;
 }
 
 .rating-row small {
   color: #777168;
+
   font-family: "Jost", sans-serif;
+
   font-size: 11px;
+
   text-align: right;
 }
 
-
 /* =========================================================
-   WRITE REVIEW CARD
+   WRITE REVIEW CARD — COMPACT
    ========================================================= */
 
 .write-review-card {
+ 
   display: grid;
+
   grid-template-columns: 0.8fr 1.2fr;
-  gap: 70px;
-  margin-top: 55px;
-  padding: 42px;
+
+  gap: 45px;
+
+  margin-top: 45px;
+
+  padding: 28px 32px;
+
   background: #171410;
 }
 
 .write-review-card .reviews-eyebrow {
   color: #b08d57;
+
+  margin-bottom: 8px;
 }
 
 .write-review-card h3 {
   margin: 0;
+
   color: #f3eee3;
+
   font-family: "Cormorant Garamond", serif;
-  font-size: 36px;
+
+  font-size: 32px;
+
   font-weight: 500;
+
   line-height: 1;
 }
 
 .write-review-card p {
   max-width: 330px;
-  margin: 15px 0 0;
+
+  margin: 10px 0 0;
+
   color: rgba(243, 238, 227, 0.65);
+
   font-family: "Jost", sans-serif;
-  font-size: 12px;
-  line-height: 1.8;
+
+  font-size: 11px;
+
+  line-height: 1.65;
 }
 
-
 /* =========================================================
-   REVIEW FORM
+   REVIEW FORM — COMPACT
    ========================================================= */
 
 .review-form {
   display: flex;
+
   flex-direction: column;
-  gap: 16px;
+
+  gap: 10px;
 }
 
 .review-rating-selector {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
-  gap: 20px;
-  padding-bottom: 5px;
+
+  gap: 15px;
+
+  padding-bottom: 2px;
 }
 
 .review-rating-selector > span {
   color: #f3eee3;
+
   font-family: "Jost", sans-serif;
-  font-size: 11px;
+
+  font-size: 10px;
+
   font-weight: 600;
-  letter-spacing: 1.2px;
+
+  letter-spacing: 1px;
+
   text-transform: uppercase;
 }
 
 .review-rating-selector > div {
   display: flex;
+
   align-items: center;
-  gap: 3px;
+
+  gap: 2px;
 }
 
 .review-rating-selector button {
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   padding: 0;
+
   color: #777168;
+
   background: transparent;
+
   border: none;
+
   cursor: pointer;
+
   transition: transform 0.2s ease;
 }
 
@@ -1395,19 +1560,35 @@ margin-top: 5.5rem;
   transform: scale(1.08);
 }
 
+/* =========================================================
+   REVIEW INPUTS
+   ========================================================= */
 
 .review-form input,
 .review-form textarea {
   width: 100%;
+
   box-sizing: border-box;
-  padding: 14px 16px;
+
+  padding: 10px 13px;
+
   color: #171410;
+
   background: #f3eee3;
+
   border: 1px solid transparent;
+
   outline: none;
+
   font-family: "Jost", sans-serif;
-  font-size: 12px;
+
+  font-size: 11px;
+
   transition: border-color 0.2s ease;
+}
+
+.review-form input {
+  height: 40px;
 }
 
 .review-form input::placeholder,
@@ -1421,11 +1602,14 @@ margin-top: 5.5rem;
 }
 
 .review-form textarea {
-  min-height: 125px;
-  resize: vertical;
-  line-height: 1.7;
-}
+  min-height: 78px;
 
+  height: 78px;
+
+  resize: vertical;
+
+  line-height: 1.55;
+}
 
 /* =========================================================
    SUBMIT BUTTON
@@ -1433,17 +1617,29 @@ margin-top: 5.5rem;
 
 .review-form > button {
   align-self: flex-start;
-  min-width: 175px;
-  padding: 14px 25px;
+
+  min-width: 155px;
+
+  padding: 11px 20px;
+
   color: #171410;
+
   background: #b08d57;
+
   border: 1px solid #b08d57;
+
   font-family: "Jost", sans-serif;
-  font-size: 10px;
+
+  font-size: 9px;
+
   font-weight: 700;
-  letter-spacing: 1.7px;
+
+  letter-spacing: 1.5px;
+
   text-transform: uppercase;
+
   cursor: pointer;
+
   transition:
     background 0.25s ease,
     color 0.25s ease;
@@ -1451,14 +1647,15 @@ margin-top: 5.5rem;
 
 .review-form > button:hover {
   color: #f3eee3;
+
   background: transparent;
 }
 
 .review-form > button:disabled {
   opacity: 0.55;
+
   cursor: not-allowed;
 }
-
 
 /* =========================================================
    REVIEWS LIST
@@ -1470,13 +1667,19 @@ margin-top: 5.5rem;
 
 .review-card {
   padding: 32px 0;
+
   border-bottom: 1px solid rgba(23, 20, 16, 0.13);
+   width: min(500px, 100%);
+   height: 50px;
+   box-sizing: border-box;
+   overflow: hidden;
+  
+   
 }
 
 .review-card:first-child {
   border-top: 1px solid rgba(23, 20, 16, 0.13);
 }
-
 
 /* =========================================================
    REVIEW CARD TOP
@@ -1484,44 +1687,62 @@ margin-top: 5.5rem;
 
 .review-card-top {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
+
   gap: 20px;
 }
 
 .review-user {
   display: flex;
+
   align-items: center;
+
   gap: 13px;
 }
 
 .review-avatar {
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   width: 42px;
   height: 42px;
+
   flex-shrink: 0;
+
   color: #f3eee3;
+
   background: #2b4433;
+
   border-radius: 50%;
+
   font-family: "Cormorant Garamond", serif;
+
   font-size: 20px;
 }
 
 .review-user > div:last-child {
   display: flex;
+
   flex-direction: column;
+
   gap: 4px;
 }
 
 .review-user strong {
   color: #171410;
+
   font-family: "Jost", sans-serif;
+
   font-size: 13px;
+
   font-weight: 600;
 }
-
 
 /* =========================================================
    VERIFIED PURCHASE
@@ -1529,13 +1750,21 @@ margin-top: 5.5rem;
 
 .verified-review {
   display: inline-flex;
+
   align-items: center;
+
   gap: 4px;
+
   color: #2b4433;
+
   font-family: "Jost", sans-serif;
+
   font-size: 9px;
+
   font-weight: 600;
+
   letter-spacing: 0.8px;
+
   text-transform: uppercase;
 }
 
@@ -1543,14 +1772,15 @@ margin-top: 5.5rem;
   color: #2b4433;
 }
 
-
 /* =========================================================
    REVIEW STARS
    ========================================================= */
 
 .review-stars {
   display: flex;
+
   align-items: center;
+
   gap: 3px;
 }
 
@@ -1558,19 +1788,21 @@ margin-top: 5.5rem;
   color: #b08d57;
 }
 
-
 /* =========================================================
    REVIEW TITLE
    ========================================================= */
 
 .review-title {
   margin: 18px 0 8px;
+
   color: #171410;
+
   font-family: "Cormorant Garamond", serif;
+
   font-size: 24px;
+
   font-weight: 600;
 }
-
 
 /* =========================================================
    REVIEW COMMENT
@@ -1578,13 +1810,17 @@ margin-top: 5.5rem;
 
 .review-comment {
   max-width: 850px;
+
   margin: 0;
+
   color: #625e57;
+
   font-family: "Jost", sans-serif;
+
   font-size: 13px;
+
   line-height: 1.85;
 }
-
 
 /* =========================================================
    REVIEW BOTTOM
@@ -1592,38 +1828,55 @@ margin-top: 5.5rem;
 
 .review-card-bottom {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
+
   gap: 20px;
+
   margin-top: 20px;
 }
 
 .review-card-bottom button {
   display: inline-flex;
+
   align-items: center;
+
   gap: 7px;
+
   padding: 8px 12px;
+
   color: #68635b;
+
   background: transparent;
+
   border: 1px solid rgba(23, 20, 16, 0.13);
+
   font-family: "Jost", sans-serif;
+
   font-size: 10px;
+
   cursor: pointer;
+
   transition: all 0.2s ease;
 }
 
 .review-card-bottom button:hover {
   color: #171410;
+
   border-color: #b08d57;
+
   background: rgba(176, 141, 87, 0.08);
 }
 
 .review-card-bottom > span {
   color: #89847b;
+
   font-family: "Jost", sans-serif;
+
   font-size: 10px;
 }
-
 
 /* =========================================================
    NO REVIEWS
@@ -1631,36 +1884,51 @@ margin-top: 5.5rem;
 
 .no-reviews {
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   justify-content: center;
+
   min-height: 240px;
+
   padding: 40px 20px;
+
   border-top: 1px solid rgba(23, 20, 16, 0.13);
+
   border-bottom: 1px solid rgba(23, 20, 16, 0.13);
+
   text-align: center;
 }
 
 .no-reviews > svg {
   color: #b08d57;
+
   margin-bottom: 15px;
 }
 
 .no-reviews h3 {
   margin: 0;
+
   color: #171410;
+
   font-family: "Cormorant Garamond", serif;
+
   font-size: 27px;
+
   font-weight: 500;
 }
 
 .no-reviews p {
   margin: 8px 0 0;
+
   color: #777168;
+
   font-family: "Jost", sans-serif;
+
   font-size: 12px;
 }
-
 
 /* =========================================================
    REVIEW LOADING
@@ -1668,39 +1936,222 @@ margin-top: 5.5rem;
 
 .reviews-loading {
   padding: 50px 20px;
+
   color: #777168;
+
   border-top: 1px solid rgba(23, 20, 16, 0.13);
+
   border-bottom: 1px solid rgba(23, 20, 16, 0.13);
+
   font-family: "Jost", sans-serif;
+
   font-size: 12px;
+
   text-align: center;
 }
 
+/* =========================================================
+   LOGIN / NOT ELIGIBLE
+   ========================================================= */
+
+.review-not-eligible {
+  width: 100%;
+
+  padding: 30px 25px;
+
+  margin-top: 20px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  background: #f3eee3;
+
+  border: 1px solid rgba(176, 141, 87, 0.28);
+
+  border-radius: 14px;
+}
+
+.review-not-eligible-icon {
+  width: 52px;
+
+  height: 52px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 13px;
+
+  border-radius: 50%;
+
+  background: #171410;
+
+  color: #b08d57;
+}
+
+.review-not-eligible-icon svg {
+  stroke-width: 1.6;
+}
+
+.review-not-eligible h4 {
+  margin: 0 0 7px;
+
+  font-family: "Cormorant Garamond", serif;
+
+  font-size: 23px;
+
+  font-weight: 600;
+
+  color: #171410;
+}
+
+.review-not-eligible p {
+  max-width: 480px;
+
+  margin: 0;
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+  color: rgba(23, 20, 16, 0.68);
+}
+
+.review-eligibility-reason {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-top: 12px;
+
+  padding: 7px 13px;
+
+  border-radius: 30px;
+
+  background: rgba(43, 68, 51, 0.08);
+
+  color: #2b4433;
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+.review-login-btn {
+  margin-top: 18px;
+
+  min-width: 165px;
+
+  height: 44px;
+
+  padding: 0 22px;
+
+  border: none;
+
+  border-radius: 4px;
+
+  background: #171410;
+
+  color: #f3eee3;
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.review-login-btn:hover {
+  background: #b08d57;
+
+  color: #171410;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 22px rgba(23, 20, 16, 0.14);
+}
+
+.review-login-btn:active {
+  transform: translateY(0);
+}
 
 /* =========================================================
-   TABLET
+   ALREADY REVIEWED
+   ========================================================= */
+
+.review-not-eligible.already-reviewed {
+  background: rgba(43, 68, 51, 0.05);
+
+  border-color: rgba(43, 68, 51, 0.18);
+}
+
+.review-not-eligible.already-reviewed
+  .review-not-eligible-icon {
+  background: #2b4433;
+
+  color: #f3eee3;
+}
+
+.review-not-eligible.already-reviewed
+  .review-eligibility-reason {
+  background: rgba(43, 68, 51, 0.1);
+
+  color: #2b4433;
+}
+
+/* =========================================================
+   TABLET — REVIEWS
    ========================================================= */
 
 @media (max-width: 900px) {
   .reviews-overview {
     grid-template-columns: 220px 1fr;
+
     gap: 40px;
   }
 
   .write-review-card {
     grid-template-columns: 1fr;
-    gap: 30px;
+
+    gap: 25px;
   }
 }
 
-
 /* =========================================================
-   MOBILE
+   MOBILE — REVIEWS
    ========================================================= */
 
 @media (max-width: 700px) {
   .reviews-section {
     margin-top: 60px;
+
     padding: 60px 0 70px;
   }
 
@@ -1718,12 +2169,15 @@ margin-top: 5.5rem;
 
   .reviews-overview {
     grid-template-columns: 1fr;
+
     gap: 38px;
+
     padding: 35px 0;
   }
 
   .overall-rating {
     align-items: flex-start;
+
     text-align: left;
   }
 
@@ -1731,13 +2185,34 @@ margin-top: 5.5rem;
     margin-top: 14px;
   }
 
+  /* Compact write review card */
+
   .write-review-card {
-    margin-top: 40px;
-    padding: 28px 22px;
+    margin-top: 35px;
+
+    padding: 24px 20px;
+
+    gap: 24px;
   }
 
   .write-review-card h3 {
-    font-size: 31px;
+    font-size: 29px;
+  }
+
+  .write-review-card p {
+    font-size: 11px;
+
+    line-height: 1.6;
+  }
+
+  .review-form {
+    gap: 10px;
+  }
+
+  .review-form textarea {
+    min-height: 75px;
+
+    height: 75px;
   }
 
   .review-card-top {
@@ -1747,8 +2222,37 @@ margin-top: 5.5rem;
   .review-card-bottom {
     align-items: flex-start;
   }
-}
 
+  .review-not-eligible {
+    padding: 27px 20px;
+
+    margin-top: 18px;
+  }
+
+  .review-not-eligible-icon {
+    width: 50px;
+
+    height: 50px;
+  }
+
+  .review-not-eligible h4 {
+    font-size: 21px;
+  }
+
+  .review-not-eligible p {
+    font-size: 12.5px;
+
+    line-height: 1.6;
+  }
+
+  .review-login-btn {
+    width: 100%;
+
+    max-width: 230px;
+
+    height: 44px;
+  }
+}
 
 /* =========================================================
    SMALL MOBILE
@@ -1769,16 +2273,23 @@ margin-top: 5.5rem;
 
   .rating-row {
     grid-template-columns: 15px 16px 1fr 22px;
+
     gap: 7px;
   }
 
   .write-review-card {
-    padding: 25px 17px;
+    padding: 22px 16px;
+  }
+
+  .write-review-card h3 {
+    font-size: 27px;
   }
 
   .review-rating-selector {
     align-items: flex-start;
+
     flex-direction: column;
+
     gap: 10px;
   }
 
@@ -1786,8 +2297,15 @@ margin-top: 5.5rem;
     width: 100%;
   }
 
+  .review-form textarea {
+    min-height: 72px;
+
+    height: 72px;
+  }
+
   .review-card-top {
     flex-direction: column;
+
     gap: 15px;
   }
 
@@ -1801,6 +2319,25 @@ margin-top: 5.5rem;
 
   .review-card-bottom {
     flex-direction: column;
+
     gap: 12px;
+  }
+
+  .review-not-eligible {
+    padding: 24px 16px;
+  }
+
+  .review-not-eligible h4 {
+    font-size: 20px;
+  }
+
+  .review-not-eligible p {
+    font-size: 12px;
+  }
+
+  .review-eligibility-reason {
+    font-size: 10px;
+
+    text-align: center;
   }
 }
