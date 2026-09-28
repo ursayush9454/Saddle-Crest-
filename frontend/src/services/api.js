@@ -116,5 +116,50 @@ export const getCurrentUser = async () => {
   return apiRequest("/auth/me");
 };
 
+
+// ========================================
+// REVIEWS
+// ========================================
+
+export const getProductReviews = async (productId) => {
+  return apiRequest(`/reviews/product/${productId}`);
+};
+
+export const getReviewEligibility = async (productId) => {
+  return apiRequest(`/reviews/eligibility/${productId}`);
+};
+
+export const createReview = async (reviewData) => {
+  return apiRequest("/reviews", {
+    method: "POST",
+    body: JSON.stringify(reviewData),
+  });
+};
+
+export const updateReview = async (
+  reviewId,
+  reviewData
+) => {
+  return apiRequest(`/reviews/${reviewId}`, {
+    method: "PUT",
+    body: JSON.stringify(reviewData),
+  });
+};
+
+export const deleteReview = async (reviewId) => {
+  return apiRequest(`/reviews/${reviewId}`, {
+    method: "DELETE",
+  });
+};
+
+export const markReviewHelpful = async (reviewId) => {
+  return apiRequest(
+    `/reviews/${reviewId}/helpful`,
+    {
+      method: "POST",
+    }
+  );
+};
+
 export default API_URL;
 

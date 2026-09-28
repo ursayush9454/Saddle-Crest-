@@ -59,6 +59,8 @@ app.use("/api/wishlist", require("./routes/wishlist"));
 
 app.use("/api/orders", require("./routes/orders"));
 
+app.use("/api/reviews",require("./routes/reviews"))
+
 app.use("/api/admin", require("./routes/admin"));
 
 // =========================

@@ -1,32 +1,128 @@
 const mongoose = require("mongoose");
+
 const schema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true, index: true },
     slug: { type: String, trim: true, index: true },
     sku: { type: String, unique: true, sparse: true, index: true },
-    description: { type: String, required: true },
-    shortDescription: { type: String, default: "" },
-    price: { type: Number, required: true, min: 0 },
-    salePrice: { type: Number, min: 0, default: null },
-    category: { type: String, required: true, index: true },
+
+    description: {
+      type: String,
+      required: true,
+    },
+
+    shortDescription: {
+      type: String,
+      default: "",
+    },
+
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    salePrice: {
+      type: Number,
+      min: 0,
+      default: null,
+    },
+
+    category: {
+      type: String,
+      required: true,
+      index: true,
+    },
+
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       default: null,
     },
-    image: { type: String, required: true },
-    images: { type: [String], default: [] },
-    stock: { type: Number, required: true, min: 0, default: 0 },
-    lowStockThreshold: { type: Number, min: 0, default: 5 },
-    badge: { type: String, default: "" },
-    tags: { type: [String], default: [] },
-    sizes: { type: [String], default: [] },
-    colors: { type: [String], default: [] },
-    featured: { type: Boolean, default: false },
-    bestSeller: { type: Boolean, default: false },
-    newArrival: { type: Boolean, default: false },
-    isActive: { type: Boolean, default: true },
+
+    image: {
+      type: String,
+      required: true,
+    },
+
+    images: {
+      type: [String],
+      default: [],
+    },
+
+    stock: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0,
+    },
+
+    lowStockThreshold: {
+      type: Number,
+      min: 0,
+      default: 5,
+    },
+
+    badge: {
+      type: String,
+      default: "",
+    },
+
+    tags: {
+      type: [String],
+      default: [],
+    },
+
+    sizes: {
+      type: [String],
+      default: [],
+    },
+
+    colors: {
+      type: [String],
+      default: [],
+    },
+
+    featured: {
+      type: Boolean,
+      default: false,
+    },
+
+    bestSeller: {
+      type: Boolean,
+      default: false,
+    },
+
+    newArrival: {
+      type: Boolean,
+      default: false,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
+    // =========================
+    // REVIEWS
+    // =========================
+
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+
+    reviewCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  }
 );
+
 module.exports = mongoose.model("Product", schema);

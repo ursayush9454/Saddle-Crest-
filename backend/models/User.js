@@ -44,6 +44,43 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
 
+    // =========================
+    // EMAIL VERIFICATION
+    // =========================
+
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    emailOtpHash: {
+      type: String,
+      default: null,
+      select: false,
+    },
+
+    emailOtpExpiresAt: {
+      type: Date,
+      default: null,
+      select: false,
+    },
+
+    emailOtpLastSentAt: {
+      type: Date,
+      default: null,
+      select: false,
+    },
+
+    emailOtpAttempts: {
+      type: Number,
+      default: 0,
+      select: false,
+    },
+
+    // =========================
+    // ADDRESSES
+    // =========================
+
     addresses: [
       {
         label: {
