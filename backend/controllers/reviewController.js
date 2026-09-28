@@ -1,6 +1,32 @@
 const Review = require("../models/Review");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
+const cloudinary = require("../config/cloudinary");
+
+// ========================================
+// CLOUDINARY REVIEW IMAGE UPLOAD
+// ========================================
+
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "saddle-and-crest/reviews",
+        resource_type: "image",
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve(result.secure_url);
+      }
+    );
+
+    stream.end(buffer);
+  });
+};
 
 // ========================================
 // RECALCULATE PRODUCT RATING
@@ -44,6 +70,69 @@ const updateProductRating = async (productId) => {
     rating,
     reviewCount: result[0].reviewCount,
   });
+};
+
+// ========================================
+// UPLOAD REVIEW PHOTOS
+// ========================================
+
+exports.uploadReviewImages = async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        message: "Please select at least one image.",
+      });
+    }
+
+    if (req.files.length > 5) {
+      return res.status(400).json({
+        message: "You can upload maximum 5 photos.",
+      });
+    }
+
+    const invalidFile = req.files.find(
+      (file) =>
+        !file.mimetype ||
+        !file.mimetype.startsWith("image/")
+    );
+
+    if (invalidFile) {
+      return res.status(400).json({
+        message: "Only image files are allowed.",
+      });
+    }
+
+    const oversizedFile = req.files.find(
+      (file) => file.size > 5 * 1024 * 1024
+    );
+
+    if (oversizedFile) {
+      return res.status(400).json({
+        message:
+          "Each review photo must be smaller than 5MB.",
+      });
+    }
+
+    const images = await Promise.all(
+      req.files.map((file) =>
+        uploadToCloudinary(file.buffer)
+      )
+    );
+
+    return res.status(201).json({
+      message: "Review photos uploaded successfully.",
+      images,
+    });
+  } catch (error) {
+    console.error(
+      "Review image upload error:",
+      error
+    );
+
+    return res.status(500).json({
+      message: "Unable to upload review photos.",
+    });
+  }
 };
 
 // ========================================
@@ -116,7 +205,6 @@ exports.getReviewEligibility = async (req, res) => {
       });
     }
 
-    // Find an order which has not already been reviewed
     for (const order of orders) {
       const existingReview = await Review.findOne({
         user: req.user._id,
@@ -227,11 +315,13 @@ exports.createReview = async (req, res) => {
     }
 
     const safeImages = Array.isArray(images)
-      ? images.filter(
-          (image) =>
-            typeof image === "string" &&
-            image.trim()
-        )
+      ? images
+          .filter(
+            (image) =>
+              typeof image === "string" &&
+              image.trim()
+          )
+          .slice(0, 5)
       : [];
 
     const review = await Review.create({
@@ -247,9 +337,11 @@ exports.createReview = async (req, res) => {
 
     await updateProductRating(product._id);
 
-    const populatedReview = await Review.findById(
-      review._id
-    ).populate("user", "name");
+    const populatedReview =
+      await Review.findById(review._id).populate(
+        "user",
+        "name"
+      );
 
     res.status(201).json({
       message: "Review submitted successfully.",
@@ -323,20 +415,24 @@ exports.updateReview = async (req, res) => {
     review.comment = comment.trim();
 
     if (Array.isArray(images)) {
-      review.images = images.filter(
-        (image) =>
-          typeof image === "string" &&
-          image.trim()
-      );
+      review.images = images
+        .filter(
+          (image) =>
+            typeof image === "string" &&
+            image.trim()
+        )
+        .slice(0, 5);
     }
 
     await review.save();
 
     await updateProductRating(review.product);
 
-    const updatedReview = await Review.findById(
-      review._id
-    ).populate("user", "name");
+    const updatedReview =
+      await Review.findById(review._id).populate(
+        "user",
+        "name"
+      );
 
     res.json({
       message: "Review updated successfully.",

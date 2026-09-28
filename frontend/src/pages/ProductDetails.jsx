@@ -10,6 +10,9 @@ import {
   Truck,
   Star,
   ThumbsUp,
+  ImagePlus,
+  X,
+  Loader2,
 } from "lucide-react";
 
 import { useNavigate, useParams } from "react-router-dom";
@@ -23,6 +26,8 @@ import {
   createReview,
   deleteReview,
   markReviewHelpful,
+  uploadReviewImages,
+  getUser,
 } from "../services/api";
 
 import "./ProductDetails.css";
@@ -51,8 +56,20 @@ const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState("");
   const [addingCart, setAddingCart] = useState(false);
 
-  // Product ID
   const productId = product?._id || product?.id;
+
+  // ========================================
+  // AUTH STATE
+  // ========================================
+
+  const [currentUser, setCurrentUser] = useState(() =>
+    getUser()
+  );
+
+  const isLoggedIn = Boolean(currentUser);
+
+  const currentUserId =
+    currentUser?._id || currentUser?.id;
 
   // ========================================
   // REVIEW STATE
@@ -60,13 +77,14 @@ const ProductDetails = () => {
 
   const [reviews, setReviews] = useState([]);
 
-  const [distribution, setDistribution] = useState({
-    5: 0,
-    4: 0,
-    3: 0,
-    2: 0,
-    1: 0,
-  });
+  const [distribution, setDistribution] =
+    useState({
+      5: 0,
+      4: 0,
+      3: 0,
+      2: 0,
+      1: 0,
+    });
 
   const [reviewLoading, setReviewLoading] =
     useState(true);
@@ -86,6 +104,41 @@ const ProductDetails = () => {
 
   const [submittingReview, setSubmittingReview] =
     useState(false);
+
+  // ========================================
+  // REVIEW PHOTO STATE
+  // ========================================
+
+  const [reviewPhotos, setReviewPhotos] =
+    useState([]);
+
+  const [uploadingPhotos, setUploadingPhotos] =
+    useState(false);
+
+  const [reviewImageViewer, setReviewImageViewer] =
+    useState(null);
+
+  // ========================================
+  // CHECK AUTH CHANGE
+  // ========================================
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setCurrentUser(getUser());
+    };
+
+    window.addEventListener(
+      "auth-change",
+      handleAuthChange
+    );
+
+    return () => {
+      window.removeEventListener(
+        "auth-change",
+        handleAuthChange
+      );
+    };
+  }, []);
 
   // ========================================
   // FETCH PRODUCT
@@ -182,6 +235,21 @@ const ProductDetails = () => {
     const checkEligibility = async () => {
       if (!id) return;
 
+      // ----------------------------------------
+      // NOT LOGGED IN
+      // ----------------------------------------
+
+      if (!isLoggedIn) {
+        setReviewEligibility({
+          eligible: false,
+          orderId: null,
+          reason:
+            "Please login to write a review.",
+        });
+
+        return;
+      }
+
       try {
         const data =
           await getReviewEligibility(id);
@@ -206,13 +274,33 @@ const ProductDetails = () => {
           eligible: false,
           orderId: null,
           reason:
-            "Login and receive this product to write a review.",
+            "You need to purchase and receive this product before reviewing it.",
         });
       }
     };
 
     checkEligibility();
-  }, [id]);
+  }, [id, isLoggedIn]);
+
+  // ========================================
+  // CHECK WHETHER CURRENT USER ALREADY REVIEWED
+  // ========================================
+
+  const hasUserReviewed = reviews.some(
+    (review) => {
+      const reviewUserId =
+        review.user?._id ||
+        review.user?.id ||
+        review.user;
+
+      return (
+        currentUserId &&
+        reviewUserId &&
+        String(reviewUserId) ===
+          String(currentUserId)
+      );
+    }
+  );
 
   // ========================================
   // PRICE
@@ -324,15 +412,149 @@ const ProductDetails = () => {
   };
 
   // ========================================
+  // REVIEW PHOTO SELECT
+  // ========================================
+
+  const handleReviewPhotoSelect = (e) => {
+    const selectedFiles =
+      Array.from(
+        e.target.files || []
+      );
+
+    if (!selectedFiles.length) return;
+
+    const availableSlots =
+      5 - reviewPhotos.length;
+
+    if (availableSlots <= 0) {
+      alert(
+        "You can upload maximum 5 photos."
+      );
+      e.target.value = "";
+      return;
+    }
+
+    const filesToAdd =
+      selectedFiles.slice(
+        0,
+        availableSlots
+      );
+
+    const validPhotos = [];
+
+    for (const file of filesToAdd) {
+      if (
+        !file.type?.startsWith(
+          "image/"
+        )
+      ) {
+        alert(
+          `${file.name} is not an image file.`
+        );
+        continue;
+      }
+
+      if (
+        file.size >
+        5 * 1024 * 1024
+      ) {
+        alert(
+          `${file.name} is larger than 5MB.`
+        );
+        continue;
+      }
+
+      validPhotos.push({
+        file,
+        preview:
+          URL.createObjectURL(file),
+      });
+    }
+
+    setReviewPhotos((prev) => [
+      ...prev,
+      ...validPhotos,
+    ]);
+
+    e.target.value = "";
+  };
+
+  // ========================================
+  // REMOVE REVIEW PHOTO
+  // ========================================
+
+  const removeReviewPhoto = (index) => {
+    setReviewPhotos((prev) => {
+      const photo = prev[index];
+
+      if (photo?.preview) {
+        URL.revokeObjectURL(
+          photo.preview
+        );
+      }
+
+      return prev.filter(
+        (_, photoIndex) =>
+          photoIndex !== index
+      );
+    });
+  };
+
+  // ========================================
+  // CLEAN PHOTO PREVIEWS
+  // ========================================
+
+  useEffect(() => {
+    return () => {
+      reviewPhotos.forEach((photo) => {
+        if (photo.preview) {
+          URL.revokeObjectURL(
+            photo.preview
+          );
+        }
+      });
+    };
+  }, [reviewPhotos]);
+
+  // ========================================
   // REVIEW SUBMIT
   // ========================================
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
 
+    // ----------------------------------------
+    // LOGIN CHECK
+    // ----------------------------------------
+
+    if (!isLoggedIn) {
+      alert(
+        "Please login to write a review."
+      );
+
+      navigate("/login");
+      return;
+    }
+
+    // ----------------------------------------
+    // ALREADY REVIEWED
+    // ----------------------------------------
+
+    if (hasUserReviewed) {
+      alert(
+        "You have already reviewed this product."
+      );
+      return;
+    }
+
+    // ----------------------------------------
+    // ELIGIBILITY
+    // ----------------------------------------
+
     if (!reviewEligibility.eligible) {
       alert(
-        "You can review this product after receiving your order."
+        reviewEligibility.reason ||
+          "You can review this product after receiving your order."
       );
       return;
     }
@@ -361,6 +583,32 @@ const ProductDetails = () => {
     try {
       setSubmittingReview(true);
 
+      let uploadedImages = [];
+
+      // ----------------------------------------
+      // UPLOAD PHOTOS
+      // ----------------------------------------
+
+      if (reviewPhotos.length > 0) {
+        setUploadingPhotos(true);
+
+        const uploadResponse =
+          await uploadReviewImages(
+            reviewPhotos.map(
+              (photo) => photo.file
+            )
+          );
+
+        uploadedImages =
+          uploadResponse.images || [];
+
+        setUploadingPhotos(false);
+      }
+
+      // ----------------------------------------
+      // CREATE REVIEW
+      // ----------------------------------------
+
       await createReview({
         productId,
         orderId:
@@ -368,10 +616,17 @@ const ProductDetails = () => {
         rating: reviewForm.rating,
         title: reviewForm.title,
         comment: reviewForm.comment,
+        images: uploadedImages,
       });
 
+      // ----------------------------------------
+      // REFRESH REVIEWS
+      // ----------------------------------------
+
       const refreshed =
-        await getProductReviews(productId);
+        await getProductReviews(
+          productId
+        );
 
       const refreshedReviews =
         refreshed.reviews || [];
@@ -387,6 +642,10 @@ const ProductDetails = () => {
           1: 0,
         }
       );
+
+      // ----------------------------------------
+      // UPDATE PRODUCT RATING
+      // ----------------------------------------
 
       const refreshedRating =
         refreshedReviews.length > 0
@@ -411,6 +670,20 @@ const ProductDetails = () => {
         reviewCount:
           refreshedReviews.length,
       }));
+
+      // ----------------------------------------
+      // RESET FORM
+      // ----------------------------------------
+
+      reviewPhotos.forEach((photo) => {
+        if (photo.preview) {
+          URL.revokeObjectURL(
+            photo.preview
+          );
+        }
+      });
+
+      setReviewPhotos([]);
 
       setReviewForm({
         rating: 5,
@@ -440,6 +713,7 @@ const ProductDetails = () => {
       );
     } finally {
       setSubmittingReview(false);
+      setUploadingPhotos(false);
     }
   };
 
@@ -460,7 +734,9 @@ const ProductDetails = () => {
       await deleteReview(reviewId);
 
       const refreshed =
-        await getProductReviews(productId);
+        await getProductReviews(
+          productId
+        );
 
       const refreshedReviews =
         refreshed.reviews || [];
@@ -501,12 +777,31 @@ const ProductDetails = () => {
           refreshedReviews.length,
       }));
 
-      setReviewEligibility({
-        eligible: true,
-        orderId:
-          reviewEligibility.orderId,
-        reason: "",
-      });
+      // Re-check eligibility
+      try {
+        const eligibility =
+          await getReviewEligibility(
+            productId
+          );
+
+        setReviewEligibility({
+          eligible: Boolean(
+            eligibility.eligible
+          ),
+          orderId:
+            eligibility.orderId ||
+            null,
+          reason:
+            eligibility.reason || "",
+        });
+      } catch {
+        setReviewEligibility({
+          eligible: true,
+          orderId:
+            reviewEligibility.orderId,
+          reason: "",
+        });
+      }
 
       alert(
         "Review deleted successfully."
@@ -604,9 +899,7 @@ const ProductDetails = () => {
 
       <Navbar />
 
-      {/* ========================================
-          BACK
-      ======================================== */}
+      {/* BACK */}
 
       <div className="product-details-container">
         <button
@@ -618,15 +911,11 @@ const ProductDetails = () => {
         </button>
       </div>
 
-      {/* ========================================
-          PRODUCT MAIN
-      ======================================== */}
+      {/* PRODUCT MAIN */}
 
       <section className="product-details-container product-main">
 
-        {/* ========================================
-            LEFT - GALLERY
-        ======================================== */}
+        {/* GALLERY */}
 
         <div className="product-gallery">
 
@@ -680,9 +969,7 @@ const ProductDetails = () => {
 
         </div>
 
-        {/* ========================================
-            RIGHT - PRODUCT INFO
-        ======================================== */}
+        {/* PRODUCT INFO */}
 
         <div className="product-info">
 
@@ -1010,9 +1297,7 @@ const ProductDetails = () => {
 
       </section>
 
-      {/* ========================================
-          REVIEWS SECTION
-      ======================================== */}
+      {/* REVIEWS */}
 
       <section className="reviews-section">
 
@@ -1138,9 +1423,7 @@ const ProductDetails = () => {
 
           </div>
 
-          {/* ========================================
-              WRITE REVIEW
-          ======================================== */}
+          {/* WRITE REVIEW */}
 
           <div className="write-review-card">
 
@@ -1162,7 +1445,63 @@ const ProductDetails = () => {
 
             </div>
 
-            {reviewEligibility.eligible ? (
+            {/* --------------------------------
+                NOT LOGGED IN
+            -------------------------------- */}
+
+            {!isLoggedIn ? (
+              <div className="review-not-eligible">
+
+                <div className="review-not-eligible-icon">
+                  <Star size={24} />
+                </div>
+
+                <h4>
+                  Login to share your experience
+                </h4>
+
+                <p>
+                  Please login to write a
+                  review for this product.
+                </p>
+
+                <button
+                  type="button"
+                  className="review-login-btn"
+                  onClick={() =>
+                    navigate("/login")
+                  }
+                >
+                  Login to Review
+                </button>
+
+              </div>
+            ) : hasUserReviewed ? (
+              /* --------------------------------
+                  ALREADY REVIEWED
+              -------------------------------- */
+
+              <div className="review-not-eligible">
+
+                <div className="review-not-eligible-icon">
+                  <Check size={24} />
+                </div>
+
+                <h4>
+                  You have already reviewed this product
+                </h4>
+
+                <p>
+                  Thank you for sharing your
+                  experience with other riders.
+                </p>
+
+              </div>
+            ) : reviewEligibility.eligible ? (
+              /* --------------------------------
+                  ELIGIBLE
+              -------------------------------- */
+
               <form
                 className="review-form"
                 onSubmit={
@@ -1252,21 +1591,130 @@ const ProductDetails = () => {
                   }
                 />
 
+                {/* PHOTO UPLOAD */}
+
+                <div className="review-photo-upload">
+
+                  <div className="review-photo-upload-heading">
+
+                    <div>
+                      <strong>
+                        Add Photos
+                      </strong>
+
+                      <span>
+                        Show other riders your experience
+                      </span>
+                    </div>
+
+                    <span>
+                      {reviewPhotos.length}/5
+                    </span>
+
+                  </div>
+
+                  <div className="review-photo-grid">
+
+                    {reviewPhotos.map(
+                      (photo, index) => (
+                        <div
+                          className="review-photo-preview"
+                          key={`${photo.preview}-${index}`}
+                        >
+
+                          <img
+                            src={photo.preview}
+                            alt={`Review preview ${
+                              index + 1
+                            }`}
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              removeReviewPhoto(
+                                index
+                              )
+                            }
+                            aria-label="Remove photo"
+                          >
+                            <X size={15} />
+                          </button>
+
+                        </div>
+                      )
+                    )}
+
+                    {reviewPhotos.length <
+                      5 && (
+                      <label className="review-photo-add">
+
+                        <ImagePlus
+                          size={22}
+                        />
+
+                        <span>
+                          Add Photo
+                        </span>
+
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          multiple
+                          hidden
+                          onChange={
+                            handleReviewPhotoSelect
+                          }
+                        />
+
+                      </label>
+                    )}
+
+                  </div>
+
+                  <p className="review-photo-help">
+                    Up to 5 photos · JPG, PNG,
+                    WEBP · Max 5MB each
+                  </p>
+
+                </div>
+
                 {/* SUBMIT */}
 
                 <button
                   type="submit"
                   disabled={
-                    submittingReview
+                    submittingReview ||
+                    uploadingPhotos
                   }
                 >
-                  {submittingReview
-                    ? "Submitting..."
-                    : "Submit Review"}
+                  {uploadingPhotos ? (
+                    <>
+                      <Loader2
+                        size={16}
+                        className="review-spinner"
+                      />
+                      Uploading Photos...
+                    </>
+                  ) : submittingReview ? (
+                    <>
+                      <Loader2
+                        size={16}
+                        className="review-spinner"
+                      />
+                      Submitting...
+                    </>
+                  ) : (
+                    "Submit Review"
+                  )}
                 </button>
 
               </form>
             ) : (
+              /* --------------------------------
+                  LOGGED IN BUT NOT ELIGIBLE
+              -------------------------------- */
+
               <div className="review-not-eligible">
 
                 <div className="review-not-eligible-icon">
@@ -1289,24 +1737,12 @@ const ProductDetails = () => {
                   </span>
                 )}
 
-                <button
-                  type="button"
-                  className="review-login-btn"
-                  onClick={() =>
-                    navigate("/login")
-                  }
-                >
-                  Login to Review
-                </button>
-
               </div>
             )}
 
           </div>
 
-          {/* ========================================
-              REVIEWS LIST
-          ======================================== */}
+          {/* REVIEWS LIST */}
 
           <div className="reviews-list">
 
@@ -1409,6 +1845,37 @@ const ProductDetails = () => {
                       {review.comment}
                     </p>
 
+                    {/* REVIEW PHOTOS */}
+
+                    {review.images?.length >
+                      0 && (
+                      <div className="review-images">
+
+                        {review.images.map(
+                          (image, index) => (
+                            <button
+                              type="button"
+                              className="review-image-thumb"
+                              key={`${image}-${index}`}
+                              onClick={() =>
+                                setReviewImageViewer(
+                                  image
+                                )
+                              }
+                            >
+                              <img
+                                src={image}
+                                alt={`Review ${
+                                  index + 1
+                                }`}
+                              />
+                            </button>
+                          )
+                        )}
+
+                      </div>
+                    )}
+
                     {/* BOTTOM */}
 
                     <div className="review-card-bottom">
@@ -1459,8 +1926,43 @@ const ProductDetails = () => {
 
       </section>
 
+      {/* ========================================
+          REVIEW IMAGE FULLSCREEN VIEWER
+      ======================================== */}
+
+      {reviewImageViewer && (
+        <div
+          className="review-image-viewer"
+          onClick={() =>
+            setReviewImageViewer(null)
+          }
+        >
+
+          <button
+            type="button"
+            className="review-image-viewer-close"
+            onClick={(e) => {
+              e.stopPropagation();
+              setReviewImageViewer(null);
+            }}
+          >
+            <X size={24} />
+          </button>
+
+          <img
+            src={reviewImageViewer}
+            alt="Review"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          />
+
+        </div>
+      )}
+
     </main>
   );
 };
 
 export default ProductDetails;
+

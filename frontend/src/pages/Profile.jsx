@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   MapPin,
@@ -11,6 +10,14 @@ import {
   X,
   Loader2,
   LogOut,
+  ShoppingBag,
+  Info,
+  Package,
+  Truck,
+  CreditCard,
+  FileText,
+  Printer,
+  ChevronRight,
 } from "lucide-react";
 
 import Navbar from "../components/Navbar";
@@ -31,6 +38,15 @@ const emptyAddress = {
 const Profile = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [addresses, setAddresses] = useState([]);
+
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderModalLoading, setOrderModalLoading] = useState(false);
+
+  const [showOrders, setShowOrders] = useState(false);
+  const [showInvoice, setShowInvoice] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [addressLoading, setAddressLoading] = useState(false);
@@ -63,7 +79,6 @@ const Profile = () => {
         response;
 
       setCurrentUser(user);
-
       setAddresses(user?.addresses || []);
 
       console.log("PROFILE USER:", user);
@@ -85,6 +100,103 @@ const Profile = () => {
   }, []);
 
   /* =========================================================
+     LOAD ORDERS
+  ========================================================= */
+
+  const loadOrders = async () => {
+    try {
+      setOrdersLoading(true);
+
+      const response = await apiRequest(
+        "/orders/my-orders"
+      );
+
+      const userOrders =
+        response?.orders ||
+        response?.data?.orders ||
+        response?.data ||
+        [];
+
+      setOrders(
+        Array.isArray(userOrders)
+          ? userOrders
+          : []
+      );
+    } catch (err) {
+      console.error(
+        "Orders load error:",
+        err
+      );
+
+      setError(
+        err?.message ||
+          "Unable to load your orders."
+      );
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
+  /* =========================================================
+     OPEN MY ORDERS
+  ========================================================= */
+
+  const handleOpenOrders = async () => {
+    setMessage("");
+    setError("");
+
+    setShowOrders(true);
+
+    await loadOrders();
+  };
+
+  /* =========================================================
+     GET SINGLE ORDER
+  ========================================================= */
+
+  const handleOpenOrderDetails = async (
+    orderId
+  ) => {
+    try {
+      setOrderModalLoading(true);
+      setError("");
+
+      const response = await apiRequest(
+        `/orders/${orderId}`
+      );
+
+      const order =
+        response?.order ||
+        response?.data?.order ||
+        response?.data ||
+        response;
+
+      setSelectedOrder(order);
+    } catch (err) {
+      console.error(
+        "Order details error:",
+        err
+      );
+
+      setError(
+        err?.message ||
+          "Unable to load order details."
+      );
+    } finally {
+      setOrderModalLoading(false);
+    }
+  };
+
+  /* =========================================================
+     CLOSE ORDER MODAL
+  ========================================================= */
+
+  const closeOrderModal = () => {
+    setSelectedOrder(null);
+    setShowInvoice(false);
+  };
+
+  /* =========================================================
      LOGOUT
   ========================================================= */
 
@@ -95,18 +207,12 @@ const Profile = () => {
 
     if (!confirmed) return;
 
-    /*
-     * Remove authentication data
-     */
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
 
-    /*
-     * Redirect user to login page
-     */
     window.location.href = "/login";
   };
 
@@ -154,11 +260,6 @@ const Profile = () => {
 
       phone: address.phone || "",
 
-      /*
-       * IMPORTANT:
-       * Database uses addressLine1.
-       * UI uses address.
-       */
       address:
         address.addressLine1 ||
         address.address ||
@@ -187,7 +288,7 @@ const Profile = () => {
   };
 
   /* =========================================================
-     CLOSE FORM
+     CLOSE ADDRESS FORM
   ========================================================= */
 
   const closeAddressForm = () => {
@@ -265,15 +366,6 @@ const Profile = () => {
       setError("");
       setMessage("");
 
-      /*
-       * IMPORTANT:
-       *
-       * UI field:
-       * address
-       *
-       * Backend / MongoDB field:
-       * addressLine1
-       */
       const payload = {
         fullName:
           addressForm.fullName.trim(),
@@ -302,16 +394,7 @@ const Profile = () => {
           "India",
       };
 
-      console.log(
-        "ADDRESS PAYLOAD:",
-        payload
-      );
-
       let response;
-
-      /* =========================
-         UPDATE
-      ========================= */
 
       if (editingAddressId) {
         response = await apiRequest(
@@ -321,13 +404,7 @@ const Profile = () => {
             body: JSON.stringify(payload),
           }
         );
-      }
-
-      /* =========================
-         ADD
-      ========================= */
-
-      else {
+      } else {
         response = await apiRequest(
           "/auth/addresses",
           {
@@ -336,20 +413,6 @@ const Profile = () => {
           }
         );
       }
-
-      console.log(
-        "ADDRESS RESPONSE:",
-        response
-      );
-
-      /*
-       * Backend returns:
-       *
-       * {
-       *   message,
-       *   addresses
-       * }
-       */
 
       if (response?.addresses) {
         setAddresses(
@@ -490,6 +553,65 @@ const Profile = () => {
           "Unable to update default address."
       );
     }
+  };
+
+  /* =========================================================
+     FORMAT DATE
+  ========================================================= */
+
+  const formatDate = (date) => {
+    if (!date) return "—";
+
+    return new Date(date).toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  };
+
+  /* =========================================================
+     FORMAT CURRENCY
+  ========================================================= */
+
+  const formatCurrency = (amount) => {
+    return `₹${Number(
+      amount || 0
+    ).toLocaleString("en-IN")}`;
+  };
+
+  /* =========================================================
+     STATUS CLASS
+  ========================================================= */
+
+  const getStatusClass = (status) => {
+    return String(status || "")
+      .toLowerCase()
+      .replace(/\s+/g, "-");
+  };
+
+  /* =========================================================
+     ORDER ITEM COUNT
+  ========================================================= */
+
+  const getItemCount = (order) => {
+    return (
+      order?.items?.reduce(
+        (total, item) =>
+          total + Number(item.quantity || 0),
+        0
+      ) || 0
+    );
+  };
+
+  /* =========================================================
+     PRINT INVOICE
+  ========================================================= */
+
+  const handlePrintInvoice = () => {
+    window.print();
   };
 
   /* =========================================================
@@ -635,10 +757,48 @@ const Profile = () => {
             </div>
 
             {/* =================================================
+                MY ORDERS BUTTON
+            ================================================= */}
+
+            <div className="my-orders-button-wrapper">
+
+              <button
+                type="button"
+                className="my-orders-button"
+                onClick={
+                  handleOpenOrders
+                }
+              >
+                <div className="my-orders-button-left">
+
+                  <div className="my-orders-icon">
+                    <ShoppingBag size={19} />
+                  </div>
+
+                  <div>
+                    <span>
+                      PURCHASE HISTORY
+                    </span>
+
+                    <strong>
+                      My Orders
+                    </strong>
+                  </div>
+
+                </div>
+
+                <ChevronRight size={19} />
+
+              </button>
+
+            </div>
+
+            {/* =================================================
                 LOGOUT
             ================================================= */}
 
             <div className="profile-logout-wrapper">
+
               <button
                 type="button"
                 className="profile-logout-btn"
@@ -650,6 +810,7 @@ const Profile = () => {
                   LOGOUT
                 </span>
               </button>
+
             </div>
 
           </section>
@@ -692,11 +853,8 @@ const Profile = () => {
 
             </div>
 
-            {/* =================================================
-                EMPTY
-            ================================================= */}
-
             {addresses.length === 0 ? (
+
               <div className="empty-addresses">
 
                 <MapPin size={35} />
@@ -722,11 +880,8 @@ const Profile = () => {
                 </button>
 
               </div>
-            ) : (
 
-              /* =================================================
-                 ADDRESS LIST
-              ================================================= */
+            ) : (
 
               <div className="address-list">
 
@@ -750,10 +905,6 @@ const Profile = () => {
                         }`}
                         key={addressId}
                       >
-
-                        {/* =========================
-                            ADDRESS TOP
-                        ========================= */}
 
                         <div className="saved-address-top">
 
@@ -815,10 +966,6 @@ const Profile = () => {
 
                         </div>
 
-                        {/* =========================
-                            ADDRESS CONTENT
-                        ========================= */}
-
                         <div className="saved-address-content">
 
                           <p>
@@ -843,18 +990,16 @@ const Profile = () => {
                           </p>
 
                           <p className="saved-phone">
+
                             <Phone
                               size={14}
                             />
 
                             {address.phone}
+
                           </p>
 
                         </div>
-
-                        {/* =========================
-                            MAKE DEFAULT
-                        ========================= */}
 
                         {!isDefault && (
                           <button
@@ -889,10 +1034,6 @@ const Profile = () => {
 
               <div className="address-modal">
 
-                {/* =========================
-                    MODAL HEADER
-                ========================= */}
-
                 <div className="address-modal-header">
 
                   <div>
@@ -922,10 +1063,6 @@ const Profile = () => {
 
                 </div>
 
-                {/* =========================
-                    FORM
-                ========================= */}
-
                 <form
                   onSubmit={
                     handleSaveAddress
@@ -933,8 +1070,6 @@ const Profile = () => {
                 >
 
                   <div className="address-form-grid">
-
-                    {/* FULL NAME */}
 
                     <div className="form-field">
 
@@ -955,8 +1090,6 @@ const Profile = () => {
                       />
 
                     </div>
-
-                    {/* PHONE */}
 
                     <div className="form-field">
 
@@ -979,8 +1112,6 @@ const Profile = () => {
 
                     </div>
 
-                    {/* ADDRESS */}
-
                     <div className="form-field full-width">
 
                       <label>
@@ -1000,8 +1131,6 @@ const Profile = () => {
                       />
 
                     </div>
-
-                    {/* ADDRESS LINE 2 */}
 
                     <div className="form-field full-width">
 
@@ -1027,8 +1156,6 @@ const Profile = () => {
 
                     </div>
 
-                    {/* CITY */}
-
                     <div className="form-field">
 
                       <label>
@@ -1049,8 +1176,6 @@ const Profile = () => {
 
                     </div>
 
-                    {/* STATE */}
-
                     <div className="form-field">
 
                       <label>
@@ -1070,8 +1195,6 @@ const Profile = () => {
                       />
 
                     </div>
-
-                    {/* PINCODE */}
 
                     <div className="form-field">
 
@@ -1095,10 +1218,6 @@ const Profile = () => {
                     </div>
 
                   </div>
-
-                  {/* =========================
-                      FORM ACTIONS
-                  ========================= */}
 
                   <div className="address-form-actions">
 
@@ -1148,8 +1267,994 @@ const Profile = () => {
                 </form>
 
               </div>
+
             </div>
           )}
+
+          {/* =================================================
+              MY ORDERS MODAL
+          ================================================= */}
+
+          {showOrders && (
+            <div className="orders-modal-overlay">
+
+              <div className="orders-modal">
+
+                <div className="orders-modal-header">
+
+                  <div>
+
+                    <span>
+                      PURCHASE HISTORY
+                    </span>
+
+                    <h2>
+                      My Orders
+                    </h2>
+
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowOrders(false)
+                    }
+                  >
+                    <X size={21} />
+                  </button>
+
+                </div>
+
+                <div className="orders-modal-body">
+
+                  {ordersLoading ? (
+
+                    <div className="orders-loading">
+
+                      <Loader2
+                        size={28}
+                        className="spin"
+                      />
+
+                      <p>
+                        Loading your orders...
+                      </p>
+
+                    </div>
+
+                  ) : orders.length === 0 ? (
+
+                    <div className="orders-empty">
+
+                      <ShoppingBag
+                        size={42}
+                      />
+
+                      <h3>
+                        No Orders Yet
+                      </h3>
+
+                      <p>
+                        Your completed purchases
+                        will appear here.
+                      </p>
+
+                    </div>
+
+                  ) : (
+
+                    <div className="orders-list">
+
+                      {orders.map(
+                        (order) => {
+
+                          const orderId =
+                            order._id ||
+                            order.id;
+
+                          const itemCount =
+                            getItemCount(
+                              order
+                            );
+
+                          return (
+                            <div
+                              className="order-overview-card"
+                              key={orderId}
+                            >
+
+                              <div className="order-overview-top">
+
+                                <div>
+
+                                  <span className="order-overview-label">
+                                    ORDER
+                                  </span>
+
+                                  <strong>
+                                    #
+                                    {String(
+                                      orderId
+                                    ).slice(-8).toUpperCase()}
+                                  </strong>
+
+                                </div>
+
+                                <span className="order-date">
+                                  {formatDate(
+                                    order.createdAt
+                                  )}
+                                </span>
+
+                              </div>
+
+                              <div className="order-overview-middle">
+
+                                <div className="order-products-preview">
+
+                                  {order.items
+                                    ?.slice(0, 3)
+                                    .map(
+                                      (
+                                        item,
+                                        index
+                                      ) => (
+                                        <div
+                                          className="order-product-mini"
+                                          key={`${orderId}-${index}`}
+                                        >
+
+                                          <div className="order-product-image">
+
+                                            {item.image ? (
+                                              <img
+                                                src={
+                                                  item.image
+                                                }
+                                                alt={
+                                                  item.name
+                                                }
+                                              />
+                                            ) : (
+                                              <Package
+                                                size={18}
+                                              />
+                                            )}
+
+                                          </div>
+
+                                          <div>
+
+                                            <strong>
+                                              {
+                                                item.name
+                                              }
+                                            </strong>
+
+                                            <span>
+                                              Qty:{" "}
+                                              {
+                                                item.quantity
+                                              }
+                                            </span>
+
+                                          </div>
+
+                                        </div>
+                                      )
+                                    )}
+
+                                </div>
+
+                                {order.items?.length >
+                                  3 && (
+                                  <span className="more-items">
+                                    +
+                                    {order.items.length -
+                                      3}{" "}
+                                    more
+                                  </span>
+                                )}
+
+                              </div>
+
+                              <div className="order-overview-bottom">
+
+                                <div className="order-total-box">
+
+                                  <small>
+                                    TOTAL
+                                  </small>
+
+                                  <strong>
+                                    {formatCurrency(
+                                      order.totalAmount
+                                    )}
+                                  </strong>
+
+                                  <span>
+                                    {itemCount}{" "}
+                                    {itemCount === 1
+                                      ? "item"
+                                      : "items"}
+                                  </span>
+
+                                </div>
+
+                                <div className="order-status-box">
+
+                                  <span
+                                    className={`order-status ${getStatusClass(
+                                      order.status
+                                    )}`}
+                                  >
+                                    {order.status ||
+                                      "Pending"}
+                                  </span>
+
+                                  <span className="payment-status">
+                                    {order.paymentStatus ||
+                                      "Pending"}
+                                  </span>
+
+                                </div>
+
+                                <button
+                                  type="button"
+                                  className="order-info-btn"
+                                  title="View order details"
+                                  onClick={() =>
+                                    handleOpenOrderDetails(
+                                      orderId
+                                    )
+                                  }
+                                >
+                                  <Info
+                                    size={18}
+                                  />
+                                </button>
+
+                              </div>
+
+                            </div>
+                          );
+                        }
+                      )}
+
+                    </div>
+
+                  )}
+
+                </div>
+
+              </div>
+
+            </div>
+          )}
+
+          {/* =================================================
+              ORDER DETAILS MODAL
+          ================================================= */}
+
+          {(selectedOrder ||
+            orderModalLoading) && (
+            <div className="order-details-overlay">
+
+              <div className="order-details-modal">
+
+                {orderModalLoading ? (
+
+                  <div className="order-details-loading">
+
+                    <Loader2
+                      size={30}
+                      className="spin"
+                    />
+
+                    <p>
+                      Loading order details...
+                    </p>
+
+                  </div>
+
+                ) : (
+
+                  <>
+                    <div className="order-details-header">
+
+                      <div>
+
+                        <span>
+                          ORDER DETAILS
+                        </span>
+
+                        <h2>
+                          #
+                          {String(
+                            selectedOrder?._id ||
+                              selectedOrder?.id ||
+                              ""
+                          )
+                            .slice(-8)
+                            .toUpperCase()}
+                        </h2>
+
+                        <small>
+                          Placed on{" "}
+                          {formatDate(
+                            selectedOrder?.createdAt
+                          )}
+                        </small>
+
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={
+                          closeOrderModal
+                        }
+                      >
+                        <X size={21} />
+                      </button>
+
+                    </div>
+
+                    <div className="order-details-body">
+
+                      {/* STATUS */}
+
+                      <div className="order-detail-status-row">
+
+                        <div>
+                          <small>
+                            ORDER STATUS
+                          </small>
+
+                          <strong
+                            className={`order-status-large ${getStatusClass(
+                              selectedOrder?.status
+                            )}`}
+                          >
+                            {selectedOrder?.status ||
+                              "Pending"}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <small>
+                            PAYMENT
+                          </small>
+
+                          <strong>
+                            {selectedOrder?.paymentStatus ||
+                              "Pending"}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <small>
+                            METHOD
+                          </small>
+
+                          <strong>
+                            {selectedOrder?.paymentMethod ||
+                              "COD"}
+                          </strong>
+                        </div>
+
+                      </div>
+
+                      {/* ITEMS */}
+
+                      <div className="order-detail-section">
+
+                        <div className="order-detail-section-title">
+                          <Package
+                            size={17}
+                          />
+
+                          <h3>
+                            Order Items
+                          </h3>
+                        </div>
+
+                        <div className="order-detail-items">
+
+                          {selectedOrder?.items?.map(
+                            (
+                              item,
+                              index
+                            ) => (
+
+                              <div
+                                className="order-detail-item"
+                                key={`${item.product || index}-${index}`}
+                              >
+
+                                <div className="order-detail-product-image">
+
+                                  {item.image ? (
+                                    <img
+                                      src={
+                                        item.image
+                                      }
+                                      alt={
+                                        item.name
+                                      }
+                                    />
+                                  ) : (
+                                    <Package
+                                      size={20}
+                                    />
+                                  )}
+
+                                </div>
+
+                                <div className="order-detail-product-info">
+
+                                  <strong>
+                                    {
+                                      item.name
+                                    }
+                                  </strong>
+
+                                  <span>
+                                    Qty:{" "}
+                                    {
+                                      item.quantity
+                                    }
+                                  </span>
+
+                                </div>
+
+                                <strong>
+                                  {formatCurrency(
+                                    Number(
+                                      item.price
+                                    ) *
+                                      Number(
+                                        item.quantity
+                                      )
+                                  )}
+                                </strong>
+
+                              </div>
+
+                            )
+                          )}
+
+                        </div>
+
+                      </div>
+
+                      {/* DELIVERY */}
+
+                      <div className="order-detail-section">
+
+                        <div className="order-detail-section-title">
+
+                          <Truck
+                            size={17}
+                          />
+
+                          <h3>
+                            Delivery Address
+                          </h3>
+
+                        </div>
+
+                        <div className="order-detail-address">
+
+                          <strong>
+                            {
+                              selectedOrder
+                                ?.shippingAddress
+                                ?.fullName
+                            }
+                          </strong>
+
+                          <p>
+                            {
+                              selectedOrder
+                                ?.shippingAddress
+                                ?.addressLine1
+                            }
+                          </p>
+
+                          {selectedOrder
+                            ?.shippingAddress
+                            ?.addressLine2 && (
+                            <p>
+                              {
+                                selectedOrder
+                                  ?.shippingAddress
+                                  ?.addressLine2
+                              }
+                            </p>
+                          )}
+
+                          <p>
+                            {
+                              selectedOrder
+                                ?.shippingAddress
+                                ?.city
+                            }
+                            ,{" "}
+                            {
+                              selectedOrder
+                                ?.shippingAddress
+                                ?.state
+                            }{" "}
+                            -{" "}
+                            {
+                              selectedOrder
+                                ?.shippingAddress
+                                ?.pincode
+                            }
+                          </p>
+
+                          <p>
+                            {
+                              selectedOrder
+                                ?.shippingAddress
+                                ?.country
+                            }
+                          </p>
+
+                          <p className="order-phone">
+                            <Phone
+                              size={13}
+                            />
+
+                            {
+                              selectedOrder
+                                ?.shippingAddress
+                                ?.phone
+                            }
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                      {/* SUMMARY */}
+
+                      <div className="order-detail-summary">
+
+                        <div>
+                          <span>
+                            Subtotal
+                          </span>
+
+                          <strong>
+                            {formatCurrency(
+                              selectedOrder?.subtotal
+                            )}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span>
+                            Shipping
+                          </span>
+
+                          <strong>
+                            {selectedOrder?.shipping ===
+                            0
+                              ? "FREE"
+                              : formatCurrency(
+                                  selectedOrder?.shipping
+                                )}
+                          </strong>
+                        </div>
+
+                        {Number(
+                          selectedOrder?.discount
+                        ) > 0 && (
+                          <div className="discount-row">
+                            <span>
+                              Discount
+                              {selectedOrder?.couponCode
+                                ? ` (${selectedOrder.couponCode})`
+                                : ""}
+                            </span>
+
+                            <strong>
+                              -
+                              {formatCurrency(
+                                selectedOrder?.discount
+                              )}
+                            </strong>
+                          </div>
+                        )}
+
+                        <div className="order-grand-total">
+
+                          <span>
+                            TOTAL
+                          </span>
+
+                          <strong>
+                            {formatCurrency(
+                              selectedOrder?.totalAmount
+                            )}
+                          </strong>
+
+                        </div>
+
+                      </div>
+
+                      {/* ACTIONS */}
+
+                      <div className="order-details-actions">
+
+                        <button
+                          type="button"
+                          className="invoice-btn"
+                          onClick={() =>
+                            setShowInvoice(
+                              true
+                            )
+                          }
+                        >
+                          <FileText
+                            size={17}
+                          />
+
+                          VIEW INVOICE
+                        </button>
+
+                        <button
+                          type="button"
+                          className="close-order-btn"
+                          onClick={
+                            closeOrderModal
+                          }
+                        >
+                          CLOSE
+                        </button>
+
+                      </div>
+
+                    </div>
+                  </>
+                )}
+
+              </div>
+
+            </div>
+          )}
+
+          {/* =================================================
+              INVOICE
+          ================================================= */}
+
+          {showInvoice &&
+            selectedOrder && (
+              <div className="invoice-overlay">
+
+                <div className="invoice-modal">
+
+                  <div className="invoice-toolbar">
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowInvoice(false)
+                      }
+                    >
+                      <X size={19} />
+                      CLOSE
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={
+                        handlePrintInvoice
+                      }
+                    >
+                      <Printer size={17} />
+                      PRINT / SAVE PDF
+                    </button>
+
+                  </div>
+
+                  <div className="invoice-paper">
+
+                    <div className="invoice-header">
+
+                      <div>
+
+                        <span className="invoice-brand">
+                          SADDLE & CREST
+                        </span>
+
+                        <p>
+                          Jaipur · Rajasthan · India
+                        </p>
+
+                        <p>
+                          concierge@saddleandcrest.com
+                        </p>
+
+                      </div>
+
+                      <div className="invoice-title">
+
+                        <span>
+                          INVOICE
+                        </span>
+
+                        <strong>
+                          #
+                          {String(
+                            selectedOrder._id
+                          )
+                            .slice(-8)
+                            .toUpperCase()}
+                        </strong>
+
+                      </div>
+
+                    </div>
+
+                    <div className="invoice-meta">
+
+                      <div>
+                        <small>
+                          BILL TO
+                        </small>
+
+                        <strong>
+                          {
+                            selectedOrder
+                              ?.shippingAddress
+                              ?.fullName
+                          }
+                        </strong>
+
+                        <p>
+                          {
+                            selectedOrder
+                              ?.shippingAddress
+                              ?.addressLine1
+                          }
+                        </p>
+
+                        {selectedOrder
+                          ?.shippingAddress
+                          ?.addressLine2 && (
+                          <p>
+                            {
+                              selectedOrder
+                                ?.shippingAddress
+                                ?.addressLine2
+                            }
+                          </p>
+                        )}
+
+                        <p>
+                          {
+                            selectedOrder
+                              ?.shippingAddress
+                              ?.city
+                          }
+                          ,{" "}
+                          {
+                            selectedOrder
+                              ?.shippingAddress
+                              ?.state
+                          }{" "}
+                          -{" "}
+                          {
+                            selectedOrder
+                              ?.shippingAddress
+                              ?.pincode
+                          }
+                        </p>
+
+                        <p>
+                          Phone:{" "}
+                          {
+                            selectedOrder
+                              ?.shippingAddress
+                              ?.phone
+                          }
+                        </p>
+
+                      </div>
+
+                      <div>
+
+                        <small>
+                          INVOICE DATE
+                        </small>
+
+                        <strong>
+                          {formatDate(
+                            selectedOrder.createdAt
+                          )}
+                        </strong>
+
+                        <small>
+                          PAYMENT METHOD
+                        </small>
+
+                        <strong>
+                          {
+                            selectedOrder.paymentMethod
+                          }
+                        </strong>
+
+                        <small>
+                          PAYMENT STATUS
+                        </small>
+
+                        <strong>
+                          {
+                            selectedOrder.paymentStatus
+                          }
+                        </strong>
+
+                      </div>
+
+                    </div>
+
+                    <table className="invoice-table">
+
+                      <thead>
+                        <tr>
+                          <th>
+                            ITEM
+                          </th>
+
+                          <th>
+                            QTY
+                          </th>
+
+                          <th>
+                            PRICE
+                          </th>
+
+                          <th>
+                            TOTAL
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+
+                        {selectedOrder.items?.map(
+                          (
+                            item,
+                            index
+                          ) => (
+
+                            <tr
+                              key={index}
+                            >
+
+                              <td>
+                                <strong>
+                                  {
+                                    item.name
+                                  }
+                                </strong>
+                              </td>
+
+                              <td>
+                                {
+                                  item.quantity
+                                }
+                              </td>
+
+                              <td>
+                                {formatCurrency(
+                                  item.price
+                                )}
+                              </td>
+
+                              <td>
+                                {formatCurrency(
+                                  Number(
+                                    item.price
+                                  ) *
+                                    Number(
+                                      item.quantity
+                                    )
+                                )}
+                              </td>
+
+                            </tr>
+
+                          )
+                        )}
+
+                      </tbody>
+
+                    </table>
+
+                    <div className="invoice-summary">
+
+                      <div>
+                        <span>
+                          Subtotal
+                        </span>
+
+                        <strong>
+                          {formatCurrency(
+                            selectedOrder.subtotal
+                          )}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>
+                          Shipping
+                        </span>
+
+                        <strong>
+                          {selectedOrder.shipping ===
+                          0
+                            ? "FREE"
+                            : formatCurrency(
+                                selectedOrder.shipping
+                              )}
+                        </strong>
+                      </div>
+
+                      {Number(
+                        selectedOrder.discount
+                      ) > 0 && (
+                        <div>
+                          <span>
+                            Discount
+                          </span>
+
+                          <strong>
+                            -
+                            {formatCurrency(
+                              selectedOrder.discount
+                            )}
+                          </strong>
+                        </div>
+                      )}
+
+                      <div className="invoice-total">
+                        <span>
+                          GRAND TOTAL
+                        </span>
+
+                        <strong>
+                          {formatCurrency(
+                            selectedOrder.totalAmount
+                          )}
+                        </strong>
+                      </div>
+
+                    </div>
+
+                    <div className="invoice-footer">
+
+                      <strong>
+                        Thank you for choosing
+                        Saddle & Crest.
+                      </strong>
+
+                      <p>
+                        This is a computer-generated
+                        invoice and does not require
+                        a physical signature.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+            )}
 
         </div>
       </main>

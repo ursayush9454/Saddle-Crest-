@@ -120,9 +120,10 @@ const calculateCouponDiscount = async ({
   discount = Math.min(discount, cartTotal);
 
   // Round
-  discount = Math.round(
-    (discount + Number.EPSILON) * 100
-  ) / 100;
+  discount =
+    Math.round(
+      (discount + Number.EPSILON) * 100
+    ) / 100;
 
   return {
     coupon,
@@ -177,14 +178,15 @@ exports.place = async (req, res) => {
       user: req.user._id,
     }).populate("items.product");
 
-    if (!cart?.items.length) {
+    if (!cart?.items?.length) {
       return res.status(400).json({
         message: "Cart is empty",
       });
     }
 
     // =========================
-    // CHECK PRODUCTS + CALCULATE SUBTOTAL
+    // CHECK PRODUCTS
+    // + CALCULATE SUBTOTAL
     // BEFORE STOCK UPDATE
     // =========================
 
@@ -193,6 +195,20 @@ exports.place = async (req, res) => {
     const availableProducts = [];
 
     for (const i of cart.items) {
+      // ==========================================
+      // IMPORTANT:
+      // Product reference can be null if product
+      // was deleted/archived after being added
+      // to the cart.
+      // ==========================================
+
+      if (!i.product) {
+        return res.status(400).json({
+          message:
+            "One of the products in your cart is no longer available. Please remove it from your cart and try again.",
+        });
+      }
+
       const product = await Product.findOne({
         _id: i.product._id,
         isActive: true,
@@ -200,15 +216,25 @@ exports.place = async (req, res) => {
 
       if (!product) {
         return res.status(400).json({
-          message: `Product ${i.product.name} is no longer available`,
+          message: `Product ${
+            i.product.name || "in your cart"
+          } is no longer available`,
         });
       }
+
+      // =========================
+      // STOCK CHECK
+      // =========================
 
       if (product.stock < i.quantity) {
         return res.status(400).json({
           message: `Insufficient stock for ${product.name}`,
         });
       }
+
+      // =========================
+      // PRICE
+      // =========================
 
       const price =
         product.salePrice ?? product.price;
@@ -248,11 +274,14 @@ exports.place = async (req, res) => {
 
         coupon = result.coupon;
         discount = result.discount;
+
         normalizedCouponCode =
-          coupon.code;
+          coupon?.code || null;
       } catch (couponError) {
         return res.status(400).json({
-          message: couponError.message,
+          message:
+            couponError.message ||
+            "Invalid coupon",
         });
       }
     }
@@ -288,7 +317,7 @@ exports.place = async (req, res) => {
             },
           },
           {
-            new: true,
+            returnDocument: "after",
           }
         );
 
@@ -356,6 +385,7 @@ exports.place = async (req, res) => {
     // =========================
 
     cart.items = [];
+
     await cart.save();
 
     // =========================
@@ -374,6 +404,7 @@ exports.place = async (req, res) => {
 
     return res.status(500).json({
       message:
+        error?.message ||
         "Unable to place order right now.",
     });
   }
@@ -457,6 +488,10 @@ exports.cancel = async (req, res) => {
       });
     }
 
+    // =========================
+    // CHECK ORDER STATUS
+    // =========================
+
     if (
       [
         "Delivered",
@@ -470,8 +505,15 @@ exports.cancel = async (req, res) => {
       });
     }
 
-    // Restore product stock
+    // =========================
+    // RESTORE PRODUCT STOCK
+    // =========================
+
     for (const item of order.items) {
+      if (!item.product) {
+        continue;
+      }
+
       await Product.findByIdAndUpdate(
         item.product,
         {
@@ -482,7 +524,10 @@ exports.cancel = async (req, res) => {
       );
     }
 
-    // Restore coupon usage
+    // =========================
+    // RESTORE COUPON USAGE
+    // =========================
+
     if (order.couponCode) {
       await Coupon.findOneAndUpdate(
         {
@@ -499,12 +544,16 @@ exports.cancel = async (req, res) => {
       );
     }
 
+    // =========================
+    // UPDATE ORDER
+    // =========================
+
     order.status = "Cancelled";
     order.cancelledAt = new Date();
 
     await order.save();
 
-    res.json({
+    return res.json({
       message:
         "Order cancelled successfully",
       order,
@@ -515,7 +564,7 @@ exports.cancel = async (req, res) => {
       error
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       message:
         "Unable to cancel order.",
     });
