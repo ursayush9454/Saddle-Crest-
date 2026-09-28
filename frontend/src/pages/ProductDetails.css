@@ -2341,3 +2341,569 @@
     text-align: center;
   }
 }
+/* =========================================================
+   REVIEW PHOTO UPLOAD
+   Matches ProductDetails.jsx exactly
+========================================================= */
+
+.review-photo-upload {
+  width: 100%;
+  margin-top: 18px;
+}
+
+/* ---------------------------------------------------------
+   HEADER
+--------------------------------------------------------- */
+
+.review-photo-upload-heading {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 11px;
+}
+
+.review-photo-upload-heading > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.review-photo-upload-heading strong {
+  display: block;
+  margin: 0;
+
+  font-family: "Jost", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  color: #171410;
+}
+
+.review-photo-upload-heading span {
+  display: block;
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.4;
+
+  color: rgba(23, 20, 16, 0.58);
+}
+
+/* Photo count - 0/5 */
+.review-photo-upload-heading > span {
+  flex-shrink: 0;
+
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+
+  color: rgba(23, 20, 16, 0.55);
+}
+
+
+/* =========================================================
+   PHOTO GRID
+========================================================= */
+
+.review-photo-grid {
+  width: 100%;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+
+  gap: 10px;
+}
+
+
+/* =========================================================
+   PHOTO PREVIEW
+========================================================= */
+
+.review-photo-preview {
+  position: relative;
+
+  width: 82px;
+  height: 82px;
+
+  flex: 0 0 82px;
+
+  overflow: hidden;
+
+  background: #f3eee3;
+
+  border: 1px solid rgba(23, 20, 16, 0.15);
+
+  box-sizing: border-box;
+}
+
+.review-photo-preview img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+
+/* =========================================================
+   REMOVE PHOTO BUTTON
+========================================================= */
+
+.review-photo-preview button {
+  position: absolute;
+
+  top: 5px;
+  right: 5px;
+
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+
+  background: rgba(23, 20, 16, 0.82);
+  color: #ffffff;
+
+  cursor: pointer;
+
+  z-index: 2;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.review-photo-preview button:hover {
+  background: #171410;
+
+  transform: scale(1.06);
+}
+
+.review-photo-preview button svg {
+  width: 14px;
+  height: 14px;
+}
+
+
+/* =========================================================
+   ADD PHOTO BOX
+========================================================= */
+
+.review-photo-add {
+  position: relative;
+
+  width: 82px;
+  height: 82px;
+
+  flex: 0 0 82px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  box-sizing: border-box;
+
+  border: 1px dashed rgba(23, 20, 16, 0.28);
+
+  background: rgba(243, 238, 227, 0.42);
+
+  color: #171410;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.review-photo-add:hover {
+  border-color: #b08d57;
+
+  background: rgba(176, 141, 87, 0.08);
+
+  transform: translateY(-2px);
+}
+
+.review-photo-add svg {
+  width: 21px;
+  height: 21px;
+
+  stroke-width: 1.5;
+}
+
+.review-photo-add span {
+  display: block;
+
+  font-family: "Jost", sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+
+  line-height: 1;
+
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
+  color: #171410;
+}
+
+
+/* =========================================================
+   HIDDEN FILE INPUT
+========================================================= */
+
+.review-photo-add input[type="file"] {
+  display: none;
+}
+
+
+/* =========================================================
+   HELP TEXT
+========================================================= */
+
+.review-photo-help {
+  margin: 9px 0 0;
+
+  font-family: "Jost", sans-serif;
+
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  color: rgba(23, 20, 16, 0.55);
+}
+
+
+/* =========================================================
+   REVIEW PHOTOS AFTER SUBMISSION
+========================================================= */
+
+.review-images {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+
+/* =========================================================
+   REVIEW IMAGE THUMBNAIL
+========================================================= */
+
+.review-image-thumb {
+  width: 72px;
+  height: 72px;
+
+  flex: 0 0 72px;
+
+  display: block;
+
+  padding: 0;
+
+  overflow: hidden;
+
+  border: 0;
+
+  background: #eeeeee;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.review-image-thumb:hover {
+  transform: translateY(-2px);
+
+  opacity: 0.9;
+}
+
+.review-image-thumb img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: transform 0.3s ease;
+}
+
+.review-image-thumb:hover img {
+  transform: scale(1.05);
+}
+
+
+/* =========================================================
+   FULLSCREEN REVIEW IMAGE VIEWER
+========================================================= */
+
+.review-image-viewer {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 99999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  box-sizing: border-box;
+
+  background: rgba(0, 0, 0, 0.90);
+
+  cursor: zoom-out;
+}
+
+.review-image-viewer img {
+  display: block;
+
+  width: auto;
+  height: auto;
+
+  max-width: min(900px, 92vw);
+  max-height: 88vh;
+
+  object-fit: contain;
+
+  cursor: default;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================================================
+   VIEWER CLOSE BUTTON
+========================================================= */
+
+.review-image-viewer-close {
+  position: absolute;
+
+  top: 20px;
+  right: 20px;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  z-index: 2;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.review-image-viewer-close:hover {
+  background: rgba(255, 255, 255, 0.22);
+
+  transform: rotate(90deg);
+}
+
+.review-image-viewer-close svg {
+  width: 22px;
+  height: 22px;
+}
+
+
+/* =========================================================
+   UPLOAD / SUBMIT SPINNER
+========================================================= */
+
+.review-spinner {
+  animation: reviewPhotoSpin 0.8s linear infinite;
+}
+
+@keyframes reviewPhotoSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   DISABLED SUBMIT BUTTON
+   Works with your existing form button
+========================================================= */
+
+.review-form > button[type="submit"]:disabled {
+  opacity: 0.65;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .review-photo-upload {
+    margin-top: 15px;
+  }
+
+  .review-photo-upload-heading {
+    gap: 10px;
+
+    margin-bottom: 9px;
+  }
+
+  .review-photo-upload-heading strong {
+    font-size: 11px;
+  }
+
+  .review-photo-upload-heading span {
+    font-size: 9px;
+  }
+
+  .review-photo-grid {
+    gap: 8px;
+  }
+
+  .review-photo-preview,
+  .review-photo-add {
+    width: 72px;
+    height: 72px;
+
+    flex-basis: 72px;
+  }
+
+  .review-photo-preview button {
+    top: 4px;
+    right: 4px;
+
+    width: 22px;
+    height: 22px;
+  }
+
+  .review-photo-preview button svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .review-photo-add svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .review-photo-add span {
+    font-size: 8px;
+  }
+
+  .review-photo-help {
+    font-size: 8px;
+  }
+
+  .review-images {
+    gap: 7px;
+
+    margin-top: 12px;
+  }
+
+  .review-image-thumb {
+    width: 62px;
+    height: 62px;
+
+    flex-basis: 62px;
+  }
+
+  .review-image-viewer {
+    padding: 20px;
+  }
+
+  .review-image-viewer img {
+    max-width: 94vw;
+    max-height: 82vh;
+  }
+
+  .review-image-viewer-close {
+    top: 15px;
+    right: 15px;
+
+    width: 38px;
+    height: 38px;
+  }
+
+  .review-image-viewer-close svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+
+  .review-photo-grid {
+    gap: 7px;
+  }
+
+  .review-photo-preview,
+  .review-photo-add {
+    width: 66px;
+    height: 66px;
+
+    flex-basis: 66px;
+  }
+
+  .review-photo-upload-heading {
+    align-items: center;
+  }
+
+  .review-photo-upload-heading strong {
+    font-size: 10px;
+  }
+
+  .review-photo-upload-heading > div > span {
+    font-size: 8px;
+  }
+
+  .review-photo-help {
+    font-size: 7.5px;
+  }
+}
