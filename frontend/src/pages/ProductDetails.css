@@ -1324,7 +1324,7 @@
 }
 
 .overall-rating > strong {
-  color: #171410;
+  color: #c07e27;
 
   font-family: "Cormorant Garamond", serif;
 
@@ -1664,17 +1664,16 @@
 .reviews-list {
   margin-top: 65px;
 }
-
 .review-card {
-  padding: 32px 0;
-
+  padding: 8px 0;
   border-bottom: 1px solid rgba(23, 20, 16, 0.13);
-   width: min(500px, 100%);
-   height: 50px;
-   box-sizing: border-box;
-   overflow: hidden;
-  
-   
+  width: min(600px, 100%);
+  box-sizing: border-box;
+  overflow: hidden;
+  margin-bottom: 0;
+  min-height: 0;
+  height: auto;
+  box-shadow: 0px 0px 1px 0px rgb(38, 36, 36);
 }
 
 .review-card:first-child {
@@ -1785,7 +1784,7 @@
 }
 
 .review-stars svg {
-  color: #b08d57;
+  color: #f7a01e;
 }
 
 /* =========================================================
@@ -1847,7 +1846,7 @@
 
   padding: 8px 12px;
 
-  color: #68635b;
+  color: #807664;
 
   background: transparent;
 
@@ -1860,6 +1859,7 @@
   cursor: pointer;
 
   transition: all 0.2s ease;
+  margin-bottom: 0%;
 }
 
 .review-card-bottom button:hover {
@@ -2906,4 +2906,50 @@
   .review-photo-help {
     font-size: 7.5px;
   }
+}
+/* =========================================================
+   REVIEW CARD — FORCE COMPACT HEIGHT
+   ========================================================= */
+
+.reviews-list {
+  display: block !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 1rem;
+}
+
+.review-card {
+  display: block !important;
+  width: min(600px, 100%) !important;
+
+  height: fit-content !important;
+  min-height: fit-content !important;
+
+  padding: 18px 20px !important;
+  margin: 1rem !important;
+
+  box-sizing: border-box !important;
+  align-self: flex-start !important;
+  padding: 1rem;
+}
+
+.review-card-top {
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.review-title {
+  margin: 18px 0 8px !important;
+}
+
+.review-comment {
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+}
+
+.review-card-bottom {
+  height: auto !important;
+  min-height: 0 !important;
+  margin-top: 20px !important;
 }

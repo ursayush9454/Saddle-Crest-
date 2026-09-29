@@ -16,13 +16,17 @@ const schema = new mongoose.Schema(
           ref: "Product",
           required: true,
         },
+
         name: String,
+
         image: String,
+
         quantity: {
           type: Number,
           min: 1,
           required: true,
         },
+
         price: {
           type: Number,
           min: 0,
@@ -81,7 +85,12 @@ const schema = new mongoose.Schema(
 
     paymentStatus: {
       type: String,
-      enum: ["Pending", "Paid", "Failed", "Refunded"],
+      enum: [
+        "Pending",
+        "Paid",
+        "Failed",
+        "Refunded",
+      ],
       default: "Pending",
     },
 
@@ -126,4 +135,7 @@ const schema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Order", schema);
+module.exports = mongoose.model(
+  "Order",
+  schema
+);

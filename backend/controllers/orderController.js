@@ -59,7 +59,9 @@ const calculateCouponDiscount = async ({
     coupon.usageLimit > 0 &&
     coupon.usedCount >= coupon.usageLimit
   ) {
-    throw new Error("This coupon usage limit has been reached");
+    throw new Error(
+      "This coupon usage limit has been reached"
+    );
   }
 
   // =========================
@@ -195,13 +197,6 @@ exports.place = async (req, res) => {
     const availableProducts = [];
 
     for (const i of cart.items) {
-      // ==========================================
-      // IMPORTANT:
-      // Product reference can be null if product
-      // was deleted/archived after being added
-      // to the cart.
-      // ==========================================
-
       if (!i.product) {
         return res.status(400).json({
           message:
@@ -567,6 +562,132 @@ exports.cancel = async (req, res) => {
     return res.status(500).json({
       message:
         "Unable to cancel order.",
+    });
+  }
+};
+
+// =========================================================
+// ADMIN: HIGHLY ORDERED PRODUCTS
+// =========================================================
+
+exports.highlyOrdered = async (req, res) => {
+  try {
+    const products = await Order.aggregate([
+      // Cancelled orders should not count
+      {
+        $match: {
+          status: {
+            $ne: "Cancelled",
+          },
+        },
+      },
+
+      // Split order items
+      {
+        $unwind: "$items",
+      },
+
+      // Group by product
+      {
+        $group: {
+          _id: "$items.product",
+
+          productName: {
+            $first: "$items.name",
+          },
+
+          image: {
+            $first: "$items.image",
+          },
+
+          totalQuantitySold: {
+            $sum: "$items.quantity",
+          },
+
+          totalOrders: {
+            $sum: 1,
+          },
+
+          totalRevenue: {
+            $sum: {
+              $multiply: [
+                "$items.price",
+                "$items.quantity",
+              ],
+            },
+          },
+
+          lastOrdered: {
+            $max: "$createdAt",
+          },
+        },
+      },
+
+      // Most ordered first
+      {
+        $sort: {
+          totalQuantitySold: -1,
+          totalOrders: -1,
+        },
+      },
+
+      // Return top 20
+      {
+        $limit: 20,
+      },
+
+      // Get current product details
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$product",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      // Final response
+      {
+        $project: {
+          _id: 1,
+
+          productName: 1,
+          image: 1,
+
+          totalQuantitySold: 1,
+          totalOrders: 1,
+          totalRevenue: 1,
+          lastOrdered: 1,
+
+          sku: "$product.sku",
+          category: "$product.category",
+          stock: "$product.stock",
+          price: "$product.price",
+          salePrice: "$product.salePrice",
+          isActive: "$product.isActive",
+        },
+      },
+    ]);
+
+    return res.json({
+      products,
+    });
+  } catch (error) {
+    console.error(
+      "Highly ordered products error:",
+      error
+    );
+
+    return res.status(500).json({
+      message:
+        "Unable to fetch highly ordered products.",
     });
   }
 };

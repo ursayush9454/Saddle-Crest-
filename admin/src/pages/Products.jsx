@@ -1,4 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import {
   RefreshCw,
   Trash2,
@@ -7,55 +12,152 @@ import {
   Search,
   X,
   SlidersHorizontal,
+  Flame,
 } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 
 import { apiRequest } from "../services/api";
+
 import "./Products.css";
+
 
 const Products = () => {
   const navigate = useNavigate();
 
-  const [products, setProducts] = useState([]);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  // =========================================================
+  // PRODUCTS
+  // =========================================================
 
-  // Delete loading
-  const [deletingId, setDeletingId] = useState(null);
+  const [products, setProducts] =
+    useState([]);
 
-  // Filters
-  const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [stockFilter, setStockFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
 
-  /* =========================================================
-     LOAD PRODUCTS
-  ========================================================= */
+  const [loading, setLoading] =
+    useState(true);
+
+
+  const [error, setError] =
+    useState("");
+
+
+  // =========================================================
+  // DELETE LOADING
+  // =========================================================
+
+  const [deletingId, setDeletingId] =
+    useState(null);
+
+
+  // =========================================================
+  // FILTERS
+  // =========================================================
+
+  const [search, setSearch] =
+    useState("");
+
+  const [categoryFilter, setCategoryFilter] =
+    useState("all");
+
+  const [stockFilter, setStockFilter] =
+    useState("all");
+
+  const [typeFilter, setTypeFilter] =
+    useState("all");
+
+
+  // =========================================================
+  // HIGHLY ORDERED
+  // =========================================================
+
+  const [highlyOrdered, setHighlyOrdered] =
+    useState([]);
+
+  const [
+    highlyOrderedLoading,
+    setHighlyOrderedLoading,
+  ] = useState(false);
+
+  const [
+    showHighlyOrdered,
+    setShowHighlyOrdered,
+  ] = useState(false);
+
+
+  // =========================================================
+  // LOAD PRODUCTS
+  // =========================================================
 
   const loadProducts = async () => {
     try {
       setError("");
       setLoading(true);
 
-      const result = await apiRequest("/admin/products");
+      const result =
+        await apiRequest(
+          "/admin/products"
+        );
 
-      setProducts(result?.products || []);
+      setProducts(
+        result?.products || []
+      );
     } catch (err) {
-      console.error("Load products error:", err);
+      console.error(
+        "Load products error:",
+        err
+      );
 
       setError(
-        err.message || "Failed to load products."
+        err.message ||
+          "Failed to load products."
       );
     } finally {
       setLoading(false);
     }
   };
 
-  /* =========================================================
-     INITIAL LOAD
-  ========================================================= */
+
+  // =========================================================
+  // LOAD HIGHLY ORDERED
+  // =========================================================
+
+  const loadHighlyOrdered =
+    async () => {
+      try {
+        setHighlyOrderedLoading(
+          true
+        );
+
+        const result =
+          await apiRequest(
+            "/admin/products/highly-ordered"
+          );
+
+        setHighlyOrdered(
+          result?.products || []
+        );
+      } catch (err) {
+        console.error(
+          "Load highly ordered products error:",
+          err
+        );
+
+        setError(
+          err.message ||
+            "Failed to load highly ordered products."
+        );
+      } finally {
+        setHighlyOrderedLoading(
+          false
+        );
+      }
+    };
+
+
+  // =========================================================
+  // INITIAL LOAD
+  // =========================================================
 
   useEffect(() => {
     let mounted = true;
@@ -64,18 +166,28 @@ const Products = () => {
       try {
         setError("");
 
-        const result = await apiRequest("/admin/products");
+        const result =
+          await apiRequest(
+            "/admin/products"
+          );
 
         if (mounted) {
-          setProducts(result?.products || []);
+          setProducts(
+            result?.products || []
+          );
+
           setLoading(false);
         }
       } catch (err) {
-        console.error("Initial products load error:", err);
+        console.error(
+          "Initial products load error:",
+          err
+        );
 
         if (mounted) {
           setError(
-            err.message || "Failed to load products."
+            err.message ||
+              "Failed to load products."
           );
 
           setLoading(false);
@@ -90,138 +202,204 @@ const Products = () => {
     };
   }, []);
 
-  /* =========================================================
-     UNIQUE CATEGORIES
-  ========================================================= */
+
+  // =========================================================
+  // UNIQUE CATEGORIES
+  // =========================================================
 
   const categories = useMemo(() => {
-    const categorySet = new Set();
+    const categorySet =
+      new Set();
 
-    products.forEach((product) => {
-      const category = product.category?.trim();
+    products.forEach(
+      (product) => {
+        const category =
+          product.category?.trim();
 
-      if (category) {
-        categorySet.add(category);
+        if (category) {
+          categorySet.add(
+            category
+          );
+        }
       }
-    });
+    );
 
-    return Array.from(categorySet).sort((a, b) =>
+    return Array.from(
+      categorySet
+    ).sort((a, b) =>
       a.localeCompare(b)
     );
   }, [products]);
 
-  /* =========================================================
-     FILTER PRODUCTS
-  ========================================================= */
 
-  const filteredProducts = useMemo(() => {
-    const searchValue = search.trim().toLowerCase();
+  // =========================================================
+  // FILTER PRODUCTS
+  // =========================================================
 
-    return products.filter((product) => {
-      /* Search */
+  const filteredProducts =
+    useMemo(() => {
+      const searchValue =
+        search
+          .trim()
+          .toLowerCase();
 
-      const matchesSearch =
-        !searchValue ||
-        product.name
-          ?.toLowerCase()
-          .includes(searchValue) ||
-        product.category
-          ?.toLowerCase()
-          .includes(searchValue) ||
-        product.sku
-          ?.toLowerCase()
-          .includes(searchValue);
+      return products.filter(
+        (product) => {
 
-      /* Category */
+          // SEARCH
 
-      const productCategory =
-        product.category?.trim() ||
-        "Uncategorized";
+          const matchesSearch =
+            !searchValue ||
+            product.name
+              ?.toLowerCase()
+              .includes(searchValue) ||
+            product.category
+              ?.toLowerCase()
+              .includes(searchValue) ||
+            product.sku
+              ?.toLowerCase()
+              .includes(searchValue);
 
-      const matchesCategory =
-        categoryFilter === "all" ||
-        productCategory === categoryFilter;
 
-      /* Stock */
+          // CATEGORY
 
-      const stock = Number(product.stock ?? 0);
+          const productCategory =
+            product.category?.trim() ||
+            "Uncategorized";
 
-      const threshold = Number(
-        product.lowStockThreshold || 5
-      );
+          const matchesCategory =
+            categoryFilter ===
+              "all" ||
+            productCategory ===
+              categoryFilter;
 
-      let matchesStock = true;
 
-      if (stockFilter === "in-stock") {
-        matchesStock = stock > threshold;
-      }
+          // STOCK
 
-      if (stockFilter === "low-stock") {
-        matchesStock =
-          stock > 0 && stock <= threshold;
-      }
+          const stock =
+            Number(
+              product.stock ?? 0
+            );
 
-      if (stockFilter === "out-of-stock") {
-        matchesStock = stock <= 0;
-      }
+          const threshold =
+            Number(
+              product.lowStockThreshold ||
+                5
+            );
 
-      /* Type */
+          let matchesStock =
+            true;
 
-      let matchesType = true;
+          if (
+            stockFilter ===
+            "in-stock"
+          ) {
+            matchesStock =
+              stock > threshold;
+          }
 
-      if (typeFilter === "featured") {
-        matchesType = product.featured === true;
-      }
+          if (
+            stockFilter ===
+            "low-stock"
+          ) {
+            matchesStock =
+              stock > 0 &&
+              stock <= threshold;
+          }
 
-      if (typeFilter === "bestseller") {
-        matchesType = product.bestSeller === true;
-      }
+          if (
+            stockFilter ===
+            "out-of-stock"
+          ) {
+            matchesStock =
+              stock <= 0;
+          }
 
-      if (typeFilter === "new") {
-        matchesType = product.newArrival === true;
-      }
 
-      return (
-        matchesSearch &&
-        matchesCategory &&
-        matchesStock &&
-        matchesType
-      );
-    });
-  }, [
-    products,
-    search,
-    categoryFilter,
-    stockFilter,
-    typeFilter,
-  ]);
+          // TYPE
 
-  /* =========================================================
-     GROUP PRODUCTS BY CATEGORY
-  ========================================================= */
+          let matchesType =
+            true;
 
-  const groupedProducts = useMemo(() => {
-    return filteredProducts.reduce(
-      (groups, product) => {
-        const category =
-          product.category?.trim() ||
-          "Uncategorized";
+          if (
+            typeFilter ===
+            "featured"
+          ) {
+            matchesType =
+              product.featured ===
+              true;
+          }
 
-        if (!groups[category]) {
-          groups[category] = [];
+          if (
+            typeFilter ===
+            "bestseller"
+          ) {
+            matchesType =
+              product.bestSeller ===
+              true;
+          }
+
+          if (
+            typeFilter ===
+            "new"
+          ) {
+            matchesType =
+              product.newArrival ===
+              true;
+          }
+
+
+          return (
+            matchesSearch &&
+            matchesCategory &&
+            matchesStock &&
+            matchesType
+          );
         }
+      );
+    }, [
+      products,
+      search,
+      categoryFilter,
+      stockFilter,
+      typeFilter,
+    ]);
 
-        groups[category].push(product);
 
-        return groups;
-      },
-      {}
-    );
-  }, [filteredProducts]);
+  // =========================================================
+  // GROUP PRODUCTS BY CATEGORY
+  // =========================================================
 
-  /* =========================================================
-     CLEAR FILTERS
-  ========================================================= */
+  const groupedProducts =
+    useMemo(() => {
+      return filteredProducts.reduce(
+        (
+          groups,
+          product
+        ) => {
+          const category =
+            product.category?.trim() ||
+            "Uncategorized";
+
+          if (!groups[category]) {
+            groups[category] =
+              [];
+          }
+
+          groups[category].push(
+            product
+          );
+
+          return groups;
+        },
+        {}
+      );
+    }, [filteredProducts]);
+
+
+  // =========================================================
+  // CLEAR FILTERS
+  // =========================================================
 
   const clearFilters = () => {
     setSearch("");
@@ -230,101 +408,130 @@ const Products = () => {
     setTypeFilter("all");
   };
 
+
   const hasActiveFilters =
     search ||
-    categoryFilter !== "all" ||
-    stockFilter !== "all" ||
-    typeFilter !== "all";
+    categoryFilter !==
+      "all" ||
+    stockFilter !==
+      "all" ||
+    typeFilter !==
+      "all";
 
-  /* =========================================================
-     EDIT PRODUCT
-  ========================================================= */
 
-  const editProduct = (product) => {
-    navigate("/add-product", {
-      state: {
-        product,
-      },
-    });
-  };
+  // =========================================================
+  // EDIT PRODUCT
+  // =========================================================
 
-  /* =========================================================
-     DELETE / ARCHIVE PRODUCT
-  ========================================================= */
-
-  const removeProduct = async (id) => {
-    if (!id) {
-      setError("Product ID is missing.");
-      return;
-    }
-
-    const confirmed = window.confirm(
-      "Are you sure you want to archive this product?"
+  const editProduct = (
+    product
+  ) => {
+    navigate(
+      "/add-product",
+      {
+        state: {
+          product,
+        },
+      }
     );
-
-    if (!confirmed) return;
-
-    try {
-      setError("");
-      setDeletingId(id);
-
-      /*
-       IMPORTANT:
-
-       Backend route is mounted as:
-
-       /api/products/:id
-
-       apiRequest already contains:
-
-       http://localhost:5000/api
-
-       Therefore endpoint must be:
-
-       /products/:id
-
-       NOT:
-
-       /admin/products/:id
-      */
-
-      await apiRequest(`/products/${id}`, {
-        method: "DELETE",
-      });
-
-      /*
-       Remove immediately from UI
-      */
-
-      setProducts((currentProducts) =>
-        currentProducts.filter(
-          (product) => product._id !== id
-        )
-      );
-
-      /*
-       Sync with backend
-      */
-
-      await loadProducts();
-    } catch (err) {
-      console.error(
-        "Delete product error:",
-        err
-      );
-
-      setError(
-        err.message ||
-          "Failed to archive product."
-      );
-    } finally {
-      setDeletingId(null);
-    }
   };
 
-  /* =========================================================
-     LOADING
-  ========================================================= */
+
+  // =========================================================
+  // DELETE / ARCHIVE PRODUCT
+  // =========================================================
+
+  const removeProduct =
+    async (id) => {
+      if (!id) {
+        setError(
+          "Product ID is missing."
+        );
+
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          "Are you sure you want to archive this product?"
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        setError("");
+
+        setDeletingId(id);
+
+
+        await apiRequest(
+          `/products/${id}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+
+        // Remove immediately
+
+        setProducts(
+          (currentProducts) =>
+            currentProducts.filter(
+              (product) =>
+                product._id !== id
+            )
+        );
+
+
+        // Sync backend
+
+        await loadProducts();
+
+      } catch (err) {
+        console.error(
+          "Delete product error:",
+          err
+        );
+
+        setError(
+          err.message ||
+            "Failed to archive product."
+        );
+      } finally {
+        setDeletingId(
+          null
+        );
+      }
+    };
+
+
+  // =========================================================
+  // HIGHLY ORDERED TOGGLE
+  // =========================================================
+
+  const toggleHighlyOrdered =
+    () => {
+      const nextState =
+        !showHighlyOrdered;
+
+      setShowHighlyOrdered(
+        nextState
+      );
+
+      if (
+        nextState &&
+        !highlyOrdered.length
+      ) {
+        loadHighlyOrdered();
+      }
+    };
+
+
+  // =========================================================
+  // LOADING
+  // =========================================================
 
   if (loading) {
     return (
@@ -334,13 +541,17 @@ const Products = () => {
     );
   }
 
-  /* =========================================================
-     UI
-  ========================================================= */
+
+  // =========================================================
+  // UI
+  // =========================================================
 
   return (
     <div className="products-page">
-      {/* ERROR */}
+
+      {/* =====================================================
+          ERROR
+      ===================================================== */}
 
       {error && (
         <div className="products-error">
@@ -348,86 +559,463 @@ const Products = () => {
         </div>
       )}
 
+
       {/* =====================================================
           HEADER
       ===================================================== */}
 
       <section className="products-header">
+
         <div>
+
           <span className="products-eyebrow">
             CATALOGUE
           </span>
 
-          <h1>Products</h1>
+          <h1>
+            Products
+          </h1>
 
           <p>
-            Manage your complete product catalogue.
+            Manage your complete
+            product catalogue.
           </p>
+
         </div>
 
+
         <div className="products-header-actions">
+
+          {/* HIGHLY ORDERED */}
+
+          <button
+            type="button"
+            className="products-highly-btn"
+            onClick={
+              toggleHighlyOrdered
+            }
+          >
+            <Flame
+              size={15}
+            />
+
+            Highly Ordered
+          </button>
+
+
+          {/* REFRESH */}
+
           <button
             className="products-refresh-btn"
-            onClick={loadProducts}
-            disabled={deletingId !== null}
+            onClick={
+              loadProducts
+            }
+            disabled={
+              deletingId !==
+              null
+            }
           >
-            <RefreshCw size={15} />
+            <RefreshCw
+              size={15}
+            />
 
             Refresh
           </button>
 
+
+          {/* ADD */}
+
           <button
             className="products-add-btn"
             onClick={() =>
-              navigate("/add-product")
+              navigate(
+                "/add-product"
+              )
             }
           >
             + Add Product
           </button>
+
         </div>
+
       </section>
+
+
+      {/* =====================================================
+          HIGHLY ORDERED PANEL
+      ===================================================== */}
+
+      {showHighlyOrdered && (
+        <section className="highly-ordered-panel">
+
+          <div className="highly-ordered-heading">
+
+            <div>
+
+              <span>
+                SALES INSIGHTS
+              </span>
+
+              <h2>
+                Highly Ordered Products
+              </h2>
+
+              <p>
+                Products ranked by
+                total quantity sold.
+              </p>
+
+            </div>
+
+
+            <button
+              type="button"
+              onClick={
+                loadHighlyOrdered
+              }
+              disabled={
+                highlyOrderedLoading
+              }
+            >
+
+              <RefreshCw
+                size={14}
+                className={
+                  highlyOrderedLoading
+                    ? "spin"
+                    : ""
+                }
+              />
+
+              Refresh
+
+            </button>
+
+          </div>
+
+
+          {/* LOADING */}
+
+          {highlyOrderedLoading ? (
+            <div className="highly-ordered-loading">
+              Loading sales data...
+            </div>
+
+          ) : !highlyOrdered.length ? (
+
+            /* EMPTY */
+
+            <div className="highly-ordered-empty">
+
+              <Flame
+                size={30}
+              />
+
+              <h3>
+                No order data yet
+              </h3>
+
+              <p>
+                Highly ordered products
+                will appear here once
+                customers start placing
+                orders.
+              </p>
+
+            </div>
+
+          ) : (
+
+            /* TABLE */
+
+            <div className="highly-ordered-table-wrapper">
+
+              <table className="highly-ordered-table">
+
+                <thead>
+
+                  <tr>
+
+                    <th>
+                      Product
+                    </th>
+
+                    <th>
+                      Category
+                    </th>
+
+                    <th>
+                      Orders
+                    </th>
+
+                    <th>
+                      Units Sold
+                    </th>
+
+                    <th>
+                      Revenue
+                    </th>
+
+                    <th>
+                      Stock
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                  {highlyOrdered.map(
+                    (
+                      product,
+                      index
+                    ) => {
+
+                      const stock =
+                        Number(
+                          product.stock ??
+                            0
+                        );
+
+
+                      const threshold =
+                        5;
+
+
+                      const stockClass =
+                        stock <=
+                        threshold
+                          ? "product-stock-low"
+                          : "product-stock-ok";
+
+
+                      return (
+
+                        <tr
+                          key={
+                            product._id ||
+                            index
+                          }
+                        >
+
+                          {/* PRODUCT */}
+
+                          <td>
+
+                            <div className="highly-product-info">
+
+                              {product.image ? (
+
+                                <img
+                                  src={
+                                    product.image
+                                  }
+                                  alt={
+                                    product.productName
+                                  }
+                                />
+
+                              ) : (
+
+                                <div className="highly-product-placeholder">
+
+                                  <Package
+                                    size={
+                                      17
+                                    }
+                                  />
+
+                                </div>
+
+                              )}
+
+
+                              <div>
+
+                                <strong>
+                                  {
+                                    product.productName
+                                  }
+                                </strong>
+
+
+                                {product.sku && (
+                                  <small>
+                                    SKU:{" "}
+                                    {
+                                      product.sku
+                                    }
+                                  </small>
+                                )}
+
+                              </div>
+
+                            </div>
+
+                          </td>
+
+
+                          {/* CATEGORY */}
+
+                          <td>
+
+                            <span className="product-category-badge">
+
+                              {product.category ||
+                                "Uncategorized"}
+
+                            </span>
+
+                          </td>
+
+
+                          {/* ORDERS */}
+
+                          <td>
+
+                            <strong>
+                              {
+                                product.totalOrders
+                              }
+                            </strong>
+
+                          </td>
+
+
+                          {/* QUANTITY */}
+
+                          <td>
+
+                            <strong>
+                              {
+                                product.totalQuantitySold
+                              }
+                            </strong>
+
+                          </td>
+
+
+                          {/* REVENUE */}
+
+                          <td>
+
+                            <strong>
+                              ₹
+                              {Number(
+                                product.totalRevenue ||
+                                  0
+                              ).toLocaleString(
+                                "en-IN"
+                              )}
+                            </strong>
+
+                          </td>
+
+
+                          {/* STOCK */}
+
+                          <td>
+
+                            <span
+                              className={
+                                stockClass
+                              }
+                            >
+                              {
+                                stock
+                              }
+                            </span>
+
+                          </td>
+
+                        </tr>
+
+                      );
+
+                    }
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          )}
+
+        </section>
+      )}
+
 
       {/* =====================================================
           FILTERS
       ===================================================== */}
 
       {products.length > 0 && (
+
         <section className="products-filter-panel">
+
           <div className="products-filter-top">
+
             <div className="products-filter-title">
-              <SlidersHorizontal size={15} />
+
+              <SlidersHorizontal
+                size={15}
+              />
 
               <span>
                 FILTER PRODUCTS
               </span>
+
             </div>
+
 
             <div className="products-result-count">
+
               Showing{" "}
+
               <strong>
-                {filteredProducts.length}
+                {
+                  filteredProducts.length
+                }
               </strong>{" "}
+
               of{" "}
+
               <strong>
-                {products.length}
+                {
+                  products.length
+                }
               </strong>
+
             </div>
+
           </div>
 
+
           <div className="products-filters">
+
             {/* SEARCH */}
 
             <div className="product-search-box">
-              <Search size={15} />
+
+              <Search
+                size={15}
+              />
 
               <input
                 type="text"
                 placeholder="Search product, SKU or category..."
                 value={search}
                 onChange={(e) =>
-                  setSearch(e.target.value)
+                  setSearch(
+                    e.target.value
+                  )
                 }
               />
+
 
               {search && (
                 <button
@@ -437,63 +1025,96 @@ const Products = () => {
                   }
                   className="product-search-clear"
                 >
-                  <X size={14} />
+                  <X
+                    size={14}
+                  />
                 </button>
               )}
+
             </div>
+
 
             {/* CATEGORY */}
 
             <div className="product-filter-control">
-              <label>Category</label>
+
+              <label>
+                Category
+              </label>
+
 
               <select
-                value={categoryFilter}
+                value={
+                  categoryFilter
+                }
                 onChange={(e) =>
                   setCategoryFilter(
                     e.target.value
                   )
                 }
               >
+
                 <option value="all">
                   All Categories
                 </option>
 
+
                 {categories.map(
                   (category) => (
+
                     <option
-                      value={category}
-                      key={category}
+                      value={
+                        category
+                      }
+                      key={
+                        category
+                      }
                     >
-                      {category}
+                      {
+                        category
+                      }
                     </option>
+
                   )
                 )}
+
 
                 {products.some(
                   (product) =>
                     !product.category?.trim()
                 ) && (
+
                   <option value="Uncategorized">
                     Uncategorized
                   </option>
+
                 )}
+
               </select>
+
             </div>
+
 
             {/* STOCK */}
 
             <div className="product-filter-control">
-              <label>Stock</label>
+
+              <label>
+                Stock
+              </label>
+
 
               <select
-                value={stockFilter}
+                value={
+                  stockFilter
+                }
                 onChange={(e) =>
                   setStockFilter(
                     e.target.value
                   )
                 }
               >
+
                 <option value="all">
                   All Stock
                 </option>
@@ -509,24 +1130,32 @@ const Products = () => {
                 <option value="out-of-stock">
                   Out of Stock
                 </option>
+
               </select>
+
             </div>
+
 
             {/* TYPE */}
 
             <div className="product-filter-control">
+
               <label>
                 Product Type
               </label>
 
+
               <select
-                value={typeFilter}
+                value={
+                  typeFilter
+                }
                 onChange={(e) =>
                   setTypeFilter(
                     e.target.value
                   )
                 }
               >
+
                 <option value="all">
                   All Products
                 </option>
@@ -542,77 +1171,110 @@ const Products = () => {
                 <option value="new">
                   New Arrival
                 </option>
+
               </select>
+
             </div>
+
 
             {/* CLEAR */}
 
             {hasActiveFilters && (
+
               <button
                 className="products-clear-btn"
-                onClick={clearFilters}
+                onClick={
+                  clearFilters
+                }
               >
-                <X size={14} />
+
+                <X
+                  size={14}
+                />
 
                 Clear
+
               </button>
+
             )}
+
           </div>
+
         </section>
+
       )}
+
 
       {/* =====================================================
           EMPTY
       ===================================================== */}
 
       {!products.length ? (
+
         <section className="products-empty">
-          <Package size={35} />
+
+          <Package
+            size={35}
+          />
 
           <h3>
             No products found
           </h3>
 
           <p>
-            Start adding products to
-            your catalogue.
+            Start adding products
+            to your catalogue.
           </p>
 
           <button
             onClick={() =>
-              navigate("/add-product")
+              navigate(
+                "/add-product"
+              )
             }
             className="products-add-btn"
           >
             + Add Product
           </button>
+
         </section>
+
       ) : !filteredProducts.length ? (
+
         <section className="products-empty products-no-results">
-          <Search size={35} />
+
+          <Search
+            size={35}
+          />
 
           <h3>
             No matching products
           </h3>
 
           <p>
-            Try changing your search
-            or filters.
+            Try changing your
+            search or filters.
           </p>
 
           <button
-            onClick={clearFilters}
+            onClick={
+              clearFilters
+            }
             className="products-clear-empty-btn"
           >
             Clear Filters
           </button>
+
         </section>
+
       ) : (
+
         /* ===================================================
            CATEGORY LIST
         =================================================== */
 
         <div className="products-category-list">
+
           {Object.entries(
             groupedProducts
           ).map(
@@ -620,40 +1282,61 @@ const Products = () => {
               category,
               categoryProducts,
             ]) => (
+
               <section
                 className="product-category-section"
-                key={category}
+                key={
+                  category
+                }
               >
+
                 {/* CATEGORY HEADER */}
 
                 <div className="product-category-heading">
+
                   <div>
+
                     <span>
                       CATEGORY
                     </span>
 
                     <h2>
-                      {category}
+                      {
+                        category
+                      }
                     </h2>
+
                   </div>
 
+
                   <strong>
+
                     {
                       categoryProducts.length
                     }{" "}
-                    {categoryProducts.length ===
-                    1
-                      ? "Product"
-                      : "Products"}
+
+                    {
+                      categoryProducts.length ===
+                      1
+                        ? "Product"
+                        : "Products"
+                    }
+
                   </strong>
+
                 </div>
+
 
                 {/* TABLE */}
 
                 <div className="products-table-wrapper">
+
                   <table className="products-table">
+
                     <thead>
+
                       <tr>
+
                         <th>
                           Product
                         </th>
@@ -677,17 +1360,25 @@ const Products = () => {
                         <th>
                           Actions
                         </th>
+
                       </tr>
+
                     </thead>
 
+
                     <tbody>
+
                       {categoryProducts.map(
-                        (product) => {
+                        (
+                          product
+                        ) => {
+
                           const stock =
                             Number(
                               product.stock ??
                                 0
                             );
+
 
                           const threshold =
                             Number(
@@ -695,27 +1386,35 @@ const Products = () => {
                                 5
                             );
 
+
                           const stockClass =
                             stock <=
                             threshold
                               ? "product-stock-low"
                               : "product-stock-ok";
 
+
                           const isDeleting =
                             deletingId ===
                             product._id;
 
+
                           return (
+
                             <tr
                               key={
                                 product._id
                               }
                             >
+
                               {/* PRODUCT */}
 
                               <td>
+
                                 <div className="product-info">
+
                                   {product.image ? (
+
                                     <img
                                       src={
                                         product.image
@@ -724,48 +1423,69 @@ const Products = () => {
                                         product.name
                                       }
                                     />
+
                                   ) : (
+
                                     <div className="product-placeholder">
+
                                       <Package
                                         size={
                                           18
                                         }
                                       />
+
                                     </div>
+
                                   )}
 
+
                                   <div>
+
                                     <strong>
                                       {
                                         product.name
                                       }
                                     </strong>
 
+
                                     {product.sku && (
+
                                       <small>
                                         SKU:{" "}
                                         {
                                           product.sku
                                         }
                                       </small>
+
                                     )}
+
                                   </div>
+
                                 </div>
+
                               </td>
+
 
                               {/* CATEGORY */}
 
                               <td>
+
                                 <span className="product-category-badge">
+
                                   {product.category?.trim() ||
                                     "Uncategorized"}
+
                                 </span>
+
                               </td>
+
 
                               {/* PRICE */}
 
                               <td>
+
                                 <div className="product-price">
+
                                   <strong>
                                     ₹
                                     {Number(
@@ -777,6 +1497,7 @@ const Products = () => {
                                     )}
                                   </strong>
 
+
                                   {product.salePrice &&
                                     product.price &&
                                     Number(
@@ -785,6 +1506,7 @@ const Products = () => {
                                       Number(
                                         product.price
                                       ) && (
+
                                       <small>
                                         ₹
                                         {Number(
@@ -793,26 +1515,37 @@ const Products = () => {
                                           "en-IN"
                                         )}
                                       </small>
+
                                     )}
+
                                 </div>
+
                               </td>
+
 
                               {/* STOCK */}
 
                               <td>
+
                                 <span
                                   className={
                                     stockClass
                                   }
                                 >
-                                  {stock}
+                                  {
+                                    stock
+                                  }
                                 </span>
+
                               </td>
+
 
                               {/* FLAGS */}
 
                               <td>
+
                                 <div className="product-flags">
+
                                   {product.featured && (
                                     <span>
                                       Featured
@@ -834,17 +1567,24 @@ const Products = () => {
                                   {!product.featured &&
                                     !product.bestSeller &&
                                     !product.newArrival && (
-                                      <span className="no-flag">
-                                        —
-                                      </span>
-                                    )}
+
+                                    <span className="no-flag">
+                                      —
+                                    </span>
+
+                                  )}
+
                                 </div>
+
                               </td>
+
 
                               {/* ACTIONS */}
 
                               <td>
+
                                 <div className="product-actions">
+
                                   {/* EDIT */}
 
                                   <button
@@ -859,12 +1599,15 @@ const Products = () => {
                                       isDeleting
                                     }
                                   >
+
                                     <Edit3
                                       size={
                                         14
                                       }
                                     />
+
                                   </button>
+
 
                                   {/* DELETE */}
 
@@ -885,37 +1628,57 @@ const Products = () => {
                                       isDeleting
                                     }
                                   >
+
                                     {isDeleting ? (
+
                                       <RefreshCw
                                         size={
                                           14
                                         }
                                         className="spin"
                                       />
+
                                     ) : (
+
                                       <Trash2
                                         size={
                                           14
                                         }
                                       />
+
                                     )}
+
                                   </button>
+
                                 </div>
+
                               </td>
+
                             </tr>
+
                           );
+
                         }
                       )}
+
                     </tbody>
+
                   </table>
+
                 </div>
+
               </section>
+
             )
           )}
+
         </div>
+
       )}
+
     </div>
   );
 };
+
 
 export default Products;
