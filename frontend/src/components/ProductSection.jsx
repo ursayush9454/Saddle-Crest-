@@ -36,12 +36,27 @@ const ProductSection = () => {
     loadBestSellers();
   }, []);
 
-  const getPrice = (product) => {
-    return Number(product.salePrice || product.price || 0);
+  const getRegularPrice = (product) => {
+    return Number(product?.price ?? 0);
+  };
+
+  const getSalePrice = (product) => {
+    const regularPrice = getRegularPrice(product);
+    const salePrice = Number(product?.salePrice ?? 0);
+
+    if (
+      Number.isFinite(salePrice) &&
+      salePrice > 0 &&
+      salePrice < regularPrice
+    ) {
+      return salePrice;
+    }
+
+    return null;
   };
 
   const formatPrice = (price) => {
-    return `₹${Number(price).toLocaleString("en-IN")}`;
+    return `₹${Number(price || 0).toLocaleString("en-IN")}`;
   };
 
   const openProduct = (id) => {
@@ -69,23 +84,26 @@ const ProductSection = () => {
   };
 
   return (
-    <section className="products-section" id="best-sellers">
-      <div className="products-header">
-        <div>
-          <span>03 — CURATED ESSENTIALS</span>
+    <section className="bs-section" id="best-sellers">
+      {/* HEADER */}
+      <div className="bs-header">
+        <div className="bs-heading">
+          <span className="bs-eyebrow">
+            03 — CURATED ESSENTIALS
+          </span>
 
-          <h2>
-            Best
-            <em> Sellers</em>
+          <h2 className="bs-title">
+            Best <em>Sellers</em>
           </h2>
         </div>
 
         <button
           type="button"
-          className="products-view-all"
+          className="bs-view-all"
           onClick={() => navigate("/shop")}
         >
-          View All
+          <span>View All</span>
+
           <ArrowUpRight
             size={15}
             strokeWidth={1.5}
@@ -93,15 +111,17 @@ const ProductSection = () => {
         </button>
       </div>
 
-      {loading ? (
-        <div className="products-loading">
+      {/* LOADING */}
+      {loading && (
+        <div className="bs-loading">
           Loading best sellers...
         </div>
-      ) : products.length === 0 ? (
-        <div className="products-empty">
-          <p>
-            Our best sellers are being curated.
-          </p>
+      )}
+
+      {/* EMPTY */}
+      {!loading && products.length === 0 && (
+        <div className="bs-empty">
+          <p>Our best sellers are being curated.</p>
 
           <button
             type="button"
@@ -110,55 +130,72 @@ const ProductSection = () => {
             Explore Shop
           </button>
         </div>
-      ) : (
-        <div className="products-grid">
+      )}
+
+      {/* PRODUCTS */}
+      {!loading && products.length > 0 && (
+        <div className="bs-grid">
           {products.map((product, index) => {
             const productId = product._id || product.id;
 
             const image =
               product.images?.[0] ||
               product.image ||
-              "https://via.placeholder.com/600x700?text=Saddle+%26+Crest";
+              "https://via.placeholder.com/800x1000?text=Saddle+%26+Crest";
 
-            const price = getPrice(product);
+            const regularPrice = getRegularPrice(product);
+            const salePrice = getSalePrice(product);
+
+            const hasSale = salePrice !== null;
+
+            const currentPrice = hasSale
+              ? salePrice
+              : regularPrice;
+
+            const discountPercentage = hasSale
+              ? Math.round(
+                  ((regularPrice - salePrice) /
+                    regularPrice) *
+                    100
+                )
+              : 0;
 
             return (
               <article
-                className="product-card"
+                className="bs-card"
                 key={productId}
                 onClick={() => openProduct(productId)}
               >
-                <div className="product-image">
+                {/* IMAGE */}
+                <div className="bs-image-box">
                   <img
+                    className="bs-image"
                     src={image}
-                    alt={product.name}
-                    loading={
-                      index === 0 ? "eager" : "lazy"
-                    }
+                    alt={product.name || "Saddle & Crest product"}
+                    loading={index === 0 ? "eager" : "lazy"}
                   />
 
-                  <button
-                    className="product-arrow"
-                    type="button"
-                    aria-label={`View ${product.name}`}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      openProduct(productId);
-                    }}
-                  >
-                    <ArrowUpRight
-                      size={17}
-                      strokeWidth={1.5}
-                    />
-                  </button>
+                  {/* SALE */}
+                  {hasSale && (
+                    <span className="bs-sale-badge">
+                      {discountPercentage}% OFF
+                    </span>
+                  )}
 
+                  {/* NORMAL BADGE */}
+                  <span className="bs-product-badge">
+                    {product.badge || "BEST SELLER"}
+                  </span>
+
+                  {/* WISHLIST */}
                   <button
                     type="button"
-                    className={`product-wishlist ${
+                    className={`bs-wishlist ${
                       isInWishlist(productId)
-                        ? "active"
+                        ? "is-active"
                         : ""
                     }`}
+                    aria-label={`Wishlist ${product.name}`}
                     onClick={(event) =>
                       handleWishlist(event, product)
                     }
@@ -168,62 +205,79 @@ const ProductSection = () => {
                       : "♡"}
                   </button>
 
-                  <span className="product-tag">
-                    {product.badge || "BEST SELLER"}
-                  </span>
+                  {/* ARROW */}
+                  <button
+                    type="button"
+                    className="bs-arrow"
+                    aria-label={`View ${product.name}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openProduct(productId);
+                    }}
+                  >
+                    <ArrowUpRight
+                      size={18}
+                      strokeWidth={1.5}
+                    />
+                  </button>
                 </div>
 
-                <div className="product-info">
-                  <div>
-                    <span>
-                      {product.category ||
-                        "SADDLE & CREST"}
-                    </span>
+                {/* DETAILS */}
+                <div className="bs-details">
+                  <span className="bs-category">
+                    {product.category || "SADDLE & CREST"}
+                  </span>
 
-                    <h3>{product.name}</h3>
+                  <h3 className="bs-name">
+                    {product.name}
+                  </h3>
+
+                  {/* PRICE */}
+                  <div className="bs-price-row">
+                    <strong className="bs-current-price">
+                      {formatPrice(currentPrice)}
+                    </strong>
+
+                    {hasSale && (
+                      <>
+                        <span className="bs-old-price">
+                          {formatPrice(regularPrice)}
+                        </span>
+
+                        <span className="bs-discount">
+                          {discountPercentage}% OFF
+                        </span>
+                      </>
+                    )}
                   </div>
 
-                  <strong>
-                    {formatPrice(price)}
-                  </strong>
+                  {/* RATING */}
+                  <div className="bs-rating">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={12}
+                        fill="currentColor"
+                        strokeWidth={1.2}
+                      />
+                    ))}
+
+                    <span>
+                      {product.rating || "4.9"}
+                    </span>
+                  </div>
+
+                  {/* CART */}
+                  <button
+                    type="button"
+                    className="bs-cart"
+                    onClick={(event) =>
+                      handleAddToCart(event, product)
+                    }
+                  >
+                    Add to Cart
+                  </button>
                 </div>
-
-                <div className="product-rating">
-                  <Star
-                    size={11}
-                    fill="currentColor"
-                  />
-                  <Star
-                    size={11}
-                    fill="currentColor"
-                  />
-                  <Star
-                    size={11}
-                    fill="currentColor"
-                  />
-                  <Star
-                    size={11}
-                    fill="currentColor"
-                  />
-                  <Star
-                    size={11}
-                    fill="currentColor"
-                  />
-
-                  <span>
-                    {product.rating || "4.9"}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  className="home-add-cart"
-                  onClick={(event) =>
-                    handleAddToCart(event, product)
-                  }
-                >
-                  Add to Cart
-                </button>
               </article>
             );
           })}

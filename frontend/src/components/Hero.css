@@ -499,7 +499,10 @@
   background: #c5a46d;
 
   animation: progressBar 5s linear forwards;
+  animation-fill-mode: forwards;
+  will-change: width;
 }
+
 
 
 @keyframes progressBar {

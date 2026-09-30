@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -15,7 +14,10 @@ import {
   Loader2,
 } from "lucide-react";
 
-import { useNavigate, useParams } from "react-router-dom";
+import {
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 
 import { useShop } from "../ShopContext/ShopContext";
 
@@ -44,38 +46,51 @@ const ProductDetails = () => {
     isInWishlist,
   } = useShop();
 
-  // ========================================
-  // PRODUCT STATE
-  // ========================================
+  /* ========================================
+     PRODUCT STATE
+  ======================================== */
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [product, setProduct] =
+    useState(null);
 
-  const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState("");
-  const [addingCart, setAddingCart] = useState(false);
+  const [loading, setLoading] =
+    useState(true);
 
-  const productId = product?._id || product?.id;
+  const [error, setError] =
+    useState("");
 
-  // ========================================
-  // AUTH STATE
-  // ========================================
+  const [quantity, setQuantity] =
+    useState(1);
 
-  const [currentUser, setCurrentUser] = useState(() =>
-    getUser()
-  );
+  const [selectedImage, setSelectedImage] =
+    useState("");
 
-  const isLoggedIn = Boolean(currentUser);
+  const [addingCart, setAddingCart] =
+    useState(false);
+
+  const productId =
+    product?._id || product?.id;
+
+  /* ========================================
+     AUTH STATE
+  ======================================== */
+
+  const [currentUser, setCurrentUser] =
+    useState(() => getUser());
+
+  const isLoggedIn =
+    Boolean(currentUser);
 
   const currentUserId =
-    currentUser?._id || currentUser?.id;
+    currentUser?._id ||
+    currentUser?.id;
 
-  // ========================================
-  // REVIEW STATE
-  // ========================================
+  /* ========================================
+     REVIEW STATE
+  ======================================== */
 
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] =
+    useState([]);
 
   const [distribution, setDistribution] =
     useState({
@@ -96,18 +111,19 @@ const ProductDetails = () => {
       reason: "",
     });
 
-  const [reviewForm, setReviewForm] = useState({
-    rating: 5,
-    title: "",
-    comment: "",
-  });
+  const [reviewForm, setReviewForm] =
+    useState({
+      rating: 5,
+      title: "",
+      comment: "",
+    });
 
   const [submittingReview, setSubmittingReview] =
     useState(false);
 
-  // ========================================
-  // REVIEW PHOTO STATE
-  // ========================================
+  /* ========================================
+     REVIEW PHOTO STATE
+  ======================================== */
 
   const [reviewPhotos, setReviewPhotos] =
     useState([]);
@@ -118,9 +134,9 @@ const ProductDetails = () => {
   const [reviewImageViewer, setReviewImageViewer] =
     useState(null);
 
-  // ========================================
-  // CHECK AUTH CHANGE
-  // ========================================
+  /* ========================================
+     AUTH CHANGE
+  ======================================== */
 
   useEffect(() => {
     const handleAuthChange = () => {
@@ -140,9 +156,9 @@ const ProductDetails = () => {
     };
   }, []);
 
-  // ========================================
-  // FETCH PRODUCT
-  // ========================================
+  /* ========================================
+     FETCH PRODUCT
+  ======================================== */
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -150,7 +166,8 @@ const ProductDetails = () => {
         setLoading(true);
         setError("");
 
-        const data = await getProduct(id);
+        const data =
+          await getProduct(id);
 
         const fetchedProduct =
           data.product || data;
@@ -179,9 +196,9 @@ const ProductDetails = () => {
     }
   }, [id]);
 
-  // ========================================
-  // FETCH REVIEWS
-  // ========================================
+  /* ========================================
+     FETCH REVIEWS
+  ======================================== */
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -193,7 +210,9 @@ const ProductDetails = () => {
         const data =
           await getProductReviews(id);
 
-        setReviews(data.reviews || []);
+        setReviews(
+          data.reviews || []
+        );
 
         setDistribution(
           data.distribution || {
@@ -227,67 +246,65 @@ const ProductDetails = () => {
     fetchReviews();
   }, [id]);
 
-  // ========================================
-  // CHECK REVIEW ELIGIBILITY
-  // ========================================
+  /* ========================================
+     REVIEW ELIGIBILITY
+  ======================================== */
 
   useEffect(() => {
-    const checkEligibility = async () => {
-      if (!id) return;
+    const checkEligibility =
+      async () => {
+        if (!id) return;
 
-      // ----------------------------------------
-      // NOT LOGGED IN
-      // ----------------------------------------
+        if (!isLoggedIn) {
+          setReviewEligibility({
+            eligible: false,
+            orderId: null,
+            reason:
+              "Please login to write a review.",
+          });
 
-      if (!isLoggedIn) {
-        setReviewEligibility({
-          eligible: false,
-          orderId: null,
-          reason:
-            "Please login to write a review.",
-        });
+          return;
+        }
 
-        return;
-      }
+        try {
+          const data =
+            await getReviewEligibility(
+              id
+            );
 
-      try {
-        const data =
-          await getReviewEligibility(id);
+          setReviewEligibility({
+            eligible: Boolean(
+              data.eligible
+            ),
+            orderId:
+              data.orderId || null,
+            reason:
+              data.reason || "",
+          });
+        } catch (error) {
+          console.log(
+            "Review eligibility check:",
+            error.message
+          );
 
-        console.log(
-          "Review eligibility:",
-          data
-        );
-
-        setReviewEligibility({
-          eligible: Boolean(data.eligible),
-          orderId: data.orderId || null,
-          reason: data.reason || "",
-        });
-      } catch (error) {
-        console.log(
-          "Review eligibility check:",
-          error.message
-        );
-
-        setReviewEligibility({
-          eligible: false,
-          orderId: null,
-          reason:
-            "You need to purchase and receive this product before reviewing it.",
-        });
-      }
-    };
+          setReviewEligibility({
+            eligible: false,
+            orderId: null,
+            reason:
+              "You need to purchase and receive this product before reviewing it.",
+          });
+        }
+      };
 
     checkEligibility();
   }, [id, isLoggedIn]);
 
-  // ========================================
-  // CHECK WHETHER CURRENT USER ALREADY REVIEWED
-  // ========================================
+  /* ========================================
+     CHECK EXISTING REVIEW
+  ======================================== */
 
-  const hasUserReviewed = reviews.some(
-    (review) => {
+  const hasUserReviewed =
+    reviews.some((review) => {
       const reviewUserId =
         review.user?._id ||
         review.user?.id ||
@@ -299,38 +316,87 @@ const ProductDetails = () => {
         String(reviewUserId) ===
           String(currentUserId)
       );
-    }
-  );
+    });
 
-  // ========================================
-  // PRICE
-  // ========================================
+  /* ========================================
+     PRICE
+  ======================================== */
 
-  const getPrice = () => {
+  const getRegularPrice = () => {
     if (!product) return 0;
 
     return Number(
-      product.salePrice ||
-        product.price ||
-        0
+      product.price || 0
     );
   };
 
-  const getOriginalPrice = () => {
-    if (!product) return 0;
+  const getSalePrice = () => {
+    if (!product) return null;
 
-    return Number(product.price || 0);
+    const salePrice = Number(
+      product.salePrice
+    );
+
+    const regularPrice =
+      getRegularPrice();
+
+    if (
+      Number.isFinite(salePrice) &&
+      salePrice > 0 &&
+      salePrice < regularPrice
+    ) {
+      return salePrice;
+    }
+
+    return null;
+  };
+
+  const getPrice = () => {
+    const salePrice =
+      getSalePrice();
+
+    return (
+      salePrice ??
+      getRegularPrice()
+    );
   };
 
   const hasDiscount =
-    product &&
-    product.salePrice &&
-    Number(product.salePrice) <
-      Number(product.price);
+    getSalePrice() !== null;
 
-  // ========================================
-  // IMAGES
-  // ========================================
+  const getDiscountPercentage = () => {
+    const regularPrice =
+      getRegularPrice();
+
+    const salePrice =
+      getSalePrice();
+
+    if (
+      !regularPrice ||
+      salePrice === null
+    ) {
+      return 0;
+    }
+
+    return Math.round(
+      ((regularPrice - salePrice) /
+        regularPrice) *
+        100
+    );
+  };
+
+  const getSavings = () => {
+    if (!hasDiscount) return 0;
+
+    return (
+      getRegularPrice() -
+      getPrice()
+    );
+  };
+
+  /* ========================================
+     IMAGES
+  ======================================== */
 
   const images =
     product?.images?.length
@@ -339,11 +405,13 @@ const ProductDetails = () => {
       ? [product.image]
       : [];
 
-  // ========================================
-  // QUANTITY
-  // ========================================
+  /* ========================================
+     QUANTITY
+  ======================================== */
 
-  const handleQuantity = (type) => {
+  const handleQuantity = (
+    type
+  ) => {
     if (type === "increase") {
       if (
         quantity <
@@ -360,518 +428,538 @@ const ProductDetails = () => {
     }
   };
 
-  // ========================================
-  // ADD TO CART
-  // ========================================
+  /* ========================================
+     ADD TO CART
+  ======================================== */
 
-  const handleAddToCart = async () => {
-    if (!product) return;
+  const handleAddToCart =
+    async () => {
+      if (!product) return;
 
-    try {
-      setAddingCart(true);
+      try {
+        setAddingCart(true);
 
-      await addToCart(
-        product,
-        quantity
-      );
-
-      navigate("/cart");
-    } catch (err) {
-      alert(
-        err.message ||
-          "Unable to add product to cart"
-      );
-    } finally {
-      setAddingCart(false);
-    }
-  };
-
-  // ========================================
-  // WISHLIST
-  // ========================================
-
-  const handleWishlist = async () => {
-    if (!product) return;
-
-    try {
-      if (
-        isInWishlist(productId)
-      ) {
-        await removeFromWishlist(
-          productId
+        await addToCart(
+          product,
+          quantity
         );
-      } else {
-        await addToWishlist(product);
+
+        navigate("/cart");
+      } catch (err) {
+        alert(
+          err.message ||
+            "Unable to add product to cart"
+        );
+      } finally {
+        setAddingCart(false);
       }
-    } catch (err) {
-      alert(
-        err.message ||
-          "Wishlist update failed"
-      );
-    }
-  };
+    };
 
-  // ========================================
-  // REVIEW PHOTO SELECT
-  // ========================================
+  /* ========================================
+     WISHLIST
+  ======================================== */
 
-  const handleReviewPhotoSelect = (e) => {
-    const selectedFiles =
-      Array.from(
-        e.target.files || []
-      );
+  const handleWishlist =
+    async () => {
+      if (!product) return;
 
-    if (!selectedFiles.length) return;
+      try {
+        if (
+          isInWishlist(productId)
+        ) {
+          await removeFromWishlist(
+            productId
+          );
+        } else {
+          await addToWishlist(
+            product
+          );
+        }
+      } catch (err) {
+        alert(
+          err.message ||
+            "Wishlist update failed"
+        );
+      }
+    };
 
-    const availableSlots =
-      5 - reviewPhotos.length;
+  /* ========================================
+     REVIEW PHOTO SELECT
+  ======================================== */
 
-    if (availableSlots <= 0) {
-      alert(
-        "You can upload maximum 5 photos."
-      );
+  const handleReviewPhotoSelect =
+    (e) => {
+      const selectedFiles =
+        Array.from(
+          e.target.files || []
+        );
+
+      if (!selectedFiles.length)
+        return;
+
+      const availableSlots =
+        5 - reviewPhotos.length;
+
+      if (availableSlots <= 0) {
+        alert(
+          "You can upload maximum 5 photos."
+        );
+
+        e.target.value = "";
+        return;
+      }
+
+      const filesToAdd =
+        selectedFiles.slice(
+          0,
+          availableSlots
+        );
+
+      const validPhotos = [];
+
+      for (const file of filesToAdd) {
+        if (
+          !file.type?.startsWith(
+            "image/"
+          )
+        ) {
+          alert(
+            `${file.name} is not an image file.`
+          );
+          continue;
+        }
+
+        if (
+          file.size >
+          5 * 1024 * 1024
+        ) {
+          alert(
+            `${file.name} is larger than 5MB.`
+          );
+          continue;
+        }
+
+        validPhotos.push({
+          file,
+          preview:
+            URL.createObjectURL(file),
+        });
+      }
+
+      setReviewPhotos((prev) => [
+        ...prev,
+        ...validPhotos,
+      ]);
+
       e.target.value = "";
-      return;
-    }
+    };
 
-    const filesToAdd =
-      selectedFiles.slice(
-        0,
-        availableSlots
-      );
+  /* ========================================
+     REMOVE REVIEW PHOTO
+  ======================================== */
 
-    const validPhotos = [];
+  const removeReviewPhoto =
+    (index) => {
+      setReviewPhotos((prev) => {
+        const photo = prev[index];
 
-    for (const file of filesToAdd) {
-      if (
-        !file.type?.startsWith(
-          "image/"
-        )
-      ) {
-        alert(
-          `${file.name} is not an image file.`
+        if (photo?.preview) {
+          URL.revokeObjectURL(
+            photo.preview
+          );
+        }
+
+        return prev.filter(
+          (_, photoIndex) =>
+            photoIndex !== index
         );
-        continue;
-      }
-
-      if (
-        file.size >
-        5 * 1024 * 1024
-      ) {
-        alert(
-          `${file.name} is larger than 5MB.`
-        );
-        continue;
-      }
-
-      validPhotos.push({
-        file,
-        preview:
-          URL.createObjectURL(file),
       });
-    }
+    };
 
-    setReviewPhotos((prev) => [
-      ...prev,
-      ...validPhotos,
-    ]);
-
-    e.target.value = "";
-  };
-
-  // ========================================
-  // REMOVE REVIEW PHOTO
-  // ========================================
-
-  const removeReviewPhoto = (index) => {
-    setReviewPhotos((prev) => {
-      const photo = prev[index];
-
-      if (photo?.preview) {
-        URL.revokeObjectURL(
-          photo.preview
-        );
-      }
-
-      return prev.filter(
-        (_, photoIndex) =>
-          photoIndex !== index
-      );
-    });
-  };
-
-  // ========================================
-  // CLEAN PHOTO PREVIEWS
-  // ========================================
+  /* ========================================
+     CLEAN PHOTO PREVIEWS
+  ======================================== */
 
   useEffect(() => {
     return () => {
-      reviewPhotos.forEach((photo) => {
-        if (photo.preview) {
-          URL.revokeObjectURL(
-            photo.preview
-          );
+      reviewPhotos.forEach(
+        (photo) => {
+          if (photo.preview) {
+            URL.revokeObjectURL(
+              photo.preview
+            );
+          }
         }
-      });
+      );
     };
   }, [reviewPhotos]);
 
-  // ========================================
-  // REVIEW SUBMIT
-  // ========================================
+  /* ========================================
+     REVIEW SUBMIT
+  ======================================== */
 
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
+  const handleReviewSubmit =
+    async (e) => {
+      e.preventDefault();
 
-    // ----------------------------------------
-    // LOGIN CHECK
-    // ----------------------------------------
+      if (!isLoggedIn) {
+        alert(
+          "Please login to write a review."
+        );
 
-    if (!isLoggedIn) {
-      alert(
-        "Please login to write a review."
-      );
-
-      navigate("/login");
-      return;
-    }
-
-    // ----------------------------------------
-    // ALREADY REVIEWED
-    // ----------------------------------------
-
-    if (hasUserReviewed) {
-      alert(
-        "You have already reviewed this product."
-      );
-      return;
-    }
-
-    // ----------------------------------------
-    // ELIGIBILITY
-    // ----------------------------------------
-
-    if (!reviewEligibility.eligible) {
-      alert(
-        reviewEligibility.reason ||
-          "You can review this product after receiving your order."
-      );
-      return;
-    }
-
-    if (!reviewForm.comment.trim()) {
-      alert(
-        "Please write your review."
-      );
-      return;
-    }
-
-    if (!reviewEligibility.orderId) {
-      alert(
-        "Your delivered order could not be found."
-      );
-      return;
-    }
-
-    if (!productId) {
-      alert(
-        "Product information is missing."
-      );
-      return;
-    }
-
-    try {
-      setSubmittingReview(true);
-
-      let uploadedImages = [];
-
-      // ----------------------------------------
-      // UPLOAD PHOTOS
-      // ----------------------------------------
-
-      if (reviewPhotos.length > 0) {
-        setUploadingPhotos(true);
-
-        const uploadResponse =
-          await uploadReviewImages(
-            reviewPhotos.map(
-              (photo) => photo.file
-            )
-          );
-
-        uploadedImages =
-          uploadResponse.images || [];
-
-        setUploadingPhotos(false);
+        navigate("/login");
+        return;
       }
 
-      // ----------------------------------------
-      // CREATE REVIEW
-      // ----------------------------------------
-
-      await createReview({
-        productId,
-        orderId:
-          reviewEligibility.orderId,
-        rating: reviewForm.rating,
-        title: reviewForm.title,
-        comment: reviewForm.comment,
-        images: uploadedImages,
-      });
-
-      // ----------------------------------------
-      // REFRESH REVIEWS
-      // ----------------------------------------
-
-      const refreshed =
-        await getProductReviews(
-          productId
+      if (hasUserReviewed) {
+        alert(
+          "You have already reviewed this product."
         );
+        return;
+      }
 
-      const refreshedReviews =
-        refreshed.reviews || [];
-
-      setReviews(refreshedReviews);
-
-      setDistribution(
-        refreshed.distribution || {
-          5: 0,
-          4: 0,
-          3: 0,
-          2: 0,
-          1: 0,
-        }
-      );
-
-      // ----------------------------------------
-      // UPDATE PRODUCT RATING
-      // ----------------------------------------
-
-      const refreshedRating =
-        refreshedReviews.length > 0
-          ? Number(
-              (
-                refreshedReviews.reduce(
-                  (sum, review) =>
-                    sum +
-                    Number(
-                      review.rating || 0
-                    ),
-                  0
-                ) /
-                refreshedReviews.length
-              ).toFixed(1)
-            )
-          : 0;
-
-      setProduct((prev) => ({
-        ...prev,
-        rating: refreshedRating,
-        reviewCount:
-          refreshedReviews.length,
-      }));
-
-      // ----------------------------------------
-      // RESET FORM
-      // ----------------------------------------
-
-      reviewPhotos.forEach((photo) => {
-        if (photo.preview) {
-          URL.revokeObjectURL(
-            photo.preview
-          );
-        }
-      });
-
-      setReviewPhotos([]);
-
-      setReviewForm({
-        rating: 5,
-        title: "",
-        comment: "",
-      });
-
-      setReviewEligibility({
-        eligible: false,
-        orderId: null,
-        reason:
-          "You have already reviewed this product.",
-      });
-
-      alert(
-        "Review submitted successfully."
-      );
-    } catch (error) {
-      console.error(
-        "Review submit error:",
-        error
-      );
-
-      alert(
-        error.message ||
-          "Unable to submit review."
-      );
-    } finally {
-      setSubmittingReview(false);
-      setUploadingPhotos(false);
-    }
-  };
-
-  // ========================================
-  // DELETE REVIEW
-  // ========================================
-
-  const handleDeleteReview = async (
-    reviewId
-  ) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete your review?"
-    );
-
-    if (!confirmed) return;
-
-    try {
-      await deleteReview(reviewId);
-
-      const refreshed =
-        await getProductReviews(
-          productId
+      if (
+        !reviewEligibility.eligible
+      ) {
+        alert(
+          reviewEligibility.reason ||
+            "You can review this product after receiving your order."
         );
+        return;
+      }
 
-      const refreshedReviews =
-        refreshed.reviews || [];
+      if (
+        !reviewForm.comment.trim()
+      ) {
+        alert(
+          "Please write your review."
+        );
+        return;
+      }
 
-      setReviews(refreshedReviews);
+      if (
+        !reviewEligibility.orderId
+      ) {
+        alert(
+          "Your delivered order could not be found."
+        );
+        return;
+      }
 
-      setDistribution(
-        refreshed.distribution || {
-          5: 0,
-          4: 0,
-          3: 0,
-          2: 0,
-          1: 0,
-        }
-      );
+      if (!productId) {
+        alert(
+          "Product information is missing."
+        );
+        return;
+      }
 
-      const refreshedRating =
-        refreshedReviews.length > 0
-          ? Number(
-              (
-                refreshedReviews.reduce(
-                  (sum, review) =>
-                    sum +
-                    Number(
-                      review.rating || 0
-                    ),
-                  0
-                ) /
-                refreshedReviews.length
-              ).toFixed(1)
-            )
-          : 0;
-
-      setProduct((prev) => ({
-        ...prev,
-        rating: refreshedRating,
-        reviewCount:
-          refreshedReviews.length,
-      }));
-
-      // Re-check eligibility
       try {
-        const eligibility =
-          await getReviewEligibility(
+        setSubmittingReview(true);
+
+        let uploadedImages = [];
+
+        if (
+          reviewPhotos.length > 0
+        ) {
+          setUploadingPhotos(true);
+
+          const uploadResponse =
+            await uploadReviewImages(
+              reviewPhotos.map(
+                (photo) =>
+                  photo.file
+              )
+            );
+
+          uploadedImages =
+            uploadResponse.images ||
+            [];
+
+          setUploadingPhotos(false);
+        }
+
+        await createReview({
+          productId,
+          orderId:
+            reviewEligibility.orderId,
+          rating:
+            reviewForm.rating,
+          title:
+            reviewForm.title,
+          comment:
+            reviewForm.comment,
+          images:
+            uploadedImages,
+        });
+
+        const refreshed =
+          await getProductReviews(
             productId
           );
 
+        const refreshedReviews =
+          refreshed.reviews || [];
+
+        setReviews(
+          refreshedReviews
+        );
+
+        setDistribution(
+          refreshed.distribution || {
+            5: 0,
+            4: 0,
+            3: 0,
+            2: 0,
+            1: 0,
+          }
+        );
+
+        const refreshedRating =
+          refreshedReviews.length >
+          0
+            ? Number(
+                (
+                  refreshedReviews.reduce(
+                    (
+                      sum,
+                      review
+                    ) =>
+                      sum +
+                      Number(
+                        review.rating ||
+                          0
+                      ),
+                    0
+                  ) /
+                  refreshedReviews.length
+                ).toFixed(1)
+              )
+            : 0;
+
+        setProduct((prev) => ({
+          ...prev,
+          rating:
+            refreshedRating,
+          reviewCount:
+            refreshedReviews.length,
+        }));
+
+        reviewPhotos.forEach(
+          (photo) => {
+            if (photo.preview) {
+              URL.revokeObjectURL(
+                photo.preview
+              );
+            }
+          }
+        );
+
+        setReviewPhotos([]);
+
+        setReviewForm({
+          rating: 5,
+          title: "",
+          comment: "",
+        });
+
         setReviewEligibility({
-          eligible: Boolean(
-            eligibility.eligible
-          ),
-          orderId:
-            eligibility.orderId ||
-            null,
+          eligible: false,
+          orderId: null,
           reason:
-            eligibility.reason || "",
+            "You have already reviewed this product.",
         });
-      } catch {
-        setReviewEligibility({
-          eligible: true,
-          orderId:
-            reviewEligibility.orderId,
-          reason: "",
-        });
+
+        alert(
+          "Review submitted successfully."
+        );
+      } catch (error) {
+        console.error(
+          "Review submit error:",
+          error
+        );
+
+        alert(
+          error.message ||
+            "Unable to submit review."
+        );
+      } finally {
+        setSubmittingReview(
+          false
+        );
+
+        setUploadingPhotos(false);
       }
+    };
 
-      alert(
-        "Review deleted successfully."
-      );
-    } catch (error) {
-      console.error(
-        "Delete review error:",
-        error
-      );
+  /* ========================================
+     DELETE REVIEW
+  ======================================== */
 
-      alert(
-        error.message ||
-          "Unable to delete review."
-      );
-    }
-  };
+  const handleDeleteReview =
+    async (reviewId) => {
+      const confirmed =
+        window.confirm(
+          "Are you sure you want to delete your review?"
+        );
 
-  // ========================================
-  // HELPFUL
-  // ========================================
+      if (!confirmed) return;
 
-  const handleHelpful = async (
-    reviewId
-  ) => {
-    try {
-      const data =
-        await markReviewHelpful(
+      try {
+        await deleteReview(
           reviewId
         );
 
-      setReviews((prev) =>
-        prev.map((review) =>
-          review._id === reviewId
-            ? {
-                ...review,
-                helpfulCount:
-                  data.helpfulCount,
-              }
-            : review
-        )
-      );
-    } catch (error) {
-      alert(
-        error.message ||
-          "Unable to mark review as helpful."
-      );
-    }
-  };
+        const refreshed =
+          await getProductReviews(
+            productId
+          );
 
-  // ========================================
-  // LOADING
-  // ========================================
+        const refreshedReviews =
+          refreshed.reviews || [];
+
+        setReviews(
+          refreshedReviews
+        );
+
+        setDistribution(
+          refreshed.distribution || {
+            5: 0,
+            4: 0,
+            3: 0,
+            2: 0,
+            1: 0,
+          }
+        );
+
+        const refreshedRating =
+          refreshedReviews.length >
+          0
+            ? Number(
+                (
+                  refreshedReviews.reduce(
+                    (
+                      sum,
+                      review
+                    ) =>
+                      sum +
+                      Number(
+                        review.rating ||
+                          0
+                      ),
+                    0
+                  ) /
+                  refreshedReviews.length
+                ).toFixed(1)
+              )
+            : 0;
+
+        setProduct((prev) => ({
+          ...prev,
+          rating:
+            refreshedRating,
+          reviewCount:
+            refreshedReviews.length,
+        }));
+
+        try {
+          const eligibility =
+            await getReviewEligibility(
+              productId
+            );
+
+          setReviewEligibility({
+            eligible: Boolean(
+              eligibility.eligible
+            ),
+            orderId:
+              eligibility.orderId ||
+              null,
+            reason:
+              eligibility.reason ||
+              "",
+          });
+        } catch {
+          setReviewEligibility({
+            eligible: true,
+            orderId:
+              reviewEligibility.orderId,
+            reason: "",
+          });
+        }
+
+        alert(
+          "Review deleted successfully."
+        );
+      } catch (error) {
+        console.error(
+          "Delete review error:",
+          error
+        );
+
+        alert(
+          error.message ||
+            "Unable to delete review."
+        );
+      }
+    };
+
+  /* ========================================
+     HELPFUL
+  ======================================== */
+
+  const handleHelpful =
+    async (reviewId) => {
+      try {
+        const data =
+          await markReviewHelpful(
+            reviewId
+          );
+
+        setReviews((prev) =>
+          prev.map((review) =>
+            review._id === reviewId
+              ? {
+                  ...review,
+                  helpfulCount:
+                    data.helpfulCount,
+                }
+              : review
+          )
+        );
+      } catch (error) {
+        alert(
+          error.message ||
+            "Unable to mark review as helpful."
+        );
+      }
+    };
+
+  /* ========================================
+     LOADING
+  ======================================== */
 
   if (loading) {
     return (
       <div className="product-details-loading">
         <div className="product-loader"></div>
-        <p>Loading product...</p>
+
+        <p>
+          Loading product...
+        </p>
       </div>
     );
   }
 
-  // ========================================
-  // ERROR
-  // ========================================
+  /* ========================================
+     ERROR
+  ======================================== */
 
   if (error || !product) {
     return (
       <div className="product-details-error">
-        <h2>Product Not Found</h2>
+        <h2>
+          Product Not Found
+        </h2>
 
         <p>
           {error ||
@@ -890,13 +978,12 @@ const ProductDetails = () => {
     );
   }
 
-  // ========================================
-  // RENDER
-  // ========================================
+  /* ========================================
+     RENDER
+  ======================================== */
 
   return (
     <main className="product-details-page">
-
       <Navbar />
 
       {/* BACK */}
@@ -904,7 +991,9 @@ const ProductDetails = () => {
       <div className="product-details-container">
         <button
           className="back-shop-btn"
-          onClick={() => navigate(-1)}
+          onClick={() =>
+            navigate(-1)
+          }
         >
           <ArrowLeft size={18} />
           Back
@@ -914,24 +1003,24 @@ const ProductDetails = () => {
       {/* PRODUCT MAIN */}
 
       <section className="product-details-container product-main">
-
         {/* GALLERY */}
 
         <div className="product-gallery">
-
           <div className="product-thumbnails">
-
             {images.map(
               (image, index) => (
                 <button
                   key={`${image}-${index}`}
                   className={
-                    selectedImage === image
+                    selectedImage ===
+                    image
                       ? "thumbnail active"
                       : "thumbnail"
                   }
                   onClick={() =>
-                    setSelectedImage(image)
+                    setSelectedImage(
+                      image
+                    )
                   }
                 >
                   <img
@@ -943,11 +1032,9 @@ const ProductDetails = () => {
                 </button>
               )
             )}
-
           </div>
 
           <div className="product-main-image">
-
             {selectedImage ? (
               <img
                 src={selectedImage}
@@ -965,28 +1052,41 @@ const ProductDetails = () => {
               </span>
             )}
 
+            {hasDiscount && (
+              <span
+                className="product-sale-badge"
+                style={{
+                  position:
+                    "absolute",
+                  top: "18px",
+                  left: "18px",
+                  zIndex: 5,
+                }}
+              >
+                {getDiscountPercentage()}%
+                OFF
+              </span>
+            )}
           </div>
-
         </div>
 
         {/* PRODUCT INFO */}
 
         <div className="product-info">
-
           {product.category && (
             <span className="product-category">
               {product.category}
             </span>
           )}
 
-          <h1>{product.name}</h1>
+          <h1>
+            {product.name}
+          </h1>
 
           {/* PRODUCT RATING */}
 
           <div className="product-rating-summary">
-
             <div className="rating-stars">
-
               {[1, 2, 3, 4, 5].map(
                 (star) => (
                   <Star
@@ -995,7 +1095,8 @@ const ProductDetails = () => {
                     fill={
                       star <=
                       Math.round(
-                        product.rating || 0
+                        product.rating ||
+                          0
                       )
                         ? "currentColor"
                         : "none"
@@ -1003,7 +1104,6 @@ const ProductDetails = () => {
                   />
                 )
               )}
-
             </div>
 
             <strong>
@@ -1018,13 +1118,11 @@ const ProductDetails = () => {
                 0}{" "}
               reviews)
             </span>
-
           </div>
 
           {/* PRICE */}
 
           <div className="product-price-row">
-
             <span className="product-current-price">
               ₹
               {getPrice().toLocaleString(
@@ -1035,7 +1133,7 @@ const ProductDetails = () => {
             {hasDiscount && (
               <span className="product-original-price">
                 ₹
-                {getOriginalPrice().toLocaleString(
+                {getRegularPrice().toLocaleString(
                   "en-IN"
                 )}
               </span>
@@ -1043,23 +1141,36 @@ const ProductDetails = () => {
 
             {hasDiscount && (
               <span className="discount-label">
-                {Math.round(
-                  ((getOriginalPrice() -
-                    getPrice()) /
-                    getOriginalPrice()) *
-                    100
-                )}
-                % OFF
+                {getDiscountPercentage()}%
+                OFF
               </span>
             )}
-
           </div>
+
+          {hasDiscount && (
+            <div
+              className="product-savings"
+              style={{
+                marginTop: "8px",
+                fontSize: "13px",
+                fontWeight: 600,
+              }}
+            >
+              You save ₹
+              {getSavings().toLocaleString(
+                "en-IN"
+              )}{" "}
+              on this product
+            </div>
+          )}
 
           {/* SHORT DESCRIPTION */}
 
           {product.shortDescription && (
             <p className="product-short-description">
-              {product.shortDescription}
+              {
+                product.shortDescription
+              }
             </p>
           )}
 
@@ -1067,29 +1178,30 @@ const ProductDetails = () => {
 
           {product.description && (
             <div className="product-description">
-
               <h3>
                 Description
               </h3>
 
               <p>
-                {product.description}
+                {
+                  product.description
+                }
               </p>
-
             </div>
           )}
 
           {/* SIZES */}
 
-          {product.sizes?.length > 0 && (
+          {product.sizes?.length >
+            0 && (
             <div className="product-option">
-
               <div className="option-heading">
-                <span>Size</span>
+                <span>
+                  Size
+                </span>
               </div>
 
               <div className="size-options">
-
                 {product.sizes.map(
                   (size) => (
                     <button
@@ -1099,23 +1211,22 @@ const ProductDetails = () => {
                     </button>
                   )
                 )}
-
               </div>
-
             </div>
           )}
 
           {/* COLORS */}
 
-          {product.colors?.length > 0 && (
+          {product.colors?.length >
+            0 && (
             <div className="product-option">
-
               <div className="option-heading">
-                <span>Color</span>
+                <span>
+                  Color
+                </span>
               </div>
 
               <div className="color-options">
-
                 {product.colors.map(
                   (color) => (
                     <span
@@ -1126,16 +1237,13 @@ const ProductDetails = () => {
                     </span>
                   )
                 )}
-
               </div>
-
             </div>
           )}
 
           {/* STOCK */}
 
           <div className="stock-info">
-
             {product.stock > 0 ? (
               <>
                 <Check size={17} />
@@ -1149,20 +1257,17 @@ const ProductDetails = () => {
             ) : (
               "Out of stock"
             )}
-
           </div>
 
           {/* QUANTITY */}
 
           {product.stock > 0 && (
             <div className="quantity-section">
-
               <span>
                 Quantity
               </span>
 
               <div className="quantity-control">
-
                 <button
                   onClick={() =>
                     handleQuantity(
@@ -1193,16 +1298,13 @@ const ProductDetails = () => {
                 >
                   <Plus size={16} />
                 </button>
-
               </div>
-
             </div>
           )}
 
           {/* ACTIONS */}
 
           <div className="product-actions">
-
             <button
               className="add-cart-btn"
               onClick={
@@ -1226,7 +1328,9 @@ const ProductDetails = () => {
 
             <button
               className={
-                isInWishlist(productId)
+                isInWishlist(
+                  productId
+                )
                   ? "wishlist-btn active"
                   : "wishlist-btn"
               }
@@ -1245,19 +1349,15 @@ const ProductDetails = () => {
                 }
               />
             </button>
-
           </div>
 
           {/* BENEFITS */}
 
           <div className="product-benefits">
-
             <div>
-
               <Truck size={22} />
 
               <div>
-
                 <strong>
                   Reliable Delivery
                 </strong>
@@ -1267,17 +1367,13 @@ const ProductDetails = () => {
                   delivered to your
                   doorstep.
                 </span>
-
               </div>
-
             </div>
 
             <div>
-
               <Check size={22} />
 
               <div>
-
                 <strong>
                   Quality Assured
                 </strong>
@@ -1286,29 +1382,18 @@ const ProductDetails = () => {
                   Crafted with attention
                   to detail.
                 </span>
-
               </div>
-
             </div>
-
           </div>
-
         </div>
-
       </section>
 
       {/* REVIEWS */}
 
       <section className="reviews-section">
-
         <div className="reviews-container">
-
-          {/* HEADING */}
-
           <div className="reviews-heading">
-
             <div>
-
               <span className="reviews-eyebrow">
                 CUSTOMER EXPERIENCE
               </span>
@@ -1322,17 +1407,13 @@ const ProductDetails = () => {
                 equestrian enthusiasts
                 who chose Saddle & Crest.
               </p>
-
             </div>
-
           </div>
 
           {/* RATING OVERVIEW */}
 
           <div className="reviews-overview">
-
             <div className="overall-rating">
-
               <strong>
                 {Number(
                   product.rating || 0
@@ -1340,7 +1421,6 @@ const ProductDetails = () => {
               </strong>
 
               <div className="large-stars">
-
                 {[1, 2, 3, 4, 5].map(
                   (star) => (
                     <Star
@@ -1349,7 +1429,8 @@ const ProductDetails = () => {
                       fill={
                         star <=
                         Math.round(
-                          product.rating || 0
+                          product.rating ||
+                            0
                         )
                           ? "currentColor"
                           : "none"
@@ -1357,7 +1438,6 @@ const ProductDetails = () => {
                     />
                   )
                 )}
-
               </div>
 
               <span>
@@ -1365,14 +1445,11 @@ const ProductDetails = () => {
                   0}{" "}
                 verified reviews
               </span>
-
             </div>
 
             <div className="rating-distribution">
-
               {[5, 4, 3, 2, 1].map(
                 (rating) => {
-
                   const count =
                     distribution[
                       rating
@@ -1390,7 +1467,6 @@ const ProductDetails = () => {
                       className="rating-row"
                       key={rating}
                     >
-
                       <span>
                         {rating}
                       </span>
@@ -1401,34 +1477,27 @@ const ProductDetails = () => {
                       />
 
                       <div className="rating-bar">
-
                         <span
                           style={{
                             width: `${percentage}%`,
                           }}
                         />
-
                       </div>
 
                       <small>
                         {count}
                       </small>
-
                     </div>
                   );
                 }
               )}
-
             </div>
-
           </div>
 
           {/* WRITE REVIEW */}
 
           <div className="write-review-card">
-
             <div>
-
               <span className="reviews-eyebrow">
                 YOUR EXPERIENCE
               </span>
@@ -1442,16 +1511,10 @@ const ProductDetails = () => {
                 riders make better
                 choices.
               </p>
-
             </div>
-
-            {/* --------------------------------
-                NOT LOGGED IN
-            -------------------------------- */}
 
             {!isLoggedIn ? (
               <div className="review-not-eligible">
-
                 <div className="review-not-eligible-icon">
                   <Star size={24} />
                 </div>
@@ -1474,15 +1537,9 @@ const ProductDetails = () => {
                 >
                   Login to Review
                 </button>
-
               </div>
             ) : hasUserReviewed ? (
-              /* --------------------------------
-                  ALREADY REVIEWED
-              -------------------------------- */
-
               <div className="review-not-eligible">
-
                 <div className="review-not-eligible-icon">
                   <Check size={24} />
                 </div>
@@ -1495,30 +1552,20 @@ const ProductDetails = () => {
                   Thank you for sharing your
                   experience with other riders.
                 </p>
-
               </div>
             ) : reviewEligibility.eligible ? (
-              /* --------------------------------
-                  ELIGIBLE
-              -------------------------------- */
-
               <form
                 className="review-form"
                 onSubmit={
                   handleReviewSubmit
                 }
               >
-
-                {/* RATING */}
-
                 <div className="review-rating-selector">
-
                   <span>
                     Your Rating
                   </span>
 
                   <div>
-
                     {[1, 2, 3, 4, 5].map(
                       (star) => (
                         <button
@@ -1546,12 +1593,8 @@ const ProductDetails = () => {
                         </button>
                       )
                     )}
-
                   </div>
-
                 </div>
-
-                {/* TITLE */}
 
                 <input
                   type="text"
@@ -1571,8 +1614,6 @@ const ProductDetails = () => {
                   }
                 />
 
-                {/* COMMENT */}
-
                 <textarea
                   placeholder="Tell us about your experience..."
                   value={
@@ -1591,12 +1632,8 @@ const ProductDetails = () => {
                   }
                 />
 
-                {/* PHOTO UPLOAD */}
-
                 <div className="review-photo-upload">
-
                   <div className="review-photo-upload-heading">
-
                     <div>
                       <strong>
                         Add Photos
@@ -1610,20 +1647,22 @@ const ProductDetails = () => {
                     <span>
                       {reviewPhotos.length}/5
                     </span>
-
                   </div>
 
                   <div className="review-photo-grid">
-
                     {reviewPhotos.map(
-                      (photo, index) => (
+                      (
+                        photo,
+                        index
+                      ) => (
                         <div
                           className="review-photo-preview"
                           key={`${photo.preview}-${index}`}
                         >
-
                           <img
-                            src={photo.preview}
+                            src={
+                              photo.preview
+                            }
                             alt={`Review preview ${
                               index + 1
                             }`}
@@ -1640,7 +1679,6 @@ const ProductDetails = () => {
                           >
                             <X size={15} />
                           </button>
-
                         </div>
                       )
                     )}
@@ -1648,7 +1686,6 @@ const ProductDetails = () => {
                     {reviewPhotos.length <
                       5 && (
                       <label className="review-photo-add">
-
                         <ImagePlus
                           size={22}
                         />
@@ -1666,20 +1703,15 @@ const ProductDetails = () => {
                             handleReviewPhotoSelect
                           }
                         />
-
                       </label>
                     )}
-
                   </div>
 
                   <p className="review-photo-help">
                     Up to 5 photos · JPG, PNG,
                     WEBP · Max 5MB each
                   </p>
-
                 </div>
-
-                {/* SUBMIT */}
 
                 <button
                   type="submit"
@@ -1708,15 +1740,9 @@ const ProductDetails = () => {
                     "Submit Review"
                   )}
                 </button>
-
               </form>
             ) : (
-              /* --------------------------------
-                  LOGGED IN BUT NOT ELIGIBLE
-              -------------------------------- */
-
               <div className="review-not-eligible">
-
                 <div className="review-not-eligible-icon">
                   <Star size={24} />
                 </div>
@@ -1733,19 +1759,18 @@ const ProductDetails = () => {
 
                 {reviewEligibility.reason && (
                   <span className="review-eligibility-reason">
-                    {reviewEligibility.reason}
+                    {
+                      reviewEligibility.reason
+                    }
                   </span>
                 )}
-
               </div>
             )}
-
           </div>
 
           {/* REVIEWS LIST */}
 
           <div className="reviews-list">
-
             {reviewLoading ? (
               <div className="reviews-loading">
                 Loading reviews...
@@ -1753,7 +1778,6 @@ const ProductDetails = () => {
             ) : reviews.length ===
               0 ? (
               <div className="no-reviews">
-
                 <Star size={32} />
 
                 <h3>
@@ -1765,7 +1789,6 @@ const ProductDetails = () => {
                   to share your
                   experience.
                 </p>
-
               </div>
             ) : (
               reviews.map(
@@ -1774,13 +1797,8 @@ const ProductDetails = () => {
                     className="review-card"
                     key={review._id}
                   >
-
-                    {/* TOP */}
-
                     <div className="review-card-top">
-
                       <div className="review-user">
-
                         <div className="review-avatar">
                           {review.user?.name
                             ?.charAt(0)
@@ -1789,7 +1807,6 @@ const ProductDetails = () => {
                         </div>
 
                         <div>
-
                           <strong>
                             {review.user
                               ?.name ||
@@ -1805,13 +1822,10 @@ const ProductDetails = () => {
                               Purchase
                             </span>
                           )}
-
                         </div>
-
                       </div>
 
                       <div className="review-stars">
-
                         {[1, 2, 3, 4, 5].map(
                           (star) => (
                             <Star
@@ -1826,12 +1840,8 @@ const ProductDetails = () => {
                             />
                           )
                         )}
-
                       </div>
-
                     </div>
-
-                    {/* TITLE */}
 
                     {review.title && (
                       <h3 className="review-title">
@@ -1839,20 +1849,20 @@ const ProductDetails = () => {
                       </h3>
                     )}
 
-                    {/* COMMENT */}
-
                     <p className="review-comment">
-                      {review.comment}
+                      {
+                        review.comment
+                      }
                     </p>
-
-                    {/* REVIEW PHOTOS */}
 
                     {review.images?.length >
                       0 && (
                       <div className="review-images">
-
                         {review.images.map(
-                          (image, index) => (
+                          (
+                            image,
+                            index
+                          ) => (
                             <button
                               type="button"
                               className="review-image-thumb"
@@ -1872,14 +1882,10 @@ const ProductDetails = () => {
                             </button>
                           )
                         )}
-
                       </div>
                     )}
 
-                    {/* BOTTOM */}
-
                     <div className="review-card-bottom">
-
                       <button
                         type="button"
                         onClick={() =>
@@ -1893,10 +1899,8 @@ const ProductDetails = () => {
                         />
 
                         Helpful (
-                        {
-                          review.helpfulCount ||
-                          0
-                        }
+                        {review.helpfulCount ||
+                          0}
                         )
                       </button>
 
@@ -1912,38 +1916,35 @@ const ProductDetails = () => {
                           }
                         )}
                       </span>
-
                     </div>
-
                   </article>
                 )
               )
             )}
-
           </div>
-
         </div>
-
       </section>
 
-      {/* ========================================
-          REVIEW IMAGE FULLSCREEN VIEWER
-      ======================================== */}
+      {/* REVIEW IMAGE VIEWER */}
 
       {reviewImageViewer && (
         <div
           className="review-image-viewer"
           onClick={() =>
-            setReviewImageViewer(null)
+            setReviewImageViewer(
+              null
+            )
           }
         >
-
           <button
             type="button"
             className="review-image-viewer-close"
             onClick={(e) => {
               e.stopPropagation();
-              setReviewImageViewer(null);
+
+              setReviewImageViewer(
+                null
+              );
             }}
           >
             <X size={24} />
@@ -1956,13 +1957,10 @@ const ProductDetails = () => {
               e.stopPropagation()
             }
           />
-
         </div>
       )}
-
     </main>
   );
 };
 
 export default ProductDetails;
-

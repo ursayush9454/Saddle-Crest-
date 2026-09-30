@@ -61,6 +61,7 @@ const Home = () => {
         >
           <FeaturedCollection />
         </section>
+        <AnnouncementBar/>
 
         {/* =========================================
             BEST SELLERS
@@ -71,6 +72,7 @@ const Home = () => {
         >
           <ProductSection />
         </section>
+        
 
         {/* =========================================
             CRAFTSMANSHIP / BRAND STORY
@@ -151,6 +153,7 @@ const Home = () => {
         >
           <Instagram />
         </section>
+        
 
         {/* =========================================
             NEWSLETTER
@@ -161,6 +164,7 @@ const Home = () => {
         >
           <Newsletter />
         </section>
+        
 
       </main>
 

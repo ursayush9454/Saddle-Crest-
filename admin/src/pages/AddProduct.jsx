@@ -1,4 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
 import {
   ArrowLeft,
   ImagePlus,
@@ -7,9 +12,21 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
 import { apiRequest } from "../services/api";
+
 import "./AddProduct.css";
+
+/*
+|--------------------------------------------------------------------------
+| DEFAULT CATEGORIES
+|--------------------------------------------------------------------------
+*/
 
 const DEFAULT_CATEGORIES = [
   "Saddles",
@@ -20,6 +37,12 @@ const DEFAULT_CATEGORIES = [
   "Custom",
 ];
 
+/*
+|--------------------------------------------------------------------------
+| PRODUCT BADGES
+|--------------------------------------------------------------------------
+*/
+
 const BADGES = [
   "None",
   "New",
@@ -29,11 +52,17 @@ const BADGES = [
   "Sale",
 ];
 
+/*
+|--------------------------------------------------------------------------
+| INITIAL FORM
+|--------------------------------------------------------------------------
+*/
+
 const initialForm = {
   name: "",
   description: "",
   price: "",
-  comparePrice: "",
+  salePrice: "",
   category: "",
   badge: "",
   sku: "",
@@ -45,50 +74,77 @@ const initialForm = {
   isActive: true,
 };
 
+/*
+|--------------------------------------------------------------------------
+| ADD PRODUCT
+|--------------------------------------------------------------------------
+*/
+
 const AddProduct = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
   const fileInputRef = useRef(null);
 
   /*
-   * If Products page sends a product through
-   * navigate("/add-product", { state: { product } })
-   * then we are in EDIT mode.
-   */
-  const editingProduct = location.state?.product || null;
-  const isEditMode = Boolean(editingProduct?._id);
+  |--------------------------------------------------------------------------
+  | EDIT MODE
+  |--------------------------------------------------------------------------
+  */
 
-  const [form, setForm] = useState(initialForm);
+  const editingProduct =
+    location.state?.product || null;
+
+  const isEditMode = Boolean(
+    editingProduct?._id
+  );
+
+  /*
+  |--------------------------------------------------------------------------
+  | STATES
+  |--------------------------------------------------------------------------
+  */
+
+  const [form, setForm] =
+    useState(initialForm);
 
   const [categories, setCategories] =
     useState(DEFAULT_CATEGORIES);
 
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrl, setImageUrl] =
+    useState("");
 
-  const [loadingCategories, setLoadingCategories] =
-    useState(true);
+  const [
+    loadingCategories,
+    setLoadingCategories,
+  ] = useState(true);
 
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] =
+    useState(false);
 
   /*
-   * ==========================================
-   * NORMALIZE EXISTING PRODUCT IMAGES
-   * ==========================================
-   */
-  const getExistingImages = (product) => {
+  |--------------------------------------------------------------------------
+  | EXISTING PRODUCT IMAGES
+  |--------------------------------------------------------------------------
+  */
+
+  const getExistingImages = (
+    product
+  ) => {
     if (!product) {
       return [];
     }
 
-    const images = Array.isArray(product.images)
+    const images = Array.isArray(
+      product.images
+    )
       ? product.images.filter(Boolean)
       : [];
 
-    /*
-     * If images[] is empty but main image exists,
-     * use main image.
-     */
-    if (!images.length && product.image) {
+    if (
+      !images.length &&
+      product.image
+    ) {
       return [product.image];
     }
 
@@ -96,135 +152,175 @@ const AddProduct = () => {
   };
 
   /*
-   * ==========================================
-   * FETCH CATEGORIES
-   * ==========================================
-   */
+  |--------------------------------------------------------------------------
+  | FETCH CATEGORIES
+  |--------------------------------------------------------------------------
+  */
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoadingCategories(true);
+    const fetchCategories =
+      async () => {
+        try {
+          setLoadingCategories(true);
 
-        const data = await apiRequest("/categories");
+          const data =
+            await apiRequest(
+              "/categories"
+            );
 
-        const backendCategories =
-          Array.isArray(data?.categories)
-            ? data.categories
-            : Array.isArray(data)
+          const backendCategories =
+            Array.isArray(
+              data?.categories
+            )
+              ? data.categories
+              : Array.isArray(data)
               ? data
               : [];
 
-        const backendNames = backendCategories
-          .map((category) =>
-            typeof category === "string"
-              ? category
-              : category?.name
-          )
-          .filter(Boolean);
+          const backendNames =
+            backendCategories
+              .map((category) =>
+                typeof category ===
+                "string"
+                  ? category
+                  : category?.name
+              )
+              .filter(Boolean);
 
-        const merged = [
-          ...DEFAULT_CATEGORIES,
-          ...backendNames,
-        ].filter(
-          (name, index, array) =>
-            array.findIndex(
-              (item) =>
-                item.toLowerCase() ===
-                name.toLowerCase()
-            ) === index
-        );
+          const merged = [
+            ...DEFAULT_CATEGORIES,
+            ...backendNames,
+          ].filter(
+            (
+              name,
+              index,
+              array
+            ) =>
+              array.findIndex(
+                (item) =>
+                  item.toLowerCase() ===
+                  name.toLowerCase()
+              ) === index
+          );
 
-        setCategories(merged);
-      } catch (error) {
-        console.error(
-          "Failed to fetch categories:",
-          error
-        );
+          setCategories(merged);
+        } catch (error) {
+          console.error(
+            "Failed to fetch categories:",
+            error
+          );
 
-        setCategories(DEFAULT_CATEGORIES);
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
+          setCategories(
+            DEFAULT_CATEGORIES
+          );
+        } finally {
+          setLoadingCategories(false);
+        }
+      };
 
     fetchCategories();
   }, []);
 
   /*
-   * ==========================================
-   * POPULATE FORM FOR EDIT MODE
-   * ==========================================
-   */
+  |--------------------------------------------------------------------------
+  | POPULATE EDIT FORM
+  |--------------------------------------------------------------------------
+  */
 
   useEffect(() => {
     if (!editingProduct) {
-      setForm(initialForm);
+      setForm({
+        ...initialForm,
+        images: [],
+      });
+
+      setImageUrl("");
+
       return;
     }
 
     const existingImages =
-      getExistingImages(editingProduct);
+      getExistingImages(
+        editingProduct
+      );
 
     setForm({
-      name: editingProduct.name || "",
+      name:
+        editingProduct.name || "",
 
       description:
-        editingProduct.description || "",
+        editingProduct.description ||
+        "",
 
       price:
-        editingProduct.price !== undefined &&
-        editingProduct.price !== null
-          ? String(editingProduct.price)
+        editingProduct.price !==
+          undefined &&
+        editingProduct.price !==
+          null
+          ? String(
+              editingProduct.price
+            )
           : "",
 
-      /*
-       * Backend field is salePrice.
-       * UI field is comparePrice.
-       */
-      comparePrice:
-        editingProduct.salePrice !== undefined &&
-        editingProduct.salePrice !== null
-          ? String(editingProduct.salePrice)
+      salePrice:
+        editingProduct.salePrice !==
+          undefined &&
+        editingProduct.salePrice !==
+          null
+          ? String(
+              editingProduct.salePrice
+            )
           : "",
 
       category:
-        editingProduct.category || "",
+        editingProduct.category ||
+        "",
 
       badge:
-        editingProduct.badge || "",
+        editingProduct.badge ||
+        "",
 
       sku:
-        editingProduct.sku || "",
+        editingProduct.sku ||
+        "",
 
       stock:
-        editingProduct.stock !== undefined &&
-        editingProduct.stock !== null
-          ? String(editingProduct.stock)
+        editingProduct.stock !==
+          undefined &&
+        editingProduct.stock !==
+          null
+          ? String(
+              editingProduct.stock
+            )
           : "",
 
-      /*
-       * Existing backend URLs are represented
-       * as URL images so they remain visible.
-       */
-      images: existingImages.map((url) => ({
-        type: "url",
-        url,
-        preview: url,
-      })),
+      images:
+        existingImages.map(
+          (url) => ({
+            type: "url",
+            url,
+            preview: url,
+          })
+        ),
 
-      featured:
-        Boolean(editingProduct.featured),
+      featured: Boolean(
+        editingProduct.featured
+      ),
 
-      bestSeller:
-        Boolean(editingProduct.bestSeller),
+      bestSeller: Boolean(
+        editingProduct.bestSeller
+      ),
 
-      newArrival:
-        Boolean(editingProduct.newArrival),
+      newArrival: Boolean(
+        editingProduct.newArrival
+      ),
 
       isActive:
-        editingProduct.isActive !== undefined
-          ? Boolean(editingProduct.isActive)
+        editingProduct.isActive !==
+        undefined
+          ? Boolean(
+              editingProduct.isActive
+            )
           : true,
     });
 
@@ -232,12 +328,14 @@ const AddProduct = () => {
   }, [editingProduct]);
 
   /*
-   * ==========================================
-   * INPUT CHANGE
-   * ==========================================
-   */
+  |--------------------------------------------------------------------------
+  | INPUT CHANGE
+  |--------------------------------------------------------------------------
+  */
 
-  const handleChange = (event) => {
+  const handleChange = (
+    event
+  ) => {
     const {
       name,
       value,
@@ -245,22 +343,121 @@ const AddProduct = () => {
       checked,
     } = event.target;
 
-    setForm((previous) => ({
-      ...previous,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : value,
-    }));
+    setForm(
+      (previous) => ({
+        ...previous,
+
+        [name]:
+          type === "checkbox"
+            ? checked
+            : value,
+      })
+    );
   };
 
   /*
-   * ==========================================
-   * IMAGE FILE SELECT
-   * ==========================================
-   */
+  |--------------------------------------------------------------------------
+  | PRICE PARSER
+  |--------------------------------------------------------------------------
+  |
+  | Handles values like:
+  |
+  | 3900
+  | "3900"
+  | "3,900"
+  |
+  */
 
-  const handleFileSelect = (event) => {
+  const parsePrice = (value) => {
+    if (
+      value === undefined ||
+      value === null ||
+      String(value).trim() === ""
+    ) {
+      return null;
+    }
+
+    const normalizedValue =
+      String(value)
+        .replace(/,/g, "")
+        .trim();
+
+    const parsedValue =
+      Number(normalizedValue);
+
+    if (
+      !Number.isFinite(
+        parsedValue
+      )
+    ) {
+      return null;
+    }
+
+    return parsedValue;
+  };
+
+  /*
+  |--------------------------------------------------------------------------
+  | SALE PRICE CALCULATION
+  |--------------------------------------------------------------------------
+  */
+
+  const regularPrice =
+    parsePrice(form.price);
+
+  const salePrice =
+    form.salePrice === ""
+      ? null
+      : parsePrice(
+          form.salePrice
+        );
+
+  /*
+  |--------------------------------------------------------------------------
+  | VALID SALE
+  |--------------------------------------------------------------------------
+  */
+
+  const hasValidSale =
+    regularPrice !== null &&
+    regularPrice > 0 &&
+    salePrice !== null &&
+    salePrice > 0 &&
+    salePrice < regularPrice;
+
+  /*
+  |--------------------------------------------------------------------------
+  | SALE SAVING
+  |--------------------------------------------------------------------------
+  */
+
+  const saleSaving =
+    hasValidSale
+      ? regularPrice - salePrice
+      : 0;
+
+  /*
+  |--------------------------------------------------------------------------
+  | SALE PERCENTAGE
+  |--------------------------------------------------------------------------
+  */
+
+  const salePercentage =
+    hasValidSale
+      ? (saleSaving /
+          regularPrice) *
+        100
+      : 0;
+
+  /*
+  |--------------------------------------------------------------------------
+  | IMAGE FILE SELECT
+  |--------------------------------------------------------------------------
+  */
+
+  const handleFileSelect = (
+    event
+  ) => {
     const files = Array.from(
       event.target.files || []
     );
@@ -269,9 +466,12 @@ const AddProduct = () => {
       return;
     }
 
-    const imageFiles = files.filter((file) =>
-      file.type.startsWith("image/")
-    );
+    const imageFiles =
+      files.filter((file) =>
+        file.type.startsWith(
+          "image/"
+        )
+      );
 
     if (!imageFiles.length) {
       alert(
@@ -279,6 +479,7 @@ const AddProduct = () => {
       );
 
       event.target.value = "";
+
       return;
     }
 
@@ -291,49 +492,70 @@ const AddProduct = () => {
       );
 
       event.target.value = "";
+
       return;
     }
 
     const selectedFiles =
-      imageFiles.slice(0, availableSlots);
+      imageFiles.slice(
+        0,
+        availableSlots
+      );
 
-    const newImages = selectedFiles.map(
-      (file) => ({
-        type: "file",
-        file,
-        preview: URL.createObjectURL(file),
+    const newImages =
+      selectedFiles.map(
+        (file) => ({
+          type: "file",
+
+          file,
+
+          preview:
+            URL.createObjectURL(
+              file
+            ),
+        })
+      );
+
+    setForm(
+      (previous) => ({
+        ...previous,
+
+        images: [
+          ...previous.images,
+          ...newImages,
+        ],
       })
     );
-
-    setForm((previous) => ({
-      ...previous,
-      images: [
-        ...previous.images,
-        ...newImages,
-      ],
-    }));
 
     event.target.value = "";
   };
 
   /*
-   * ==========================================
-   * ADD IMAGE URL
-   * ==========================================
-   */
+  |--------------------------------------------------------------------------
+  | ADD IMAGE URL
+  |--------------------------------------------------------------------------
+  */
 
   const addImage = () => {
-    const url = imageUrl.trim();
+    const url =
+      imageUrl.trim();
 
     if (!url) {
-      alert("Please enter an image URL.");
+      alert(
+        "Please enter an image URL."
+      );
+
       return;
     }
 
-    if (form.images.length >= 10) {
+    if (
+      form.images.length >=
+      10
+    ) {
       alert(
         "Maximum 10 images are allowed."
       );
+
       return;
     }
 
@@ -343,152 +565,306 @@ const AddProduct = () => {
       alert(
         "Please enter a valid image URL."
       );
+
       return;
     }
 
-    const alreadyExists = form.images.some(
-      (image) =>
-        image.type === "url" &&
-        image.url === url
-    );
+    const alreadyExists =
+      form.images.some(
+        (image) =>
+          image.type === "url" &&
+          image.url === url
+      );
 
     if (alreadyExists) {
       alert(
         "This image has already been added."
       );
+
       return;
     }
 
-    setForm((previous) => ({
-      ...previous,
-      images: [
-        ...previous.images,
-        {
-          type: "url",
-          url,
-          preview: url,
-        },
-      ],
-    }));
+    setForm(
+      (previous) => ({
+        ...previous,
+
+        images: [
+          ...previous.images,
+
+          {
+            type: "url",
+
+            url,
+
+            preview: url,
+          },
+        ],
+      })
+    );
 
     setImageUrl("");
   };
 
   /*
-   * ==========================================
-   * REMOVE IMAGE
-   * ==========================================
-   */
+  |--------------------------------------------------------------------------
+  | REMOVE IMAGE
+  |--------------------------------------------------------------------------
+  */
 
-  const removeImage = (index) => {
-    setForm((previous) => {
-      const image = previous.images[index];
+  const removeImage = (
+    index
+  ) => {
+    setForm(
+      (previous) => {
+        const image =
+          previous.images[
+            index
+          ];
 
-      if (
-        image?.type === "file" &&
-        image?.preview
-      ) {
-        URL.revokeObjectURL(
-          image.preview
-        );
-      }
-
-      return {
-        ...previous,
-        images: previous.images.filter(
-          (_, imageIndex) =>
-            imageIndex !== index
-        ),
-      };
-    });
-  };
-
-  /*
-   * ==========================================
-   * CLEANUP PREVIEW URLS
-   * ==========================================
-   */
-
-  useEffect(() => {
-    return () => {
-      form.images.forEach((image) => {
         if (
-          image.type === "file" &&
-          image.preview
+          image?.type ===
+            "file" &&
+          image?.preview
         ) {
           URL.revokeObjectURL(
             image.preview
           );
         }
-      });
+
+        return {
+          ...previous,
+
+          images:
+            previous.images.filter(
+              (
+                _,
+                imageIndex
+              ) =>
+                imageIndex !==
+                index
+            ),
+        };
+      }
+    );
+  };
+
+  /*
+  |--------------------------------------------------------------------------
+  | CLEANUP IMAGE PREVIEWS
+  |--------------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    return () => {
+      form.images.forEach(
+        (image) => {
+          if (
+            image.type ===
+              "file" &&
+            image.preview
+          ) {
+            URL.revokeObjectURL(
+              image.preview
+            );
+          }
+        }
+      );
     };
   }, []);
 
   /*
-   * ==========================================
-   * SUBMIT
-   * ==========================================
-   */
+  |--------------------------------------------------------------------------
+  | SUBMIT
+  |--------------------------------------------------------------------------
+  */
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (
+    event
+  ) => {
     event.preventDefault();
+
+    /*
+    |--------------------------------------------------------------------------
+    | PRODUCT NAME
+    |--------------------------------------------------------------------------
+    */
 
     if (!form.name.trim()) {
       alert(
         "Product name is required."
       );
+
       return;
     }
 
-    if (!form.description.trim()) {
+    /*
+    |--------------------------------------------------------------------------
+    | DESCRIPTION
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      !form.description.trim()
+    ) {
       alert(
         "Product description is required."
       );
+
       return;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | REGULAR PRICE
+    |--------------------------------------------------------------------------
+    */
+
+    const currentPrice =
+      parsePrice(form.price);
+
     if (
-      !form.price ||
-      Number(form.price) <= 0
+      currentPrice === null ||
+      currentPrice <= 0
     ) {
-      alert("Please enter a valid price.");
+      alert(
+        "Please enter a valid regular price."
+      );
+
       return;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SALE PRICE VALIDATION
+    |--------------------------------------------------------------------------
+    |
+    | IMPORTANT:
+    |
+    | ₹3900 regular
+    | ₹3700 sale
+    |
+    | 3700 < 3900
+    |
+    | Therefore VALID.
+    |
+    */
+
+    let currentSalePrice =
+      null;
+
+    if (
+      form.salePrice !== ""
+    ) {
+      currentSalePrice =
+        parsePrice(
+          form.salePrice
+        );
+
+      /*
+       * Invalid number
+       */
+
+      if (
+        currentSalePrice === null ||
+        currentSalePrice <= 0
+      ) {
+        alert(
+          "Please enter a valid sale price."
+        );
+
+        return;
+      }
+
+      /*
+       * Sale must be LOWER
+       * than regular price.
+       */
+
+      if (
+        currentSalePrice >=
+        currentPrice
+      ) {
+        alert(
+          `Sale price must be lower than the regular price.\n\nRegular Price: ₹${currentPrice.toLocaleString(
+            "en-IN"
+          )}\nSale Price: ₹${currentSalePrice.toLocaleString(
+            "en-IN"
+          )}`
+        );
+
+        return;
+      }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CATEGORY
+    |--------------------------------------------------------------------------
+    */
 
     if (!form.category) {
       alert(
         "Please select a category."
       );
+
       return;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | IMAGES
+    |--------------------------------------------------------------------------
+    */
 
     if (!form.images.length) {
       alert(
         "Please add at least one product image."
       );
+
       return;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | STOCK
+    |--------------------------------------------------------------------------
+    */
+
+    const stockValue =
+      form.stock === ""
+        ? 0
+        : parsePrice(
+            form.stock
+          );
+
     if (
-      form.stock !== "" &&
-      Number(form.stock) < 0
+      stockValue === null ||
+      stockValue < 0
     ) {
       alert(
         "Stock quantity cannot be negative."
       );
+
       return;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE
+    |--------------------------------------------------------------------------
+    */
 
     try {
       setSaving(true);
 
-      const formData = new FormData();
+      const formData =
+        new FormData();
 
       /*
-       * ======================================
-       * BASIC FIELDS
-       * ======================================
-       */
+      |--------------------------------------------------------------------------
+      | BASIC INFORMATION
+      |--------------------------------------------------------------------------
+      */
 
       formData.append(
         "name",
@@ -500,34 +876,66 @@ const AddProduct = () => {
         form.description.trim()
       );
 
+      /*
+      |--------------------------------------------------------------------------
+      | REGULAR PRICE
+      |--------------------------------------------------------------------------
+      */
+
       formData.append(
         "price",
-        String(Number(form.price))
+        String(currentPrice)
       );
 
       /*
-       * Backend expects salePrice.
-       */
-      if (form.comparePrice !== "") {
+      |--------------------------------------------------------------------------
+      | SALE PRICE
+      |--------------------------------------------------------------------------
+      |
+      | Valid sale:
+      |
+      | 3900 -> 3700
+      |
+      */
+
+      if (
+        currentSalePrice !==
+        null
+      ) {
         formData.append(
           "salePrice",
-          String(Number(form.comparePrice))
+          String(
+            currentSalePrice
+          )
         );
       } else if (isEditMode) {
         /*
-         * Explicitly clear old sale price
-         * when editing and field is empty.
+         * Empty sale price while editing
+         * means remove the existing sale.
          */
+
         formData.append(
           "salePrice",
           ""
         );
       }
 
+      /*
+      |--------------------------------------------------------------------------
+      | CATEGORY
+      |--------------------------------------------------------------------------
+      */
+
       formData.append(
         "category",
         form.category
       );
+
+      /*
+      |--------------------------------------------------------------------------
+      | BADGE
+      |--------------------------------------------------------------------------
+      */
 
       if (
         form.badge &&
@@ -538,8 +946,17 @@ const AddProduct = () => {
           form.badge
         );
       } else {
-        formData.append("badge", "");
+        formData.append(
+          "badge",
+          ""
+        );
       }
+
+      /*
+      |--------------------------------------------------------------------------
+      | SKU
+      |--------------------------------------------------------------------------
+      */
 
       if (form.sku.trim()) {
         formData.append(
@@ -547,111 +964,162 @@ const AddProduct = () => {
           form.sku.trim()
         );
       } else if (isEditMode) {
-        formData.append("sku", "");
+        formData.append(
+          "sku",
+          ""
+        );
       }
+
+      /*
+      |--------------------------------------------------------------------------
+      | STOCK
+      |--------------------------------------------------------------------------
+      */
 
       formData.append(
         "stock",
+        String(stockValue)
+      );
+
+      /*
+      |--------------------------------------------------------------------------
+      | SETTINGS
+      |--------------------------------------------------------------------------
+      */
+
+      formData.append(
+        "featured",
         String(
-          form.stock === ""
-            ? 0
-            : Number(form.stock)
+          Boolean(
+            form.featured
+          )
         )
       );
 
       formData.append(
-        "featured",
-        String(Boolean(form.featured))
-      );
-
-      formData.append(
         "bestSeller",
-        String(Boolean(form.bestSeller))
+        String(
+          Boolean(
+            form.bestSeller
+          )
+        )
       );
 
       formData.append(
         "newArrival",
-        String(Boolean(form.newArrival))
+        String(
+          Boolean(
+            form.newArrival
+          )
+        )
       );
 
       formData.append(
         "isActive",
-        String(Boolean(form.isActive))
+        String(
+          Boolean(
+            form.isActive
+          )
+        )
       );
 
       /*
-       * ======================================
-       * IMAGES
-       * ======================================
-       *
-       * EDIT MODE:
-       * Existing URL images -> existingImages
-       *
-       * New URL images -> images
-       *
-       * New uploaded files -> images
-       *
-       * This matches your backend update
-       * controller.
-       */
+      |--------------------------------------------------------------------------
+      | IMAGES
+      |--------------------------------------------------------------------------
+      */
 
       if (isEditMode) {
-        form.images.forEach((image) => {
-          if (image.type === "url") {
-            /*
-             * Existing Cloudinary/image URL
-             * is kept as existingImages.
-             */
-            formData.append(
-              "existingImages",
-              image.url
-            );
-          }
+        /*
+         * Existing URL images
+         */
 
-          if (image.type === "file") {
-            formData.append(
-              "images",
-              image.file
-            );
+        form.images.forEach(
+          (image) => {
+            if (
+              image.type ===
+              "url"
+            ) {
+              formData.append(
+                "existingImages",
+                image.url
+              );
+            }
+
+            /*
+             * New uploaded files
+             */
+
+            if (
+              image.type ===
+              "file"
+            ) {
+              formData.append(
+                "images",
+                image.file
+              );
+            }
           }
-        });
+        );
       } else {
         /*
-         * ADD MODE
+         * New product
          */
-        form.images.forEach((image) => {
-          if (image.type === "file") {
-            formData.append(
-              "images",
-              image.file
-            );
-          }
 
-          if (image.type === "url") {
-            formData.append(
-              "images",
-              image.url
-            );
+        form.images.forEach(
+          (image) => {
+            /*
+             * Uploaded file
+             */
+
+            if (
+              image.type ===
+              "file"
+            ) {
+              formData.append(
+                "images",
+                image.file
+              );
+            }
+
+            /*
+             * Image URL
+             */
+
+            if (
+              image.type ===
+              "url"
+            ) {
+              formData.append(
+                "images",
+                image.url
+              );
+            }
           }
-        });
+        );
       }
 
       /*
-       * ======================================
-       * API REQUEST
-       * ======================================
-       */
+      |--------------------------------------------------------------------------
+      | API REQUEST
+      |--------------------------------------------------------------------------
+      */
 
       let data;
 
       if (isEditMode) {
-        data = await apiRequest(
-          `/products/${editingProduct._id}`,
-          {
-            method: "PUT",
-            body: formData,
-          }
-        );
+        /*
+         * UPDATE
+         */
+
+        data =
+          await apiRequest(
+            `/products/${editingProduct._id}`,
+            {
+              method: "PUT",
+              body: formData,
+            }
+          );
 
         console.log(
           "Product updated:",
@@ -662,13 +1130,18 @@ const AddProduct = () => {
           "Product updated successfully."
         );
       } else {
-        data = await apiRequest(
-          "/products",
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
+        /*
+         * CREATE
+         */
+
+        data =
+          await apiRequest(
+            "/products",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
 
         console.log(
           "Product created:",
@@ -681,8 +1154,11 @@ const AddProduct = () => {
       }
 
       /*
-       * Reset only after successful request.
-       */
+      |--------------------------------------------------------------------------
+      | RESET
+      |--------------------------------------------------------------------------
+      */
+
       setForm({
         ...initialForm,
         images: [],
@@ -690,7 +1166,15 @@ const AddProduct = () => {
 
       setImageUrl("");
 
-      navigate("/products");
+      /*
+      |--------------------------------------------------------------------------
+      | BACK TO PRODUCTS
+      |--------------------------------------------------------------------------
+      */
+
+      navigate(
+        "/products"
+      );
     } catch (error) {
       console.error(
         isEditMode
@@ -701,11 +1185,9 @@ const AddProduct = () => {
 
       alert(
         error?.message ||
-          (
-            isEditMode
-              ? "Failed to update product. Please try again."
-              : "Failed to add product. Please try again."
-          )
+          (isEditMode
+            ? "Failed to update product. Please try again."
+            : "Failed to add product. Please try again.")
       );
     } finally {
       setSaving(false);
@@ -713,34 +1195,45 @@ const AddProduct = () => {
   };
 
   /*
-   * ==========================================
-   * BACK
-   * ==========================================
-   */
+  |--------------------------------------------------------------------------
+  | BACK
+  |--------------------------------------------------------------------------
+  */
 
   const handleBack = () => {
     if (saving) {
       return;
     }
 
-    navigate("/products");
+    navigate(
+      "/products"
+    );
   };
+
+  /*
+  |--------------------------------------------------------------------------
+  | UI
+  |--------------------------------------------------------------------------
+  */
 
   return (
     <div className="add-product-page">
-      {/* =========================
-          HEADER
-      ========================= */}
+      {/* HEADER */}
 
       <div className="page-header">
         <div>
           <button
             type="button"
             className="outline-button back-button"
-            onClick={handleBack}
+            onClick={
+              handleBack
+            }
             disabled={saving}
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft
+              size={16}
+            />
+
             Back to Products
           </button>
 
@@ -758,32 +1251,33 @@ const AddProduct = () => {
         </div>
       </div>
 
-      {/* =========================
-          FORM
-      ========================= */}
+      {/* FORM */}
 
       <form
         className="add-product-form"
-        onSubmit={handleSubmit}
+        onSubmit={
+          handleSubmit
+        }
       >
-        {/* =========================
-            BASIC INFORMATION
-        ========================= */}
+        {/* BASIC INFORMATION */}
 
         <section className="panel">
           <div className="panel-heading">
             <div>
-              <h2>Basic Information</h2>
+              <h2>
+                Basic Information
+              </h2>
 
               <p>
-                Enter the main details of
-                your product.
+                Enter the main
+                details of your
+                product.
               </p>
             </div>
           </div>
 
           <div className="form-grid">
-            {/* NAME */}
+            {/* PRODUCT NAME */}
 
             <div className="form-group full-width">
               <label htmlFor="name">
@@ -795,8 +1289,12 @@ const AddProduct = () => {
                 id="name"
                 name="name"
                 type="text"
-                value={form.name}
-                onChange={handleChange}
+                value={
+                  form.name
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="e.g. The Heritage Saddle"
               />
             </div>
@@ -813,17 +1311,22 @@ const AddProduct = () => {
                 id="description"
                 name="description"
                 rows="6"
-                value={form.description}
-                onChange={handleChange}
+                value={
+                  form.description
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="Write a detailed description of the product..."
               />
             </div>
 
-            {/* PRICE */}
+            {/* REGULAR PRICE */}
 
             <div className="form-group">
               <label htmlFor="price">
-                Price (INR){" "}
+                Regular Price
+                (INR){" "}
                 <span>*</span>
               </label>
 
@@ -835,33 +1338,106 @@ const AddProduct = () => {
                   name="price"
                   type="number"
                   min="0"
-                  value={form.price}
-                  onChange={handleChange}
-                  placeholder="48500"
+                  step="0.01"
+                  value={
+                    form.price
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="72500"
                 />
               </div>
             </div>
 
-            {/* COMPARE PRICE */}
+            {/* SALE PRICE */}
 
             <div className="form-group">
-              <label htmlFor="comparePrice">
-                Compare at Price (INR)
+              <label htmlFor="salePrice">
+                Sale Price
+                (INR)
               </label>
 
               <div className="price-input">
                 <span>₹</span>
 
                 <input
-                  id="comparePrice"
-                  name="comparePrice"
+                  id="salePrice"
+                  name="salePrice"
                   type="number"
                   min="0"
-                  value={form.comparePrice}
-                  onChange={handleChange}
-                  placeholder="55000"
+                  step="0.01"
+                  value={
+                    form.salePrice
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="64999"
                 />
               </div>
+
+              {/* VALID SALE */}
+
+              {hasValidSale && (
+                <div
+                  style={{
+                    marginTop:
+                      "8px",
+
+                    fontSize:
+                      "13px",
+
+                    color:
+                      "#2B4433",
+
+                    fontWeight:
+                      600,
+                  }}
+                >
+                  You save ₹
+                  {saleSaving.toLocaleString(
+                    "en-IN"
+                  )}{" "}
+                  (
+                  {salePercentage.toFixed(
+                    2
+                  )}
+                  % OFF)
+                </div>
+              )}
+
+              {/* INVALID SALE */}
+
+              {form.salePrice !==
+                "" &&
+                salePrice !==
+                  null &&
+                regularPrice !==
+                  null &&
+                salePrice >=
+                  regularPrice && (
+                  <div
+                    style={{
+                      marginTop:
+                        "8px",
+
+                      fontSize:
+                        "13px",
+
+                      color:
+                        "#b42318",
+
+                      fontWeight:
+                        600,
+                    }}
+                  >
+                    Sale price must
+                    be lower than
+                    the regular
+                    price.
+                  </div>
+                )}
             </div>
 
             {/* CATEGORY */}
@@ -875,8 +1451,12 @@ const AddProduct = () => {
               <select
                 id="category"
                 name="category"
-                value={form.category}
-                onChange={handleChange}
+                value={
+                  form.category
+                }
+                onChange={
+                  handleChange
+                }
                 disabled={
                   loadingCategories
                 }
@@ -890,10 +1470,16 @@ const AddProduct = () => {
                 {categories.map(
                   (category) => (
                     <option
-                      key={category}
-                      value={category}
+                      key={
+                        category
+                      }
+                      value={
+                        category
+                      }
                     >
-                      {category}
+                      {
+                        category
+                      }
                     </option>
                   )
                 )}
@@ -910,15 +1496,22 @@ const AddProduct = () => {
               <select
                 id="badge"
                 name="badge"
-                value={form.badge}
-                onChange={handleChange}
+                value={
+                  form.badge
+                }
+                onChange={
+                  handleChange
+                }
               >
                 {BADGES.map(
                   (badge) => (
                     <option
-                      key={badge}
+                      key={
+                        badge
+                      }
                       value={
-                        badge === "None"
+                        badge ===
+                        "None"
                           ? ""
                           : badge
                       }
@@ -941,8 +1534,12 @@ const AddProduct = () => {
                 id="sku"
                 name="sku"
                 type="text"
-                value={form.sku}
-                onChange={handleChange}
+                value={
+                  form.sku
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="SC-HS-001"
               />
             </div>
@@ -959,37 +1556,48 @@ const AddProduct = () => {
                 name="stock"
                 type="number"
                 min="0"
-                value={form.stock}
-                onChange={handleChange}
+                step="1"
+                value={
+                  form.stock
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="10"
               />
             </div>
           </div>
         </section>
 
-        {/* =========================
-            PRODUCT IMAGES
-        ========================= */}
+        {/* PRODUCT IMAGES */}
 
         <section className="panel">
           <div className="panel-heading">
             <div>
-              <h2>Product Images</h2>
+              <h2>
+                Product Images
+              </h2>
 
               <p>
-                Upload product images or
-                add them using an image URL.
+                Upload product
+                images or add
+                them using an
+                image URL.
               </p>
             </div>
           </div>
 
           <input
-            ref={fileInputRef}
+            ref={
+              fileInputRef
+            }
             type="file"
             accept="image/*"
             multiple
             hidden
-            onChange={handleFileSelect}
+            onChange={
+              handleFileSelect
+            }
           />
 
           <button
@@ -1001,7 +1609,9 @@ const AddProduct = () => {
             disabled={saving}
           >
             <div className="image-upload-icon">
-              <Upload size={21} />
+              <Upload
+                size={21}
+              />
             </div>
 
             <div>
@@ -1010,19 +1620,26 @@ const AddProduct = () => {
               </strong>
 
               <span>
-                Click to upload product
-                images
+                Click to upload
+                product images
               </span>
             </div>
           </button>
 
+          {/* IMAGE URL */}
+
           <div className="image-url-row">
             <input
               type="url"
-              value={imageUrl}
-              onChange={(event) =>
+              value={
+                imageUrl
+              }
+              onChange={(
+                event
+              ) =>
                 setImageUrl(
-                  event.target.value
+                  event.target
+                    .value
                 )
               }
               placeholder="Or paste image URL..."
@@ -1032,33 +1649,54 @@ const AddProduct = () => {
             <button
               type="button"
               className="add-image-button"
-              onClick={addImage}
+              onClick={
+                addImage
+              }
               disabled={saving}
             >
-              <Plus size={16} />
+              <Plus
+                size={16}
+              />
+
               Add URL
             </button>
           </div>
 
-          {form.images.length > 0 && (
+          {/* IMAGE COUNT */}
+
+          {form.images.length >
+            0 && (
             <div className="image-count">
-              {form.images.length} / 10
-              images added
+              {
+                form.images
+                  .length
+              }{" "}
+              / 10 images
+              added
             </div>
           )}
 
-          {form.images.length > 0 && (
+          {/* IMAGE PREVIEWS */}
+
+          {form.images.length >
+            0 && (
             <div className="image-preview-list">
               {form.images.map(
-                (image, index) => (
+                (
+                  image,
+                  index
+                ) => (
                   <div
                     className="image-preview-item"
                     key={`${image.type}-${index}-${image.preview}`}
                   >
                     <img
-                      src={image.preview}
+                      src={
+                        image.preview
+                      }
                       alt={`Product ${
-                        index + 1
+                        index +
+                        1
                       }`}
                     />
 
@@ -1066,17 +1704,25 @@ const AddProduct = () => {
                       type="button"
                       className="remove-image-button"
                       onClick={() =>
-                        removeImage(index)
+                        removeImage(
+                          index
+                        )
                       }
-                      disabled={saving}
+                      disabled={
+                        saving
+                      }
                       aria-label={`Remove image ${
-                        index + 1
+                        index +
+                        1
                       }`}
                     >
-                      <X size={15} />
+                      <X
+                        size={15}
+                      />
                     </button>
 
-                    {index === 0 && (
+                    {index ===
+                      0 && (
                       <span className="primary-image-label">
                         Main Image
                       </span>
@@ -1087,30 +1733,37 @@ const AddProduct = () => {
             </div>
           )}
 
-          {form.images.length === 0 && (
+          {/* EMPTY IMAGE */}
+
+          {form.images.length ===
+            0 && (
             <div className="empty-image-state">
-              <ImagePlus size={22} />
+              <ImagePlus
+                size={22}
+              />
 
               <span>
-                No product images
-                added yet.
+                No product
+                images added
+                yet.
               </span>
             </div>
           )}
         </section>
 
-        {/* =========================
-            PRODUCT STATUS
-        ========================= */}
+        {/* PRODUCT SETTINGS */}
 
         <section className="panel">
           <div className="panel-heading">
             <div>
-              <h2>Product Settings</h2>
+              <h2>
+                Product Settings
+              </h2>
 
               <p>
-                Choose where and how this
-                product should appear.
+                Choose where and
+                how this product
+                should appear.
               </p>
             </div>
           </div>
@@ -1125,7 +1778,9 @@ const AddProduct = () => {
                 checked={
                   form.featured
                 }
-                onChange={handleChange}
+                onChange={
+                  handleChange
+                }
               />
 
               <div>
@@ -1134,8 +1789,9 @@ const AddProduct = () => {
                 </strong>
 
                 <span>
-                  Show this product in
-                  the featured collection.
+                  Show this product
+                  in the featured
+                  collection.
                 </span>
               </div>
             </label>
@@ -1149,7 +1805,9 @@ const AddProduct = () => {
                 checked={
                   form.bestSeller
                 }
-                onChange={handleChange}
+                onChange={
+                  handleChange
+                }
               />
 
               <div>
@@ -1158,8 +1816,9 @@ const AddProduct = () => {
                 </strong>
 
                 <span>
-                  Show this product in
-                  the best sellers section.
+                  Show this product
+                  in the best sellers
+                  section.
                 </span>
               </div>
             </label>
@@ -1173,7 +1832,9 @@ const AddProduct = () => {
                 checked={
                   form.newArrival
                 }
-                onChange={handleChange}
+                onChange={
+                  handleChange
+                }
               />
 
               <div>
@@ -1182,8 +1843,8 @@ const AddProduct = () => {
                 </strong>
 
                 <span>
-                  Show this product in
-                  new arrivals.
+                  Show this product
+                  in new arrivals.
                 </span>
               </div>
             </label>
@@ -1197,7 +1858,9 @@ const AddProduct = () => {
                 checked={
                   form.isActive
                 }
-                onChange={handleChange}
+                onChange={
+                  handleChange
+                }
               />
 
               <div>
@@ -1207,22 +1870,23 @@ const AddProduct = () => {
 
                 <span>
                   Make this product
-                  visible in the store.
+                  visible in the
+                  store.
                 </span>
               </div>
             </label>
           </div>
         </section>
 
-        {/* =========================
-            ACTIONS
-        ========================= */}
+        {/* ACTIONS */}
 
         <div className="form-actions">
           <button
             type="button"
             className="outline-button"
-            onClick={handleBack}
+            onClick={
+              handleBack
+            }
             disabled={saving}
           >
             Cancel
@@ -1233,15 +1897,17 @@ const AddProduct = () => {
             className="primary-button"
             disabled={saving}
           >
-            <Save size={17} />
+            <Save
+              size={17}
+            />
 
             {saving
               ? isEditMode
                 ? "Updating Product..."
                 : "Adding Product..."
               : isEditMode
-                ? "Update Product"
-                : "Add Product"}
+              ? "Update Product"
+              : "Add Product"}
           </button>
         </div>
       </form>

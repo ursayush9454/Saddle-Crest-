@@ -12,7 +12,9 @@ import heroImage1 from "../assets/image.png";
 import heroImage2 from "../assets/hero2.png";
 import heroImage3 from "../assets/hero3.jpg";
 import heroImage4 from "../assets/Hero4.jpg";
+import heroImage5 from "../assets/hero6.png";
 
+const SLIDE_DURATION = 5000;
 
 const slides = [
   {
@@ -110,55 +112,105 @@ const slides = [
       </>
     ),
   },
-];
 
+  {
+    image: heroImage5,
+    position: "center center",
+    mobilePosition: "50% center",
+
+    eyebrow: "Heritage in Every Detail",
+
+    title: (
+      <>
+        Tradition
+        <br />
+        <em>Reimagined</em>
+      </>
+    ),
+
+    description: (
+      <>
+        Indian craftsmanship meets
+        <br />
+        contemporary equestrian design.
+      </>
+    ),
+  },
+];
 
 const Hero = () => {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [progressKey, setProgressKey] = useState(0);
 
-
-  /* =========================
+  /* =====================================================
      AUTO SLIDER
-  ========================= */
+
+     Every slide gets a fresh 5 second timer.
+  ===================================================== */
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
+    const timer = setTimeout(() => {
+      setActiveSlide((prev) => {
+        if (prev === slides.length - 1) {
+          return 0;
+        }
 
-    return () => clearInterval(interval);
-  }, []);
+        return prev + 1;
+      });
+    }, SLIDE_DURATION);
 
+    return () => clearTimeout(timer);
+  }, [activeSlide]);
 
-  /* =========================
-     NEXT
-  ========================= */
+  /* =====================================================
+     NEXT SLIDE
+  ===================================================== */
 
   const nextSlide = () => {
-    setActiveSlide((prev) => (prev + 1) % slides.length);
+    setActiveSlide((prev) => {
+      if (prev === slides.length - 1) {
+        return 0;
+      }
+
+      return prev + 1;
+    });
+
+    setProgressKey((prev) => prev + 1);
   };
 
-
-  /* =========================
-     PREVIOUS
-  ========================= */
+  /* =====================================================
+     PREVIOUS SLIDE
+  ===================================================== */
 
   const prevSlide = () => {
-    setActiveSlide(
-      (prev) => (prev - 1 + slides.length) % slides.length
-    );
+    setActiveSlide((prev) => {
+      if (prev === 0) {
+        return slides.length - 1;
+      }
+
+      return prev - 1;
+    });
+
+    setProgressKey((prev) => prev + 1);
   };
 
+  /* =====================================================
+     GO TO SPECIFIC SLIDE
+  ===================================================== */
+
+  const goToSlide = (index) => {
+    setActiveSlide(index);
+    setProgressKey((prev) => prev + 1);
+  };
 
   const slide = slides[activeSlide];
-
 
   return (
     <section className="hero">
 
-      {/* =========================
+      {/* =================================================
           HERO IMAGE
-      ========================= */}
+      ================================================= */}
 
       <div
         key={`image-${activeSlide}`}
@@ -170,30 +222,25 @@ const Hero = () => {
         }}
       />
 
-
-      {/* =========================
+      {/* =================================================
           OVERLAY
-      ========================= */}
+      ================================================= */}
 
       <div className="hero-overlay" />
 
-
-      {/* =========================
+      {/* =================================================
           HERO CONTENT
-      ========================= */}
+      ================================================= */}
 
       <div
         key={`content-${activeSlide}`}
         className="hero-content"
       >
-
         <p className="hero-eyebrow">
           {slide.eyebrow}
         </p>
 
-        <h1>
-          {slide.title}
-        </h1>
+        <h1>{slide.title}</h1>
 
         <p className="hero-description">
           {slide.description}
@@ -206,13 +253,11 @@ const Hero = () => {
           Explore Collection
           <ArrowRight size={16} />
         </a>
-
       </div>
 
-
-      {/* =========================
-          SLIDER ARROWS
-      ========================= */}
+      {/* =================================================
+          SLIDER CONTROLS
+      ================================================= */}
 
       <div className="hero-controls">
 
@@ -236,12 +281,13 @@ const Hero = () => {
 
       </div>
 
-
-      {/* =========================
+      {/* =================================================
           BOTTOM
-      ========================= */}
+      ================================================= */}
 
       <div className="hero-bottom">
+
+        {/* SLIDE NUMBERS */}
 
         <div className="hero-location">
 
@@ -254,7 +300,7 @@ const Hero = () => {
                   ? "active"
                   : ""
               }
-              onClick={() => setActiveSlide(index)}
+              onClick={() => goToSlide(index)}
               aria-label={`Go to slide ${index + 1}`}
             >
               0{index + 1}
@@ -262,7 +308,6 @@ const Hero = () => {
           ))}
 
         </div>
-
 
         {/* SCROLL */}
 
@@ -276,7 +321,6 @@ const Hero = () => {
 
         </div>
 
-
         {/* EST */}
 
         <div className="hero-est">
@@ -285,15 +329,14 @@ const Hero = () => {
 
       </div>
 
-
-      {/* =========================
+      {/* =================================================
           PROGRESS BAR
-      ========================= */}
+      ================================================= */}
 
       <div className="hero-progress">
 
         <div
-          key={`progress-${activeSlide}`}
+          key={`progress-${activeSlide}-${progressKey}`}
           className="hero-progress-bar"
         />
 
@@ -302,6 +345,5 @@ const Hero = () => {
     </section>
   );
 };
-
 
 export default Hero;

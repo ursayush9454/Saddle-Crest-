@@ -2,9 +2,25 @@ const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true, index: true },
-    slug: { type: String, trim: true, index: true },
-    sku: { type: String, unique: true, sparse: true, index: true },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      index: true,
+    },
+
+    slug: {
+      type: String,
+      trim: true,
+      index: true,
+    },
+
+    sku: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true,
+    },
 
     description: {
       type: String,
@@ -15,6 +31,10 @@ const schema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    // =========================
+    // PRICING
+    // =========================
 
     price: {
       type: Number,

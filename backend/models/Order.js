@@ -27,10 +27,25 @@ const schema = new mongoose.Schema(
           required: true,
         },
 
+        // Actual amount charged per unit
         price: {
           type: Number,
           min: 0,
           required: true,
+        },
+
+        // Original product price
+        originalPrice: {
+          type: Number,
+          min: 0,
+          required: true,
+        },
+
+        // Sale price at the time of purchase
+        salePrice: {
+          type: Number,
+          min: 0,
+          default: null,
         },
       },
     ],

@@ -7,8 +7,14 @@ import {
   ShoppingBag,
   Trash2,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+
 import { useShop } from "../ShopContext/ShopContext";
+
 import "./Cart.css";
 import Navbar from "../components/Navbar";
 
@@ -23,11 +29,14 @@ const Cart = () => {
     cartSubtotal,
   } = useShop();
 
-  // Free shipping above ₹10,000
   const shipping =
-    cartSubtotal >= 10000 || cartSubtotal === 0 ? 0 : 450;
+    cartSubtotal >= 10000 ||
+    cartSubtotal === 0
+      ? 0
+      : 450;
 
-  const total = cartSubtotal + shipping;
+  const total =
+    cartSubtotal + shipping;
 
   const handleCheckout = () => {
     if (!cart || cart.length === 0) {
@@ -37,26 +46,99 @@ const Cart = () => {
     navigate("/checkout");
   };
 
+  /* ========================================
+     PRICE HELPERS
+  ======================================== */
+
+  const getRegularPrice = (
+    item
+  ) => {
+    return Number(
+      item.price ??
+        item.product?.price ??
+        0
+    );
+  };
+
+  const getSalePrice = (
+    item
+  ) => {
+    const salePrice = Number(
+      item.salePrice ??
+        item.product?.salePrice
+    );
+
+    const regularPrice =
+      getRegularPrice(item);
+
+    if (
+      Number.isFinite(salePrice) &&
+      salePrice > 0 &&
+      salePrice < regularPrice
+    ) {
+      return salePrice;
+    }
+
+    return null;
+  };
+
+  const getEffectivePrice = (
+    item
+  ) => {
+    const salePrice =
+      getSalePrice(item);
+
+    return (
+      salePrice ??
+      getRegularPrice(item)
+    );
+  };
+
+  const getDiscountPercentage = (
+    item
+  ) => {
+    const regularPrice =
+      getRegularPrice(item);
+
+    const salePrice =
+      getSalePrice(item);
+
+    if (
+      !regularPrice ||
+      salePrice === null
+    ) {
+      return 0;
+    }
+
+    return Math.round(
+      ((regularPrice - salePrice) /
+        regularPrice) *
+        100
+    );
+  };
+
   return (
     <main className="cart-page">
-       <Navbar navbarBackground={'#000'} top="0"/>
+      <Navbar
+        navbarBackground="#000"
+        top="0"
+      />
 
-      {/* =========================================
-          HERO
-      ========================================= */}
+      {/* EMPTY CART */}
 
-
-      {/* =========================================
-          EMPTY CART
-      ========================================= */}
-
-      {!cart || cart.length === 0 ? (
+      {!cart ||
+      cart.length === 0 ? (
         <section className="cart-empty-section">
           <div className="cart-empty-icon">
-            <ShoppingBag size={30} strokeWidth={1.2} />
+            <ShoppingBag
+              size={30}
+              strokeWidth={1.2}
+            />
           </div>
 
-          <span>YOUR CART IS EMPTY</span>
+          <span>
+            YOUR CART IS EMPTY
+          </span>
 
           <h2>
             Your journey
@@ -64,31 +146,38 @@ const Cart = () => {
           </h2>
 
           <p>
-            Explore handcrafted saddlery, riding essentials and
-            timeless leather goods made for the modern equestrian.
+            Explore handcrafted
+            saddlery, riding essentials
+            and timeless leather goods
+            made for the modern
+            equestrian.
           </p>
 
-          <Link to="/shop" className="cart-shop-btn">
+          <Link
+            to="/shop"
+            className="cart-shop-btn"
+          >
             EXPLORE THE COLLECTION
+
             <ArrowRight size={17} />
           </Link>
         </section>
       ) : (
         <section className="cart-content">
-
-          {/* =========================================
-              CART ITEMS
-          ========================================= */}
+          {/* CART */}
 
           <div className="cart-main">
-
             <div className="cart-heading">
               <div>
-                <span>YOUR SELECTION</span>
+                <span>
+                  YOUR SELECTION
+                </span>
 
                 <h2>
                   {cart.length}{" "}
-                  {cart.length === 1 ? "Piece" : "Pieces"}
+                  {cart.length === 1
+                    ? "Piece"
+                    : "Pieces"}
                 </h2>
               </div>
 
@@ -99,7 +188,6 @@ const Cart = () => {
             </div>
 
             <div className="cart-items">
-
               {cart.map((item) => {
                 const productId =
                   item.productId ||
@@ -114,29 +202,44 @@ const Cart = () => {
                   item.product?.images?.[0] ||
                   "";
 
-                const itemPrice = Number(
-                  item.salePrice ||
-                  item.product?.salePrice ||
-                  item.price ||
-                  item.product?.price ||
-                  0
-                );
+                const regularPrice =
+                  getRegularPrice(item);
 
-                const itemStock = Number(
-                  item.stock ||
-                  item.product?.stock ||
-                  999
-                );
+                const salePrice =
+                  getSalePrice(item);
+
+                const itemPrice =
+                  getEffectivePrice(
+                    item
+                  );
+
+                const discountPercentage =
+                  getDiscountPercentage(
+                    item
+                  );
+
+                const itemStock =
+                  Number(
+                    item.stock ||
+                      item.product
+                        ?.stock ||
+                      999
+                  );
+
+                const quantity =
+                  Number(
+                    item.quantity || 1
+                  );
 
                 const itemTotal =
-                  itemPrice * Number(item.quantity || 1);
+                  itemPrice *
+                  quantity;
 
                 return (
                   <article
                     className="cart-item"
                     key={productId}
                   >
-
                     {/* IMAGE */}
 
                     <Link
@@ -146,131 +249,204 @@ const Cart = () => {
                       {itemImage ? (
                         <img
                           src={itemImage}
-                          alt={item.name || "Product"}
+                          alt={
+                            item.name ||
+                            "Product"
+                          }
                         />
                       ) : (
                         <div className="cart-no-image">
-                          <ShoppingBag size={25} />
+                          <ShoppingBag
+                            size={25}
+                          />
                         </div>
                       )}
                     </Link>
 
-                    {/* PRODUCT INFO */}
+                    {/* INFO */}
 
                     <div className="cart-item-info">
-
                       <span>
                         {item.category ||
-                          item.product?.category ||
+                          item.product
+                            ?.category ||
                           "Saddle & Crest"}
                       </span>
 
                       <h3>
                         {item.name ||
-                          item.product?.name ||
+                          item.product
+                            ?.name ||
                           "Product"}
                       </h3>
 
                       <p>
-                        Handcrafted with attention to detail,
-                        designed for a lifetime of riding.
+                        Handcrafted with
+                        attention to detail,
+                        designed for a lifetime
+                        of riding.
                       </p>
 
                       <button
                         type="button"
                         className="cart-remove"
                         onClick={() =>
-                          removeFromCart(productId)
+                          removeFromCart(
+                            productId
+                          )
                         }
                       >
                         <Trash2 size={14} />
                         REMOVE
                       </button>
-
                     </div>
 
                     {/* PRICE */}
 
                     <div className="cart-item-price">
-                      ₹{itemPrice.toLocaleString("en-IN")}
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection:
+                            "column",
+                          alignItems:
+                            "flex-end",
+                          gap: "4px",
+                        }}
+                      >
+                        <strong>
+                          ₹
+                          {itemPrice.toLocaleString(
+                            "en-IN"
+                          )}
+                        </strong>
+
+                        {salePrice !==
+                          null && (
+                          <>
+                            <span
+                              style={{
+                                textDecoration:
+                                  "line-through",
+                                opacity: 0.55,
+                                fontSize:
+                                  "12px",
+                              }}
+                            >
+                              ₹
+                              {regularPrice.toLocaleString(
+                                "en-IN"
+                              )}
+                            </span>
+
+                            <small
+                              style={{
+                                fontSize:
+                                  "10px",
+                                fontWeight: 700,
+                                letterSpacing:
+                                  "0.05em",
+                              }}
+                            >
+                              {
+                                discountPercentage
+                              }
+                              % OFF
+                            </small>
+                          </>
+                        )}
+                      </div>
                     </div>
 
                     {/* QUANTITY */}
 
                     <div className="cart-quantity">
-
                       <button
                         type="button"
                         onClick={() =>
-                          decreaseQuantity(productId)
+                          decreaseQuantity(
+                            productId
+                          )
                         }
-                        disabled={Number(item.quantity) <= 1}
+                        disabled={
+                          quantity <= 1
+                        }
                         aria-label="Decrease quantity"
                       >
                         <Minus size={13} />
                       </button>
 
                       <span>
-                        {item.quantity}
+                        {quantity}
                       </span>
 
                       <button
                         type="button"
                         onClick={() => {
                           if (
-                            Number(item.quantity) <
+                            quantity <
                             itemStock
                           ) {
-                            increaseQuantity(productId);
+                            increaseQuantity(
+                              productId
+                            );
                           }
                         }}
                         disabled={
-                          Number(item.quantity) >=
+                          quantity >=
                           itemStock
                         }
                         aria-label="Increase quantity"
                       >
                         <Plus size={13} />
                       </button>
-
                     </div>
 
                     {/* TOTAL */}
 
                     <div className="cart-item-total">
-                      ₹{itemTotal.toLocaleString("en-IN")}
+                      ₹
+                      {itemTotal.toLocaleString(
+                        "en-IN"
+                      )}
                     </div>
-
                   </article>
                 );
               })}
-
             </div>
           </div>
 
-          {/* =========================================
-              ORDER SUMMARY
-          ========================================= */}
+          {/* SUMMARY */}
 
           <aside className="cart-summary">
-
             <div className="cart-summary-top">
-              <span>ORDER SUMMARY</span>
-              <h2>Your Order</h2>
+              <span>
+                ORDER SUMMARY
+              </span>
+
+              <h2>
+                Your Order
+              </h2>
             </div>
 
             <div className="cart-summary-lines">
-
               <div>
-                <span>Subtotal</span>
+                <span>
+                  Subtotal
+                </span>
 
                 <strong>
-                  ₹{cartSubtotal.toLocaleString("en-IN")}
+                  ₹
+                  {cartSubtotal.toLocaleString(
+                    "en-IN"
+                  )}
                 </strong>
               </div>
 
               <div>
-                <span>Shipping</span>
+                <span>
+                  Shipping
+                </span>
 
                 <strong>
                   {shipping === 0
@@ -280,55 +456,73 @@ const Cart = () => {
                       )}`}
                 </strong>
               </div>
-
             </div>
 
             <div className="cart-summary-total">
-              <span>Total</span>
+              <span>
+                Total
+              </span>
 
               <strong>
-                ₹{total.toLocaleString("en-IN")}
+                ₹
+                {total.toLocaleString(
+                  "en-IN"
+                )}
               </strong>
             </div>
-
-            {/* CHECKOUT */}
 
             <button
               type="button"
               className="cart-checkout"
-              onClick={handleCheckout}
+              onClick={
+                handleCheckout
+              }
             >
-              <span>PROCEED TO CHECKOUT</span>
+              <span>
+                PROCEED TO CHECKOUT
+              </span>
+
               <ArrowRight size={17} />
             </button>
 
             <div className="cart-note">
               <span>✦</span>
 
-              Complimentary shipping on orders above ₹10,000
+              Complimentary shipping on
+              orders above ₹10,000
             </div>
-
-            {/* TRUST */}
 
             <div className="cart-trust">
-
               <div>
-                <strong>01</strong>
-                <span>SECURE PAYMENT</span>
+                <strong>
+                  01
+                </strong>
+
+                <span>
+                  SECURE PAYMENT
+                </span>
               </div>
 
               <div>
-                <strong>02</strong>
-                <span>HANDCRAFTED GOODS</span>
+                <strong>
+                  02
+                </strong>
+
+                <span>
+                  HANDCRAFTED GOODS
+                </span>
               </div>
 
               <div>
-                <strong>03</strong>
-                <span>CONCIERGE SUPPORT</span>
-              </div>
+                <strong>
+                  03
+                </strong>
 
+                <span>
+                  CONCIERGE SUPPORT
+                </span>
+              </div>
             </div>
-
           </aside>
         </section>
       )}

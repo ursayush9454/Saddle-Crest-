@@ -58,11 +58,17 @@ const parseBoolean = (
     return defaultValue;
   }
 
-  if (value === true || value === "true") {
+  if (
+    value === true ||
+    value === "true"
+  ) {
     return true;
   }
 
-  if (value === false || value === "false") {
+  if (
+    value === false ||
+    value === "false"
+  ) {
     return false;
   }
 
@@ -71,11 +77,123 @@ const parseBoolean = (
 
 /*
 |--------------------------------------------------------------------------
+| PRICE HELPER
+|--------------------------------------------------------------------------
+|
+| Converts incoming FormData/string values into safe numbers.
+|
+*/
+
+const parsePrice = (value) => {
+  if (
+    value === undefined ||
+    value === null ||
+    value === ""
+  ) {
+    return null;
+  }
+
+  const normalizedValue = String(value)
+    .replace(/,/g, "")
+    .trim();
+
+  const parsedValue = Number(normalizedValue);
+
+  if (!Number.isFinite(parsedValue)) {
+    return null;
+  }
+
+  return parsedValue;
+};
+
+/*
+|--------------------------------------------------------------------------
+| SALE PRICE HELPER
+|--------------------------------------------------------------------------
+|
+| Rules:
+|
+| Regular Price = ₹3900
+| Sale Price    = ₹3700
+|
+| This is VALID.
+|
+| Sale Price must:
+| - be greater than 0
+| - be strictly lower than regular price
+|
+*/
+
+const parseSalePrice = (
+  value,
+  regularPrice
+) => {
+  /*
+   * Empty sale price means:
+   * product is not on sale.
+   */
+
+  if (
+    value === undefined ||
+    value === null ||
+    String(value).trim() === ""
+  ) {
+    return null;
+  }
+
+  const salePrice = parsePrice(value);
+
+  if (
+    salePrice === null ||
+    salePrice <= 0
+  ) {
+    throw new Error(
+      "Please enter a valid sale price."
+    );
+  }
+
+  if (
+    !Number.isFinite(regularPrice) ||
+    regularPrice <= 0
+  ) {
+    throw new Error(
+      "Please enter a valid regular price."
+    );
+  }
+
+  /*
+   * IMPORTANT:
+   *
+   * Sale price must be LOWER than
+   * regular price.
+   *
+   * Example:
+   *
+   * 3900 > 3700 = VALID
+   * 3900 = 3900 = INVALID
+   * 3900 < 4000 = INVALID
+   */
+
+  if (salePrice >= regularPrice) {
+    throw new Error(
+      "Sale price must be lower than the regular price."
+    );
+  }
+
+  return salePrice;
+};
+
+/*
+|--------------------------------------------------------------------------
 | GET ALL PRODUCTS
 |--------------------------------------------------------------------------
 */
 
-exports.list = async (req, res, next) => {
+exports.list = async (
+  req,
+  res,
+  next
+) => {
   try {
     const {
       search,
@@ -96,27 +214,36 @@ exports.list = async (req, res, next) => {
 
     /*
     |--------------------------------------------------------------------------
-    | Search
+    | SEARCH
     |--------------------------------------------------------------------------
     */
 
     if (search) {
       query.$or = [
         {
-          name: new RegExp(search, "i"),
+          name: new RegExp(
+            search,
+            "i"
+          ),
         },
         {
-          description: new RegExp(search, "i"),
+          description: new RegExp(
+            search,
+            "i"
+          ),
         },
         {
-          tags: new RegExp(search, "i"),
+          tags: new RegExp(
+            search,
+            "i"
+          ),
         },
       ];
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Category
+    | CATEGORY
     |--------------------------------------------------------------------------
     */
 
@@ -126,59 +253,73 @@ exports.list = async (req, res, next) => {
 
     /*
     |--------------------------------------------------------------------------
-    | Featured
+    | FEATURED
     |--------------------------------------------------------------------------
     */
 
     if (featured !== undefined) {
-      query.featured = featured === "true";
+      query.featured =
+        featured === "true";
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Best Seller
+    | BEST SELLER
     |--------------------------------------------------------------------------
     */
 
     if (bestSeller !== undefined) {
-      query.bestSeller = bestSeller === "true";
+      query.bestSeller =
+        bestSeller === "true";
     }
 
     /*
     |--------------------------------------------------------------------------
-    | New Arrival
+    | NEW ARRIVAL
     |--------------------------------------------------------------------------
     */
 
     if (newArrival !== undefined) {
-      query.newArrival = newArrival === "true";
+      query.newArrival =
+        newArrival === "true";
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Price Filter
+    | PRICE FILTER
     |--------------------------------------------------------------------------
     */
 
-    if (minPrice || maxPrice) {
-      query.price = {
-        ...(minPrice
-          ? {
-              $gte: Number(minPrice),
-            }
-          : {}),
+    const parsedMinPrice =
+      parsePrice(minPrice);
 
-        ...(maxPrice
-          ? {
-              $lte: Number(maxPrice),
-            }
-          : {}),
-      };
+    const parsedMaxPrice =
+      parsePrice(maxPrice);
+
+    if (
+      parsedMinPrice !== null ||
+      parsedMaxPrice !== null
+    ) {
+      query.price = {};
+
+      if (
+        parsedMinPrice !== null
+      ) {
+        query.price.$gte =
+          parsedMinPrice;
+      }
+
+      if (
+        parsedMaxPrice !== null
+      ) {
+        query.price.$lte =
+          parsedMaxPrice;
+      }
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Sorting
+    | SORTING
     |--------------------------------------------------------------------------
     */
 
@@ -202,35 +343,66 @@ exports.list = async (req, res, next) => {
 
     /*
     |--------------------------------------------------------------------------
-    | Pagination
+    | PAGINATION
     |--------------------------------------------------------------------------
     */
 
-    const currentPage = Math.max(
-      1,
-      Number(page)
-    );
+    const parsedPage =
+      Number(page);
 
-    const perPage = Math.min(
-      100,
-      Math.max(1, Number(limit))
-    );
+    const parsedLimit =
+      Number(limit);
 
-    const [products, total] =
-      await Promise.all([
-        Product.find(query)
-          .sort(
-            sorts[sort] ||
-              sorts.newest
+    const currentPage =
+      Number.isFinite(
+        parsedPage
+      ) && parsedPage > 0
+        ? Math.floor(parsedPage)
+        : 1;
+
+    const perPage =
+      Number.isFinite(
+        parsedLimit
+      ) && parsedLimit > 0
+        ? Math.min(
+            100,
+            Math.floor(
+              parsedLimit
+            )
           )
-          .skip(
-            (currentPage - 1) *
-              perPage
-          )
-          .limit(perPage),
+        : 12;
 
-        Product.countDocuments(query),
-      ]);
+    /*
+    |--------------------------------------------------------------------------
+    | FETCH
+    |--------------------------------------------------------------------------
+    */
+
+    const [
+      products,
+      total,
+    ] = await Promise.all([
+      Product.find(query)
+        .sort(
+          sorts[sort] ||
+            sorts.newest
+        )
+        .skip(
+          (currentPage - 1) *
+            perPage
+        )
+        .limit(perPage),
+
+      Product.countDocuments(
+        query
+      ),
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESPONSE
+    |--------------------------------------------------------------------------
+    */
 
     res.json({
       message:
@@ -272,7 +444,8 @@ exports.getOne = async (
 
     if (!product) {
       return res.status(404).json({
-        message: "Product not found",
+        message:
+          "Product not found",
       });
     }
 
@@ -310,7 +483,7 @@ exports.create = async (
 
     /*
     |--------------------------------------------------------------------------
-    | Upload selected files to Cloudinary
+    | UPLOAD FILES
     |--------------------------------------------------------------------------
     */
 
@@ -322,17 +495,18 @@ exports.create = async (
     ) {
       uploadedImages =
         await Promise.all(
-          req.files.map((file) =>
-            uploadToCloudinary(
-              file.buffer
-            )
+          req.files.map(
+            (file) =>
+              uploadToCloudinary(
+                file.buffer
+              )
           )
         );
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Support image URLs
+    | IMAGE URLS
     |--------------------------------------------------------------------------
     */
 
@@ -341,12 +515,6 @@ exports.create = async (
         req.body.images
       );
 
-    /*
-    |--------------------------------------------------------------------------
-    | Combine images
-    |--------------------------------------------------------------------------
-    */
-
     const imageUrls = [
       ...uploadedImages,
       ...urlImages,
@@ -354,11 +522,13 @@ exports.create = async (
 
     /*
     |--------------------------------------------------------------------------
-    | Image required
+    | IMAGE REQUIRED
     |--------------------------------------------------------------------------
     */
 
-    if (imageUrls.length === 0) {
+    if (
+      imageUrls.length === 0
+    ) {
       return res.status(400).json({
         message:
           "At least one product image is required",
@@ -367,12 +537,55 @@ exports.create = async (
 
     /*
     |--------------------------------------------------------------------------
-    | Product data
+    | REGULAR PRICE
+    |--------------------------------------------------------------------------
+    */
+
+    const price =
+      parsePrice(
+        req.body.price
+      );
+
+    if (
+      price === null ||
+      price <= 0
+    ) {
+      return res.status(400).json({
+        message:
+          "Please enter a valid product price.",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SALE PRICE
+    |--------------------------------------------------------------------------
+    */
+
+    let salePrice = null;
+
+    try {
+      salePrice =
+        parseSalePrice(
+          req.body.salePrice,
+          price
+        );
+    } catch (error) {
+      return res.status(400).json({
+        message:
+          error.message,
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PRODUCT DATA
     |--------------------------------------------------------------------------
     */
 
     const productData = {
-      name: req.body.name,
+      name:
+        req.body.name,
 
       slug:
         req.body.slug || "",
@@ -387,18 +600,17 @@ exports.create = async (
         req.body.shortDescription ||
         "",
 
-      price: Number(
-        req.body.price
-      ),
+      /*
+       * REGULAR PRICE
+       */
+      price,
 
-      salePrice:
-        req.body.salePrice !==
-          undefined &&
-        req.body.salePrice !== ""
-          ? Number(
-              req.body.salePrice
-            )
-          : null,
+      /*
+       * SALE PRICE
+       *
+       * null = no sale
+       */
+      salePrice,
 
       category:
         req.body.category,
@@ -407,20 +619,22 @@ exports.create = async (
         req.body.categoryId ||
         null,
 
-      image: imageUrls[0],
+      image:
+        imageUrls[0],
 
-      images: imageUrls,
+      images:
+        imageUrls,
 
-      stock: Number(
-        req.body.stock || 0
-      ),
+      stock:
+        parsePrice(
+          req.body.stock
+        ) ?? 0,
 
       lowStockThreshold:
-        Number(
+        parsePrice(
           req.body
-            .lowStockThreshold ||
-            5
-        ),
+            .lowStockThreshold
+        ) ?? 5,
 
       badge:
         req.body.badge || "",
@@ -437,27 +651,31 @@ exports.create = async (
         req.body.colors
       ),
 
-      featured: parseBoolean(
-        req.body.featured
-      ),
+      featured:
+        parseBoolean(
+          req.body.featured
+        ),
 
-      bestSeller: parseBoolean(
-        req.body.bestSeller
-      ),
+      bestSeller:
+        parseBoolean(
+          req.body.bestSeller
+        ),
 
-      newArrival: parseBoolean(
-        req.body.newArrival
-      ),
+      newArrival:
+        parseBoolean(
+          req.body.newArrival
+        ),
 
-      isActive: parseBoolean(
-        req.body.isActive,
-        true
-      ),
+      isActive:
+        parseBoolean(
+          req.body.isActive,
+          true
+        ),
     };
 
     /*
     |--------------------------------------------------------------------------
-    | Save product
+    | SAVE
     |--------------------------------------------------------------------------
     */
 
@@ -513,7 +731,7 @@ exports.update = async (
 
     /*
     |--------------------------------------------------------------------------
-    | Upload new files
+    | UPLOAD NEW FILES
     |--------------------------------------------------------------------------
     */
 
@@ -525,17 +743,18 @@ exports.update = async (
     ) {
       uploadedImages =
         await Promise.all(
-          req.files.map((file) =>
-            uploadToCloudinary(
-              file.buffer
-            )
+          req.files.map(
+            (file) =>
+              uploadToCloudinary(
+                file.buffer
+              )
           )
         );
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Existing images
+    | EXISTING IMAGES
     |--------------------------------------------------------------------------
     */
 
@@ -546,7 +765,7 @@ exports.update = async (
 
     /*
     |--------------------------------------------------------------------------
-    | URL images
+    | NEW URL IMAGES
     |--------------------------------------------------------------------------
     */
 
@@ -557,7 +776,7 @@ exports.update = async (
 
     /*
     |--------------------------------------------------------------------------
-    | Combine images
+    | COMBINE IMAGES
     |--------------------------------------------------------------------------
     */
 
@@ -569,11 +788,13 @@ exports.update = async (
 
     /*
     |--------------------------------------------------------------------------
-    | Keep old images if none sent
+    | KEEP OLD IMAGES
     |--------------------------------------------------------------------------
     */
 
-    if (imageUrls.length === 0) {
+    if (
+      imageUrls.length === 0
+    ) {
       imageUrls =
         product.images?.length
           ? product.images
@@ -584,11 +805,13 @@ exports.update = async (
 
     /*
     |--------------------------------------------------------------------------
-    | Still no image
+    | IMAGE REQUIRED
     |--------------------------------------------------------------------------
     */
 
-    if (imageUrls.length === 0) {
+    if (
+      imageUrls.length === 0
+    ) {
       return res.status(400).json({
         message:
           "Product must have at least one image",
@@ -597,7 +820,49 @@ exports.update = async (
 
     /*
     |--------------------------------------------------------------------------
-    | Update data
+    | REGULAR PRICE
+    |--------------------------------------------------------------------------
+    */
+
+    const price =
+      parsePrice(
+        req.body.price
+      );
+
+    if (
+      price === null ||
+      price <= 0
+    ) {
+      return res.status(400).json({
+        message:
+          "Please enter a valid product price.",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SALE PRICE
+    |--------------------------------------------------------------------------
+    */
+
+    let salePrice = null;
+
+    try {
+      salePrice =
+        parseSalePrice(
+          req.body.salePrice,
+          price
+        );
+    } catch (error) {
+      return res.status(400).json({
+        message:
+          error.message,
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE DATA
     |--------------------------------------------------------------------------
     */
 
@@ -618,18 +883,20 @@ exports.update = async (
         req.body.shortDescription ||
         "",
 
-      price: Number(
-        req.body.price
-      ),
+      /*
+       * REGULAR PRICE
+       */
+      price,
 
-      salePrice:
-        req.body.salePrice !==
-          undefined &&
-        req.body.salePrice !== ""
-          ? Number(
-              req.body.salePrice
-            )
-          : null,
+      /*
+       * SALE PRICE
+       *
+       * ₹3900 regular
+       * ₹3700 sale
+       *
+       * salePrice = 3700
+       */
+      salePrice,
 
       category:
         req.body.category,
@@ -644,16 +911,16 @@ exports.update = async (
       images:
         imageUrls,
 
-      stock: Number(
-        req.body.stock || 0
-      ),
+      stock:
+        parsePrice(
+          req.body.stock
+        ) ?? 0,
 
       lowStockThreshold:
-        Number(
+        parsePrice(
           req.body
-            .lowStockThreshold ||
-            5
-        ),
+            .lowStockThreshold
+        ) ?? 5,
 
       badge:
         req.body.badge || "",
@@ -670,30 +937,34 @@ exports.update = async (
         req.body.colors
       ),
 
-      featured: parseBoolean(
-        req.body.featured,
-        product.featured
-      ),
+      featured:
+        parseBoolean(
+          req.body.featured,
+          product.featured
+        ),
 
-      bestSeller: parseBoolean(
-        req.body.bestSeller,
-        product.bestSeller
-      ),
+      bestSeller:
+        parseBoolean(
+          req.body.bestSeller,
+          product.bestSeller
+        ),
 
-      newArrival: parseBoolean(
-        req.body.newArrival,
-        product.newArrival
-      ),
+      newArrival:
+        parseBoolean(
+          req.body.newArrival,
+          product.newArrival
+        ),
 
-      isActive: parseBoolean(
-        req.body.isActive,
-        product.isActive
-      ),
+      isActive:
+        parseBoolean(
+          req.body.isActive,
+          product.isActive
+        ),
     };
 
     /*
     |--------------------------------------------------------------------------
-    | Update database
+    | UPDATE DATABASE
     |--------------------------------------------------------------------------
     */
 
@@ -702,7 +973,9 @@ exports.update = async (
         req.params.id,
         updateData,
         {
-          returnDocument: "after",
+          returnDocument:
+            "after",
+
           runValidators: true,
         }
       );
@@ -735,15 +1008,6 @@ exports.update = async (
 |--------------------------------------------------------------------------
 | DELETE / ARCHIVE PRODUCT
 |--------------------------------------------------------------------------
-|
-| Admin delete = soft delete/archive.
-|
-| Product is NOT physically removed from
-| MongoDB. isActive becomes false.
-|
-| Public product API already returns only
-| isActive: true products.
-|--------------------------------------------------------------------------
 */
 
 exports.remove = async (
@@ -764,7 +1028,9 @@ exports.remove = async (
           isActive: false,
         },
         {
-          returnDocument: "after",
+          returnDocument:
+            "after",
+
           runValidators: true,
         }
       );
@@ -783,8 +1049,10 @@ exports.remove = async (
 
     return res.status(200).json({
       success: true,
+
       message:
         "Product archived successfully",
+
       product,
     });
   } catch (error) {

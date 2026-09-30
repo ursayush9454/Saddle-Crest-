@@ -1,0 +1,18 @@
+warning: in the working copy of 'backend/controllers/orderController.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/controllers/productController.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/Order.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/Product.js', LF will be replaced by CRLF the next time Git touches it
+ admin/src/pages/AddProduct.jsx             | 1494 [32m++++++++++++++++++++[m[31m--------[m
+ backend/controllers/orderController.js     |  680 [32m+++++++++[m[31m----[m
+ backend/controllers/productController.js   |  596 [32m++++++++[m[31m---[m
+ backend/models/Order.js                    |   15 [32m+[m
+ backend/models/Product.js                  |   26 [32m+[m[31m-[m
+ frontend/src/components/Hero.css           |    3 [32m+[m
+ frontend/src/components/Hero.jsx           |  140 [32m++[m[31m-[m
+ frontend/src/components/ProductSection.css |  583 [32m+++++++[m[31m----[m
+ frontend/src/components/ProductSection.jsx |  242 [32m+++[m[31m--[m
+ frontend/src/pages/Cart.jsx                |  378 [32m+++++[m[31m--[m
+ frontend/src/pages/Checkout.jsx            |  940 [32m+++++++++++[m[31m------[m
+ frontend/src/pages/Home.jsx                |    4 [32m+[m
+ frontend/src/pages/ProductDetails.jsx      | 1446 [32m++++++++++++++[m[31m-------------[m
+ 13 files changed, 4266 insertions(+), 2281 deletions(-)
