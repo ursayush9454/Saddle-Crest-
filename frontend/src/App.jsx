@@ -8,6 +8,7 @@ import Rider from "./pages/Rider";
 import Horse from "./pages/Horse";
 import Collections from "./pages/Collections";
 import JournalPage from "./pages/JournalPage";
+import BlogDetails from "./pages/BlogDetails";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
 import Checkout from "./pages/Checkout";
@@ -28,6 +29,7 @@ import Story from "./pages/Story";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReviewOrder from "./pages/ReviewsOrder";
 import OrderDetails from "./pages/OrderDetails";
+import InstagramPage from "./pages/InstagramPage";
 
 // Protected Route
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -45,73 +47,67 @@ const App = () => {
 
       <Routes>
 
-        {/* =========================================
-            HOME
-        ========================================= */}
+        {/* HOME */}
         <Route
           path="/"
           element={<Home />}
         />
 
-        {/* =========================================
-            ABOUT
-        ========================================= */}
+        {/* ABOUT */}
         <Route
           path="/About"
           element={<About />}
         />
 
-        {/* =========================================
-            SHOP
-        ========================================= */}
+        {/* SHOP */}
         <Route
           path="/shop"
           element={<Shop />}
         />
 
-        {/* =========================================
-            RIDER
-        ========================================= */}
+        {/* RIDER */}
         <Route
           path="/rider"
           element={<Rider />}
         />
 
-        {/* =========================================
-            HORSE
-        ========================================= */}
+        {/* HORSE */}
         <Route
           path="/horse"
           element={<Horse />}
         />
 
-        {/* =========================================
-            COLLECTIONS
-        ========================================= */}
+        {/* COLLECTIONS */}
         <Route
           path="/collections"
           element={<Collections />}
         />
 
-        {/* =========================================
-            JOURNAL
-        ========================================= */}
+        {/* JOURNAL */}
         <Route
           path="/journal"
           element={<JournalPage />}
         />
 
-        {/* =========================================
-            PRODUCT DETAILS
-        ========================================= */}
+        {/* BLOG */}
+        <Route
+          path="/blog"
+          element={<JournalPage />}
+        />
+
+        {/* BLOG DETAILS */}
+        <Route
+          path="/blog/:slug"
+          element={<BlogDetails />}
+        />
+
+        {/* PRODUCT DETAILS */}
         <Route
           path="/product/:id"
           element={<ProductDetails />}
         />
 
-        {/* =========================================
-            AUTH
-        ========================================= */}
+        {/* AUTH */}
         <Route
           path="/login"
           element={<Login />}
@@ -122,9 +118,7 @@ const App = () => {
           element={<Register />}
         />
 
-        {/* =========================================
-            PROTECTED - CART
-        ========================================= */}
+        {/* PROTECTED - CART */}
         <Route
           path="/cart"
           element={
@@ -134,9 +128,7 @@ const App = () => {
           }
         />
 
-        {/* =========================================
-            PROTECTED - WISHLIST
-        ========================================= */}
+        {/* PROTECTED - WISHLIST */}
         <Route
           path="/wishlist"
           element={
@@ -146,9 +138,7 @@ const App = () => {
           }
         />
 
-        {/* =========================================
-            PROTECTED - CHECKOUT
-        ========================================= */}
+        {/* PROTECTED - CHECKOUT */}
         <Route
           path="/checkout"
           element={
@@ -158,9 +148,7 @@ const App = () => {
           }
         />
 
-        {/* =========================================
-            PROTECTED - ORDERS
-        ========================================= */}
+        {/* PROTECTED - ORDERS */}
         <Route
           path="/orders"
           element={
@@ -179,9 +167,7 @@ const App = () => {
           }
         />
 
-        {/* =========================================
-            PROTECTED - PROFILE
-        ========================================= */}
+        {/* PROTECTED - PROFILE */}
         <Route
           path="/profile"
           element={
@@ -191,9 +177,7 @@ const App = () => {
           }
         />
 
-        {/* =========================================
-            PROTECTED - REVIEW ORDER
-        ========================================= */}
+        {/* PROTECTED - REVIEW ORDER */}
         <Route
           path="/review-order"
           element={
@@ -203,9 +187,7 @@ const App = () => {
           }
         />
 
-        {/* =========================================
-            PUBLIC POLICIES
-        ========================================= */}
+        {/* PUBLIC POLICIES */}
         <Route
           path="/shipping-delivery"
           element={<ShippingDelivery />}
@@ -231,9 +213,7 @@ const App = () => {
           element={<PrivacyPolicy />}
         />
 
-        {/* =========================================
-            OTHER PUBLIC PAGES
-        ========================================= */}
+        {/* OTHER PUBLIC PAGES */}
         <Route
           path="/Contact"
           element={<Contact />}
@@ -252,6 +232,11 @@ const App = () => {
         <Route
           path="/story"
           element={<Story />}
+        />
+        
+        <Route
+          path="/instagram"
+          element={<InstagramPage/>}
         />
 
       </Routes>

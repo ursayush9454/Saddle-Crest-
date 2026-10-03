@@ -220,6 +220,23 @@ const ProductSection = () => {
                       strokeWidth={1.5}
                     />
                   </button>
+
+                  {/* QUICK SHOP */}
+                  <button
+                    type="button"
+                    className="bs-quick-shop"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openProduct(productId);
+                    }}
+                  >
+                    <span>Quick Shop</span>
+
+                    <ArrowUpRight
+                      size={14}
+                      strokeWidth={1.5}
+                    />
+                  </button>
                 </div>
 
                 {/* DETAILS */}

@@ -33,10 +33,8 @@ const gallery = [
 const Instagram = () => {
   return (
     <section className="instagram-section">
-
       {/* Header */}
       <div className="instagram-header">
-
         <div className="instagram-title">
           <span className="instagram-symbol">◎</span>
           <span>@SADDLEANDCREST</span>
@@ -54,15 +52,13 @@ const Instagram = () => {
           royal traditions and the timeless Indian
           equestrian spirit.
         </p>
-
       </div>
 
       {/* Gallery */}
       <div className="instagram-grid">
-
         {gallery.map((item, index) => (
           <a
-            href="#instagram"
+            href="/instagram"
             className="instagram-card"
             key={index}
           >
@@ -72,7 +68,6 @@ const Instagram = () => {
             />
 
             <div className="instagram-overlay">
-
               <div className="instagram-overlay-content">
                 <span>{item.title}</span>
 
@@ -80,27 +75,20 @@ const Instagram = () => {
                   <ArrowUpRight size={18} />
                 </div>
               </div>
-
             </div>
           </a>
         ))}
-
       </div>
 
       {/* Bottom */}
       <div className="instagram-bottom">
+        <span>FOLLOW OUR JOURNEY</span>
 
-        <span>
-          FOLLOW OUR JOURNEY
-        </span>
-
-        <a href="#instagram">
+        <a href="/instagram">
           @SADDLEANDCREST
           <ArrowUpRight size={15} />
         </a>
-
       </div>
-
     </section>
   );
 };

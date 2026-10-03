@@ -1,29 +1,39 @@
 /* =========================================================
    SADDLE & CREST
-   BEST SELLERS — ISOLATED STYLES
-   ========================================================= */
+   BEST SELLERS — COMPACT GRID
+========================================================= */
 
 .bs-section {
   width: 100%;
-  padding: 110px 5.5% 120px;
+  padding: 95px 5%;
   background: #f3eee3;
   color: #171410;
   overflow: hidden;
   box-sizing: border-box;
 }
 
+.bs-section *,
+.bs-section *::before,
+.bs-section *::after {
+  box-sizing: border-box;
+}
+
+
 /* =========================================================
    HEADER
-   ========================================================= */
+========================================================= */
 
 .bs-header {
   width: 100%;
+  max-width: 1180px;
+
+  margin: 0 auto 45px;
+
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+
   gap: 30px;
-  margin-bottom: 55px;
-  box-sizing: border-box;
 }
 
 .bs-heading {
@@ -32,12 +42,14 @@
 
 .bs-eyebrow {
   display: block;
-  margin-bottom: 17px;
+
+  margin-bottom: 14px;
 
   font-family: "Jost", sans-serif;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
-  letter-spacing: 2.6px;
+
+  letter-spacing: 2.4px;
   line-height: 1.2;
 
   text-transform: uppercase;
@@ -48,10 +60,11 @@
   margin: 0;
 
   font-family: "Cormorant Garamond", serif;
-  font-size: clamp(48px, 5vw, 78px);
+  font-size: clamp(46px, 5vw, 68px);
   font-weight: 400;
+
   line-height: 0.9;
-  letter-spacing: -2px;
+  letter-spacing: -1.5px;
 
   color: #171410;
 }
@@ -61,9 +74,10 @@
   color: #5c2a2a;
 }
 
+
 /* =========================================================
    VIEW ALL
-   ========================================================= */
+========================================================= */
 
 .bs-view-all {
   flex-shrink: 0;
@@ -71,10 +85,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
 
-  min-width: 125px;
-  padding: 12px 0;
+  gap: 10px;
+
+  min-width: 115px;
+  padding: 10px 0;
 
   border: 0;
   border-bottom: 1px solid rgba(23, 20, 16, 0.45);
@@ -83,10 +98,12 @@
   color: #171410;
 
   font-family: "Jost", sans-serif;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
-  letter-spacing: 2px;
+
+  letter-spacing: 1.8px;
   line-height: 1;
+
   text-transform: uppercase;
 
   cursor: pointer;
@@ -100,30 +117,32 @@
 .bs-view-all:hover {
   color: #5c2a2a;
   border-color: #5c2a2a;
-  gap: 17px;
+  gap: 15px;
 }
+
 
 /* =========================================================
    GRID
-   ========================================================= */
+========================================================= */
 
 .bs-grid {
   width: 100%;
-  max-width: 1500px;
+  max-width: 1180px;
+
   margin: 0 auto;
 
   display: grid;
+
   grid-template-columns: repeat(3, minmax(0, 1fr));
 
-  column-gap: 30px;
-  row-gap: 52px;
-
-  box-sizing: border-box;
+  column-gap: 20px;
+  row-gap: 42px;
 }
+
 
 /* =========================================================
    CARD
-   ========================================================= */
+========================================================= */
 
 .bs-card {
   width: 100%;
@@ -135,33 +154,28 @@
   position: relative;
 
   cursor: pointer;
-
-  box-sizing: border-box;
 }
 
-/* =========================================================
-   IMAGE CONTAINER
 
-   IMPORTANT:
-   NO GENERIC CLASS HERE
-   ========================================================= */
+/* =========================================================
+   IMAGE
+   COMPACT DESKTOP SIZE
+========================================================= */
 
 .bs-image-box {
   position: relative;
 
   width: 100%;
-  height: 560px;
+
+  /*
+    Smaller than previous 560px
+  */
+  height: 410px;
 
   overflow: hidden;
 
   background: #ded8cc;
-
-  box-sizing: border-box;
 }
-
-/* =========================================================
-   IMAGE
-   ========================================================= */
 
 .bs-image {
   display: block;
@@ -176,7 +190,7 @@
   padding: 0 !important;
 
   object-fit: cover !important;
-  object-position: center center;
+  object-position: center;
 
   transform: scale(1);
 
@@ -188,9 +202,10 @@
   transform: scale(1.045);
 }
 
+
 /* =========================================================
-   IMAGE DARK OVERLAY
-   ========================================================= */
+   IMAGE OVERLAY
+========================================================= */
 
 .bs-image-box::after {
   content: "";
@@ -211,80 +226,84 @@
   pointer-events: none;
 }
 
+
 /* =========================================================
    SALE BADGE
-   ========================================================= */
+========================================================= */
 
 .bs-sale-badge {
   position: absolute;
 
-  top: 16px;
-  left: 16px;
+  top: 13px;
+  left: 13px;
 
   z-index: 5;
 
-  padding: 8px 12px;
+  padding: 6px 9px;
 
   background: #5c2a2a;
   color: #f3eee3;
 
   font-family: "Jost", sans-serif;
-  font-size: 9px;
+  font-size: 7px;
   font-weight: 600;
 
-  letter-spacing: 1.4px;
+  letter-spacing: 1.2px;
   line-height: 1;
 
   text-transform: uppercase;
 }
 
+
 /* =========================================================
    PRODUCT BADGE
-   ========================================================= */
+========================================================= */
 
 .bs-product-badge {
   position: absolute;
 
-  top: 16px;
-  left: 16px;
+  top: 13px;
+  left: 13px;
 
   z-index: 4;
 
-  padding: 8px 13px;
+  padding: 6px 10px;
 
   background: rgba(243, 238, 227, 0.96);
   color: #171410;
 
   font-family: "Jost", sans-serif;
-  font-size: 9px;
+  font-size: 7px;
   font-weight: 600;
 
-  letter-spacing: 1.4px;
+  letter-spacing: 1.2px;
   line-height: 1;
 
   text-transform: uppercase;
 }
 
-/* If sale exists, move normal badge below */
+
+/* Sale badge ke neeche normal badge */
 
 .bs-sale-badge ~ .bs-product-badge {
-  top: 55px;
+  top: 43px;
 }
+
 
 /* =========================================================
    WISHLIST
-   ========================================================= */
+========================================================= */
 
 .bs-wishlist {
   position: absolute;
 
-  top: 16px;
-  right: 16px;
+  top: 13px;
+  right: 13px;
 
   z-index: 6;
 
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
 
   display: flex;
   align-items: center;
@@ -299,7 +318,7 @@
   color: #171410;
 
   font-family: Arial, sans-serif;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 400;
 
   line-height: 1;
@@ -307,7 +326,7 @@
   cursor: pointer;
 
   box-shadow:
-    0 4px 16px rgba(23, 20, 16, 0.1);
+    0 4px 14px rgba(23, 20, 16, 0.1);
 
   transition:
     transform 0.3s ease,
@@ -326,20 +345,21 @@
   color: #f3eee3;
 }
 
+
 /* =========================================================
    ARROW
-   ========================================================= */
+========================================================= */
 
 .bs-arrow {
   position: absolute;
 
-  right: 18px;
-  bottom: 18px;
+  right: 13px;
+  bottom: 13px;
 
-  z-index: 5;
+  z-index: 7;
 
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
 
   display: flex;
   align-items: center;
@@ -356,7 +376,7 @@
   cursor: pointer;
 
   box-shadow:
-    0 5px 18px rgba(23, 20, 16, 0.1);
+    0 5px 16px rgba(23, 20, 16, 0.1);
 
   transition:
     transform 0.3s ease,
@@ -368,28 +388,98 @@
   background: #b08d57;
 }
 
+
+/* =========================================================
+   QUICK SHOP
+========================================================= */
+
+.bs-quick-shop {
+  position: absolute;
+
+  left: 13px;
+  right: 60px;
+  bottom: 13px;
+
+  z-index: 6;
+
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 14px;
+
+  border: 1px solid rgba(243, 238, 227, 0.5);
+  border-radius: 0;
+
+  background: #171410;
+  color: #f3eee3;
+
+  font-family: "Jost", sans-serif;
+  font-size: 8px;
+  font-weight: 500;
+
+  letter-spacing: 1.5px;
+
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transform: translateY(12px);
+
+  transition:
+    opacity 0.28s ease,
+    visibility 0.28s ease,
+    transform 0.28s ease,
+    background 0.25s ease;
+}
+
+.bs-card:hover .bs-quick-shop {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.bs-quick-shop:hover {
+  background: #2b4433;
+  border-color: #2b4433;
+}
+
+.bs-quick-shop svg {
+  transition: transform 0.25s ease;
+}
+
+.bs-quick-shop:hover svg {
+  transform: translate(3px, -3px);
+}
+
+
 /* =========================================================
    DETAILS
-   ========================================================= */
+========================================================= */
 
 .bs-details {
   width: 100%;
 
-  padding: 20px 3px 0;
-
-  box-sizing: border-box;
+  padding: 15px 2px 0;
 }
 
 .bs-category {
   display: block;
 
-  margin-bottom: 7px;
+  margin-bottom: 5px;
 
   font-family: "Jost", sans-serif;
-  font-size: 9px;
+  font-size: 7px;
   font-weight: 600;
 
-  letter-spacing: 1.8px;
+  letter-spacing: 1.5px;
   line-height: 1.2;
 
   text-transform: uppercase;
@@ -401,7 +491,7 @@
   margin: 0;
 
   font-family: "Cormorant Garamond", serif;
-  font-size: 29px;
+  font-size: 23px;
   font-weight: 500;
 
   line-height: 1.08;
@@ -409,23 +499,24 @@
   color: #171410;
 }
 
+
 /* =========================================================
    PRICE
-   ========================================================= */
+========================================================= */
 
 .bs-price-row {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
 
-  gap: 9px;
+  gap: 7px;
 
-  margin-top: 11px;
+  margin-top: 8px;
 }
 
 .bs-current-price {
   font-family: "Jost", sans-serif;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 600;
 
   line-height: 1.2;
@@ -435,7 +526,7 @@
 
 .bs-old-price {
   font-family: "Jost", sans-serif;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 400;
 
   color: #8b8276;
@@ -447,64 +538,66 @@
   display: inline-flex;
   align-items: center;
 
-  padding: 4px 7px;
+  padding: 3px 5px;
 
   background: rgba(92, 42, 42, 0.09);
   color: #5c2a2a;
 
   font-family: "Jost", sans-serif;
-  font-size: 8px;
+  font-size: 7px;
   font-weight: 700;
 
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   line-height: 1;
 
   text-transform: uppercase;
 }
 
+
 /* =========================================================
    RATING
-   ========================================================= */
+========================================================= */
 
 .bs-rating {
   display: flex;
   align-items: center;
 
-  gap: 3px;
+  gap: 2px;
 
-  margin-top: 10px;
+  margin-top: 8px;
 
-  min-height: 17px;
+  min-height: 15px;
 }
 
 .bs-rating svg {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
 
   color: #b08d57;
   fill: #b08d57;
 }
 
 .bs-rating span {
-  margin-left: 6px;
+  margin-left: 5px;
 
   font-family: "Jost", sans-serif;
-  font-size: 10px;
+  font-size: 9px;
 
   color: #777066;
 }
 
+
 /* =========================================================
    ADD TO CART
-   ========================================================= */
+========================================================= */
 
 .bs-cart {
   display: block;
 
   width: 100%;
 
-  margin-top: 15px;
-  padding: 14px 18px;
+  margin-top: 11px;
+  padding: 11px 14px;
 
   border: 1px solid rgba(23, 20, 16, 0.7);
 
@@ -512,17 +605,15 @@
   color: #171410;
 
   font-family: "Jost", sans-serif;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 600;
 
-  letter-spacing: 1.8px;
+  letter-spacing: 1.5px;
   line-height: 1.2;
 
   text-transform: uppercase;
 
   cursor: pointer;
-
-  box-sizing: border-box;
 
   transition:
     background 0.3s ease,
@@ -536,44 +627,46 @@
   color: #f3eee3;
 }
 
+
 /* =========================================================
    LOADING
-   ========================================================= */
+========================================================= */
 
 .bs-loading {
   width: 100%;
-  padding: 100px 20px;
+  padding: 80px 20px;
 
   text-align: center;
 
   font-family: "Jost", sans-serif;
-  font-size: 13px;
+  font-size: 12px;
 
   color: #6d665c;
 }
 
+
 /* =========================================================
    EMPTY
-   ========================================================= */
+========================================================= */
 
 .bs-empty {
   width: 100%;
-  padding: 100px 20px;
+  padding: 80px 20px;
 
   text-align: center;
 
   font-family: "Jost", sans-serif;
-  font-size: 13px;
+  font-size: 12px;
 
   color: #6d665c;
 }
 
 .bs-empty p {
-  margin: 0 0 20px;
+  margin: 0 0 18px;
 }
 
 .bs-empty button {
-  padding: 13px 22px;
+  padding: 12px 20px;
 
   border: 1px solid #171410;
 
@@ -581,10 +674,10 @@
   color: #171410;
 
   font-family: "Jost", sans-serif;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
 
-  letter-spacing: 1.5px;
+  letter-spacing: 1.4px;
 
   text-transform: uppercase;
 
@@ -596,9 +689,10 @@
   color: #f3eee3;
 }
 
+
 /* =========================================================
    LARGE DESKTOP
-   ========================================================= */
+========================================================= */
 
 @media (min-width: 1500px) {
   .bs-section {
@@ -607,133 +701,225 @@
   }
 
   .bs-grid {
-    max-width: 1550px;
-    column-gap: 34px;
+    max-width: 1250px;
+    column-gap: 24px;
   }
 
   .bs-image-box {
-    height: 620px;
-  }
-
-  .bs-name {
-    font-size: 31px;
+    height: 430px;
   }
 }
+
 
 /* =========================================================
    LAPTOP
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 1200px) {
   .bs-section {
-    padding: 95px 4.5% 105px;
+    padding: 85px 4.5% 95px;
   }
 
   .bs-grid {
-    column-gap: 24px;
-    row-gap: 45px;
+    max-width: 1100px;
+    column-gap: 18px;
+    row-gap: 38px;
   }
 
   .bs-image-box {
-    height: 500px;
+    height: 370px;
   }
 
   .bs-name {
-    font-size: 27px;
+    font-size: 22px;
   }
 }
 
+
 /* =========================================================
    TABLET
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 900px) {
   .bs-section {
-    padding: 85px 5% 95px;
+    padding: 75px 5% 85px;
   }
 
   .bs-header {
     align-items: flex-start;
-    margin-bottom: 42px;
+    margin-bottom: 38px;
   }
 
   .bs-title {
-    font-size: 58px;
+    font-size: 54px;
   }
 
   .bs-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 40px 20px;
+
+    gap: 32px 16px;
   }
 
   .bs-image-box {
-    height: 480px;
+    height: 350px;
   }
 
   .bs-name {
-    font-size: 26px;
+    font-size: 21px;
+  }
+
+  .bs-quick-shop {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
   }
 }
 
+
 /* =========================================================
    MOBILE
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 600px) {
   .bs-section {
-    padding: 70px 20px 80px;
+    padding: 65px 18px 75px;
   }
 
   .bs-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 28px;
-    margin-bottom: 38px;
+
+    gap: 22px;
+
+    margin-bottom: 32px;
+  }
+
+  .bs-eyebrow {
+    font-size: 8px;
+    letter-spacing: 2px;
   }
 
   .bs-title {
-    font-size: 50px;
-    letter-spacing: -1.5px;
-  }
-
-  .bs-view-all {
-    min-width: auto;
+    font-size: 46px;
+    letter-spacing: -1.2px;
   }
 
   .bs-grid {
     grid-template-columns: 1fr;
-    gap: 48px;
+
+    gap: 38px;
   }
 
+  /*
+    SMALL MOBILE IMAGE
+  */
   .bs-image-box {
     height: auto;
-    aspect-ratio: 4 / 5;
+
+    aspect-ratio: 4 / 4.6;
   }
 
-  .bs-name {
-    font-size: 29px;
+  .bs-sale-badge {
+    top: 12px;
+    left: 12px;
+
+    padding: 6px 8px;
+
+    font-size: 6.5px;
+  }
+
+  .bs-product-badge {
+    top: 12px;
+    left: 12px;
+
+    padding: 6px 8px;
+
+    font-size: 6.5px;
+  }
+
+  .bs-sale-badge ~ .bs-product-badge {
+    top: 40px;
   }
 
   .bs-wishlist {
-    top: 14px;
-    right: 14px;
+    top: 12px;
+    right: 12px;
 
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
+
+    font-size: 15px;
   }
 
   .bs-arrow {
-    right: 14px;
-    bottom: 14px;
+    right: 12px;
+    bottom: 12px;
 
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .bs-quick-shop {
+    left: 10px;
+    right: 58px;
+    bottom: 10px;
+
+    height: 38px;
+
+    font-size: 7px;
+    letter-spacing: 1.4px;
+
+    opacity: 1;
+    visibility: visible;
+
+    transform: translateY(0);
+  }
+
+  .bs-details {
+    padding-top: 13px;
+  }
+
+  .bs-category {
+    font-size: 6.5px;
+  }
+
+  .bs-name {
+    font-size: 23px;
+  }
+
+  .bs-price-row {
+    gap: 6px;
+    margin-top: 7px;
+  }
+
+  .bs-current-price {
+    font-size: 12px;
+  }
+
+  .bs-old-price {
+    font-size: 9px;
+  }
+
+  .bs-discount {
+    font-size: 6.5px;
+  }
+
+  .bs-rating {
+    margin-top: 7px;
+  }
+
+  .bs-cart {
+    margin-top: 10px;
+    padding: 11px 14px;
+
+    font-size: 8px;
   }
 }
 
+
 /* =========================================================
    SMALL MOBILE
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 380px) {
   .bs-section {
@@ -742,14 +928,66 @@
   }
 
   .bs-title {
-    font-size: 45px;
-  }
-
-  .bs-name {
-    font-size: 27px;
+    font-size: 43px;
   }
 
   .bs-grid {
-    gap: 42px;
+    gap: 34px;
+  }
+
+  .bs-image-box {
+    aspect-ratio: 4 / 4.5;
+  }
+
+  .bs-name {
+    font-size: 21px;
+  }
+
+  .bs-quick-shop {
+    left: 9px;
+    right: 55px;
+    bottom: 9px;
+
+    height: 36px;
+
+    font-size: 6.8px;
+  }
+
+  .bs-arrow {
+    right: 10px;
+    bottom: 10px;
+
+    width: 37px;
+    height: 37px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .bs-image,
+  .bs-arrow,
+  .bs-quick-shop,
+  .bs-quick-shop svg {
+    transition: none;
+  }
+
+  .bs-card:hover .bs-image {
+    transform: none;
+  }
+
+  .bs-arrow:hover {
+    transform: none;
+  }
+
+  .bs-card:hover .bs-quick-shop {
+    transform: none;
+  }
+
+  .bs-quick-shop:hover svg {
+    transform: none;
   }
 }

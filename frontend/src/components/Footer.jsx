@@ -167,9 +167,9 @@ const Footer = () => {
 
           <div>
             <span>VISIT THE HOUSE</span>
-            <p>
-              Kanpur · Uttar Pradesh · India
-            </p>
+            <a href="/"> Kanpur · Uttar Pradesh · India</a>
+             
+            
           </div>
 
         </div>

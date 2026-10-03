@@ -34,12 +34,27 @@ const NewArrivals = () => {
     loadNewArrivals();
   }, []);
 
-  const getPrice = (product) => {
-    return Number(product.salePrice || product.price || 0);
+  const getRegularPrice = (product) => {
+    return Number(product?.price || 0);
+  };
+
+  const getSalePrice = (product) => {
+    const regularPrice = getRegularPrice(product);
+    const salePrice = Number(product?.salePrice || 0);
+
+    if (
+      Number.isFinite(salePrice) &&
+      salePrice > 0 &&
+      salePrice < regularPrice
+    ) {
+      return salePrice;
+    }
+
+    return null;
   };
 
   const formatPrice = (price) => {
-    return `₹${Number(price).toLocaleString("en-IN")}`;
+    return `₹${Number(price || 0).toLocaleString("en-IN")}`;
   };
 
   const getProductImage = (item) => {
@@ -49,6 +64,10 @@ const NewArrivals = () => {
       item.images?.[1] ||
       "https://via.placeholder.com/800x1000?text=Saddle+%26+Crest"
     );
+  };
+
+  const openProduct = (productId) => {
+    navigate(`/product/${productId}`);
   };
 
   return (
@@ -107,13 +126,27 @@ const NewArrivals = () => {
 
             const image = getProductImage(item);
 
+            const regularPrice = getRegularPrice(item);
+            const salePrice = getSalePrice(item);
+            const hasSale = salePrice !== null;
+
+            const currentPrice = hasSale
+              ? salePrice
+              : regularPrice;
+
+            const discountPercentage = hasSale
+              ? Math.round(
+                  ((regularPrice - salePrice) /
+                    regularPrice) *
+                    100
+                )
+              : 0;
+
             return (
               <article
                 className="arrival-card"
                 key={productId}
-                onClick={() =>
-                  navigate(`/product/${productId}`)
-                }
+                onClick={() => openProduct(productId)}
               >
                 {/* =========================================
                     IMAGE
@@ -122,13 +155,26 @@ const NewArrivals = () => {
                 <div className="arrival-image">
                   <img
                     src={image}
-                    alt={item.name || "Saddle & Crest product"}
+                    alt={
+                      item.name ||
+                      "Saddle & Crest product"
+                    }
                     loading="lazy"
                   />
 
                   <span className="arrival-number">
                     {String(index + 1).padStart(2, "0")}
                   </span>
+
+                  {/* SALE BADGE */}
+
+                  {hasSale && (
+                    <span className="arrival-sale-badge">
+                      {discountPercentage}% OFF
+                    </span>
+                  )}
+
+                  {/* EXISTING ARROW */}
 
                   <button
                     type="button"
@@ -139,13 +185,30 @@ const NewArrivals = () => {
                     onClick={(event) => {
                       event.stopPropagation();
 
-                      navigate(
-                        `/product/${productId}`
-                      );
+                      openProduct(productId);
                     }}
                   >
                     <ArrowUpRight
                       size={19}
+                      strokeWidth={1.5}
+                    />
+                  </button>
+
+                  {/* QUICK SHOP */}
+
+                  <button
+                    type="button"
+                    className="arrival-quick-shop"
+                    onClick={(event) => {
+                      event.stopPropagation();
+
+                      openProduct(productId);
+                    }}
+                  >
+                    <span>Quick Shop</span>
+
+                    <ArrowUpRight
+                      size={14}
                       strokeWidth={1.5}
                     />
                   </button>
@@ -163,13 +226,24 @@ const NewArrivals = () => {
                     </span>
 
                     <h3>
-                      {item.name || "Untitled Product"}
+                      {item.name ||
+                        "Untitled Product"}
                     </h3>
                   </div>
 
-                  <strong>
-                    {formatPrice(getPrice(item))}
-                  </strong>
+                  {/* PRICE */}
+
+                  <div className="arrival-price">
+                    <strong>
+                      {formatPrice(currentPrice)}
+                    </strong>
+
+                    {hasSale && (
+                      <span className="arrival-old-price">
+                        {formatPrice(regularPrice)}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </article>
             );

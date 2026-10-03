@@ -664,3 +664,416 @@
     height: 36px;
   }
 }
+/* =========================================================
+   MOBILE FOOTER FIX
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* Main footer wrapper */
+  .footer {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding-top: 0 !important;
+  }
+
+
+  /* =====================================================
+     FOOTER MAIN
+     ===================================================== */
+
+  .footer-main {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+
+    gap: 55px !important;
+
+    padding: 90px 22px 65px !important;
+
+    margin: 0 !important;
+
+    box-sizing: border-box;
+
+    position: relative;
+    z-index: 2;
+  }
+
+
+  /* =====================================================
+     BRAND
+     ===================================================== */
+
+  .footer-brand {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+
+  .footer-logo {
+    position: relative !important;
+
+    width: 100%;
+    max-width: 100%;
+
+    margin: 0 0 28px !important;
+
+    padding: 0 !important;
+
+    text-align: left;
+
+    z-index: 3;
+  }
+
+
+  .footer-logo span {
+    display: block;
+
+    font-size: 42px !important;
+    line-height: 0.95 !important;
+
+    letter-spacing: 6px !important;
+
+    white-space: nowrap;
+  }
+
+
+  .footer-logo small {
+    display: block;
+
+    font-size: 17px !important;
+
+    line-height: 1;
+
+    margin: 7px 0 !important;
+
+    padding: 0 !important;
+  }
+
+
+  .footer-brand p {
+    width: 100%;
+    max-width: 100%;
+
+    margin: 0 0 30px !important;
+
+    font-size: 15px !important;
+    line-height: 1.8 !important;
+
+    box-sizing: border-box;
+  }
+
+
+  /* Concierge button */
+  .footer-concierge {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 17px 0 !important;
+
+    box-sizing: border-box;
+  }
+
+
+  .footer-concierge span {
+    font-size: 12px !important;
+
+    letter-spacing: 2px !important;
+
+    line-height: 1.5;
+
+    white-space: normal;
+  }
+
+
+  /* =====================================================
+     FOOTER COLUMNS
+     ===================================================== */
+
+  .footer-column {
+    width: 100%;
+    min-width: 0;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box;
+  }
+
+
+  .footer-column h4 {
+    margin: 0 0 25px !important;
+
+    font-size: 13px !important;
+
+    letter-spacing: 3px !important;
+
+    line-height: 1.4;
+
+    text-transform: uppercase;
+  }
+
+
+  .footer-column a {
+    display: block;
+
+    width: 100%;
+
+    margin: 0 0 17px !important;
+    padding: 0 !important;
+
+    font-size: 16px !important;
+
+    line-height: 1.5 !important;
+
+    white-space: normal;
+
+    overflow-wrap: break-word;
+
+    box-sizing: border-box;
+  }
+
+
+  .footer-column a:last-child {
+    margin-bottom: 0 !important;
+  }
+
+
+  /* =====================================================
+     CONTACT SECTION
+     ===================================================== */
+
+  .footer-contact {
+    width: 100%;
+    max-width: 100%;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 32px !important;
+
+    padding: 45px 22px !important;
+
+    margin: 0 !important;
+
+    box-sizing: border-box;
+  }
+
+
+  .footer-contact-item {
+    width: 100%;
+    min-width: 0;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 16px;
+
+    box-sizing: border-box;
+  }
+
+
+  .contact-icon {
+    flex: 0 0 auto;
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+
+  .footer-contact-item > div:last-child {
+    min-width: 0;
+    width: 100%;
+  }
+
+
+  .footer-contact-item span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 11px !important;
+
+    letter-spacing: 2px;
+
+    line-height: 1.4;
+  }
+
+
+  .footer-contact-item a {
+    display: block;
+
+    max-width: 100%;
+
+    font-size: 15px !important;
+
+    line-height: 1.6;
+
+    overflow-wrap: anywhere;
+  }
+
+
+  /* =====================================================
+     FOOTER BOTTOM
+     ===================================================== */
+
+  .footer-bottom {
+    width: 100%;
+    max-width: 100%;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-items: flex-start !important;
+
+    gap: 25px !important;
+
+    padding: 30px 22px 35px !important;
+
+    margin: 0 !important;
+
+    box-sizing: border-box;
+  }
+
+
+  .footer-copy {
+    width: 100%;
+
+    margin: 0 !important;
+
+    font-size: 12px !important;
+
+    line-height: 1.6;
+  }
+
+
+  .footer-legal {
+    width: 100%;
+
+    display: flex !important;
+
+    flex-wrap: wrap;
+
+    gap: 12px 20px !important;
+
+    margin: 0 !important;
+  }
+
+
+  .footer-legal a {
+    font-size: 12px !important;
+
+    line-height: 1.5;
+
+    white-space: nowrap;
+  }
+
+
+  .footer-social {
+    width: 100%;
+
+    display: flex !important;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    gap: 18px !important;
+
+    margin: 0 !important;
+  }
+
+
+  .social-icon {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .footer-main {
+    padding: 75px 18px 55px !important;
+
+    gap: 48px !important;
+  }
+
+
+  .footer-logo span {
+    font-size: 36px !important;
+
+    letter-spacing: 5px !important;
+  }
+
+
+  .footer-logo small {
+    font-size: 15px !important;
+
+    margin: 6px 0 !important;
+  }
+
+
+  .footer-brand p {
+    font-size: 14px !important;
+
+    line-height: 1.75 !important;
+  }
+
+
+  .footer-column h4 {
+    font-size: 12px !important;
+
+    letter-spacing: 2.5px !important;
+  }
+
+
+  .footer-column a {
+    font-size: 15px !important;
+
+    margin-bottom: 15px !important;
+  }
+
+
+  .footer-contact {
+    padding: 40px 18px !important;
+
+    gap: 28px !important;
+  }
+
+
+  .footer-bottom {
+    padding: 28px 18px 32px !important;
+  }
+
+}
