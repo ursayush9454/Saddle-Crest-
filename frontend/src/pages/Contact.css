@@ -16,7 +16,7 @@
   align-items: center;
   justify-content: center;
 
-  background-image: url("/assets/contact-hero.jpg");
+  background:linear-gradient(-180deg,#9a9389,#2b4433);
   background-size: cover;
   background-position: center;
 

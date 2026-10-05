@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   padding: 140px 7vw 100px;
-  background: #171410;
+  background: linear-gradient(-145deg, #ebe4d7, #70d149);
   color: #f3eee3;
   overflow: hidden;
 }
@@ -32,7 +32,7 @@
   height: 500px;
   right: -180px;
   top: -180px;
-  border: 1px solid rgba(176, 141, 87, 0.18);
+  border: 1px solid rgba(3, 3, 3, 0.956);
   border-radius: 50%;
 }
 
@@ -43,7 +43,7 @@
   height: 330px;
   right: -90px;
   top: -90px;
-  border: 1px solid rgba(176, 141, 87, 0.12);
+  border: 1px solid rgb(19, 18, 17);
   border-radius: 50%;
 }
 
@@ -63,7 +63,7 @@
   letter-spacing: 0.24em;
   text-transform: uppercase;
 
-  color: #b08d57;
+  color: #0d0d0c;
 }
 
 .policy-hero h1 {
