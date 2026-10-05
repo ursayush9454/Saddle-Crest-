@@ -1,6 +1,7 @@
 /* =====================================================
    SADDLE & CREST — NAVBAR
 ===================================================== */
+
 /* =====================================================
    SEARCH OVERLAY
    Existing Navbar colors/design untouched
@@ -727,24 +728,11 @@
 
 
 /* =====================================================
-   REDUCED MOTION
+   NAVBAR (MAIN)
 ===================================================== */
 
-@media (prefers-reduced-motion: reduce) {
-  .navbar-search-overlay,
-  .navbar-search-panel,
-  .navbar-search-product,
-  .navbar-search-product-image img,
-  .navbar-search-close,
-  .navbar-search-clear,
-  .search-loader {
-    transition: none;
-    animation: none;
-  }
-}
 .navbar {
   position: fixed;
-  /* top: 36px; */
   top: 0;
   left: 0;
   z-index: 9999;
@@ -759,14 +747,13 @@
 
   color: #e9e2d500;
 
-  /* background: transparent; */
   background: var(--navbar-bg, transparent);
   background: linear-gradient(
-  90deg,
-  rgba(44, 38, 29, 0.75),
-  rgba(94, 60, 60, 0.7),
-  rgba(87, 70, 47, 0.75)
-);
+    90deg,
+    rgba(44, 38, 29, 0.75),
+    rgba(94, 60, 60, 0.7),
+    rgba(87, 70, 47, 0.75)
+  );
 
   border-bottom: 1px solid rgba(233, 226, 213, 0.18);
 
@@ -776,33 +763,24 @@
     background 0.35s ease,
     border-color 0.35s ease,
     backdrop-filter 0.35s ease;
-    
 }
 
 .navbar-scrolled {
-  /* background: linear-gradient(-145deg , #847a7a,#534892); */
-/* background: linear-gradient(
-    90deg,
-    #3c2d1e 0%,
-    #241814 35%,
-    #351d20 65%,
-    #100e0c 100%
-  ); */
   background: linear-gradient(
-  90deg,
-  rgba(44, 38, 29, 0.75),
-  rgba(94, 60, 60, 0.7),
-  rgba(87, 70, 47, 0.75)
-);
+    90deg,
+    rgba(44, 38, 29, 0.75),
+    rgba(94, 60, 60, 0.7),
+    rgba(87, 70, 47, 0.75)
+  );
 
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
-   top: 0px;
-   z-index: 9999;
-   
+  top: 0px;
+  z-index: 9999;
 
   border-bottom: 1px solid rgba(176, 141, 87, 0.18);
 }
+
 .navbar::after {
   content: "";
   position: absolute;
@@ -821,66 +799,6 @@
   pointer-events: none;
 }
 
-/* .navbar {
-  position:fixed;
-  top: 36px;
-  left: 0;
-  z-index: 50;
-
-  width: 100%;
-  height: 86px;
-  padding: 0 5%;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  color: #e9e2d5;
-  border-bottom: 1px solid rgba(233, 226, 213, 0.18);
-
-  font-family: "Jost", sans-serif;
-
-  transition:
-    background 0.35s ease,
-    border-color 0.35s ease;
-}
-.navbar-scrolled {
-  background: rgba(0, 0, 0, 0.96);
-
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-
-  border-bottom: 1px solid rgba(176, 141, 87, 0.18);
-} */
-/* 
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 82px;
-
-  z-index: 9999;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 0 5vw;
-
-  background: transparent;
-  color: #f3eee3;
-
-  transition:
-    background 0.35s ease,
-    backdrop-filter 0.35s ease;
-}
-
-.navbar-scrolled {
-  background: rgba(23, 20, 16, 0.96);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-} */
 
 /* =====================================================
    LEFT / DESKTOP NAV
@@ -1105,13 +1023,14 @@
 
 /* =====================================================
    MOBILE BACKDROP
+   (z-index above navbar so the drawer covers it)
 ===================================================== */
 
 .mobile-menu-backdrop {
   position: fixed;
   inset: 0;
 
-  z-index: 90;
+  z-index: 10001;
 
   background: rgba(0, 0, 0, 0.55);
 
@@ -1140,7 +1059,7 @@
 
   top: 0;
   left: 0;
-  z-index: 100;
+  z-index: 10002;
 
   width: min(420px, 88vw);
   height: 100dvh;
@@ -1169,6 +1088,8 @@
 ===================================================== */
 
 .mobile-menu-header {
+  position: relative;
+
   min-height: 88px;
   padding: 0 28px;
 
@@ -1179,12 +1100,20 @@
   border-bottom: 1px solid rgba(197, 164, 109, 0.22);
 }
 
+/* Logo centered in the drawer header */
 .mobile-menu-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
 
   line-height: 0.8;
+  padding-left: 3px; /* optical centering for letter-spacing */
 
   color: #e9e2d5;
   text-decoration: none;
@@ -1294,6 +1223,63 @@
 
 
 /* =====================================================
+   MOBILE ACCOUNT BUTTON (matches nav links)
+===================================================== */
+
+.mobile-menu .mobile-menu-nav .mobile-account-link {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 67px;
+  margin: 0;
+  padding: 0 0 0 22px; /* match the link text indent */
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border: none;
+  border-bottom: 1px solid rgba(233, 226, 213, 0.12);
+  border-radius: 0;
+
+  background: transparent;
+  color: #e9e2d5;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 31px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  text-transform: none;
+
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.mobile-menu .mobile-menu-nav .mobile-account-link span {
+  display: flex;
+  align-items: center;
+}
+
+.mobile-menu .mobile-menu-nav .mobile-account-link:hover {
+  color: #c5a46d;
+}
+
+.mobile-menu .mobile-menu-nav .mobile-account-link svg {
+  color: #c5a46d;
+  stroke: currentColor;
+  opacity: 0;
+  transform: translate(-8px, 8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.mobile-menu .mobile-menu-nav .mobile-account-link:hover svg {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+
+/* =====================================================
    MOBILE COUNTS
 ===================================================== */
 
@@ -1369,8 +1355,9 @@
   .navbar {
     padding: 0 4%;
   }
-  .navbar-scrolled{
-    top:0;
+
+  .navbar-scrolled {
+    top: 0;
   }
 
   .desktop-nav {
@@ -1406,10 +1393,12 @@
 
     border-bottom-color: rgba(233, 226, 213, 0.2);
   }
-  .navbar-scrolled{
+
+  .navbar-scrolled {
     top: 0;
     z-index: 9999;
   }
+
   .navbar-left {
     width: 25%;
   }
@@ -1491,7 +1480,8 @@
     height: 66px;
     padding: 0 18px;
   }
-  .navbar-scrolled{
+
+  .navbar-scrolled {
     top: 0;
   }
 
@@ -1543,6 +1533,11 @@
     font-size: 28px;
   }
 
+  .mobile-menu .mobile-menu-nav .mobile-account-link {
+    min-height: 61px;
+    font-size: 28px;
+  }
+
   .mobile-menu-footer {
     padding: 22px;
   }
@@ -1557,9 +1552,11 @@
   .navbar {
     padding: 0 14px;
   }
-.navbar-scrolled{
-  top: 0;
-}
+
+  .navbar-scrolled {
+    top: 0;
+  }
+
   .brand-logo {
     font-size: 16px;
     letter-spacing: 2.5px;
@@ -1583,6 +1580,10 @@
   .mobile-menu-nav a {
     font-size: 26px;
   }
+
+  .mobile-menu .mobile-menu-nav .mobile-account-link {
+    font-size: 26px;
+  }
 }
 
 
@@ -1597,8 +1598,21 @@
   .desktop-nav a,
   .mobile-menu-nav a,
   .mobile-menu-nav a svg,
+  .mobile-menu .mobile-menu-nav .mobile-account-link,
+  .mobile-menu .mobile-menu-nav .mobile-account-link svg,
   .navbar-actions button,
   .navbar-actions a {
     transition: none;
+  }
+
+  .navbar-search-overlay,
+  .navbar-search-panel,
+  .navbar-search-product,
+  .navbar-search-product-image img,
+  .navbar-search-close,
+  .navbar-search-clear,
+  .search-loader {
+    transition: none;
+    animation: none;
   }
 }
