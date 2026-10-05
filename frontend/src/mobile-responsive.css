@@ -54,20 +54,20 @@
    GLOBAL CONTAINERS
 ========================================================= */
 
+
 @media (max-width: 768px) {
+
   .container,
   .section-container,
   .home-container,
   .page-container {
-    width: calc(100% - 32px);
-    max-width: none;
+    width: 100%;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
-  }
-
-  section {
-    max-width: 100%;
-    overflow: hidden;
+    padding-left: 16px;
+    padding-right: 16px;
+    box-sizing: border-box;
   }
 }
 
@@ -1887,5 +1887,101 @@
 
   .product-discount {
     display: none;
+  }
+}
+/* =========================================================
+   FINAL MOBILE WIDTH / OVERFLOW FIX
+   Prevent pages from being pushed to the right
+========================================================= */
+
+@media (max-width: 768px) {
+
+  html,
+  body,
+  #root {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Every major page wrapper */
+  main,
+  section,
+  article,
+  header,
+  footer,
+  nav,
+  .page,
+  .page-wrapper,
+  .page-container {
+    max-width: 100% !important;
+  }
+
+  /* Prevent flex/grid children from forcing parent wider */
+  .container,
+  .section-container,
+  .home-container,
+  .page-container,
+  .checkout-page,
+  .checkout-layout,
+  .checkout-section,
+  .checkout-summary,
+  .cart-page,
+  .cart-layout,
+  .cart-summary,
+  .orders-page,
+  .orders-list,
+  .order-card,
+  .profile-page,
+  .profile-layout,
+  .profile-content {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Flex/grid children */
+  .checkout-layout > *,
+  .cart-layout > *,
+  .profile-layout > *,
+  .order-card > *,
+  .checkout-section > *,
+  .checkout-summary > *,
+  .cart-summary > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Long text must not increase width */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  strong,
+  a {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  /* Images/media */
+  img,
+  video,
+  iframe {
+    max-width: 100% !important;
+  }
+
+  /* Form elements */
+  input,
+  textarea,
+  select,
+  button {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }

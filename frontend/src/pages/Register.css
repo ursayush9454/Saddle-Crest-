@@ -238,3 +238,100 @@
     line-height: 1.55;
   }
 }
+/* =========================================================
+   LOGIN + REGISTER PASSWORD EYE — MOBILE FIX
+========================================================= */
+
+.password-input {
+  position: relative !important;
+  width: 100% !important;
+  isolation: isolate;
+}
+
+.password-input input {
+  width: 100% !important;
+  padding-right: 58px !important;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+.password-toggle {
+  position: absolute !important;
+  top: 50% !important;
+  right: 7px !important;
+
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+
+  transform: translateY(-50%) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+
+  z-index: 10 !important;
+
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.password-toggle svg {
+  width: 18px !important;
+  height: 18px !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 600px) {
+
+  .password-input {
+    width: 100% !important;
+  }
+
+  .password-input input {
+    height: 50px !important;
+    padding-left: 13px !important;
+    padding-right: 55px !important;
+    font-size: 13px !important;
+  }
+
+  .password-toggle {
+    right: 5px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+  }
+
+  .password-toggle svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+}
+
+@media (max-width: 380px) {
+
+  .password-input input {
+    padding-right: 52px !important;
+  }
+
+  .password-toggle {
+    right: 3px !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+  }
+
+  .password-toggle svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+}
