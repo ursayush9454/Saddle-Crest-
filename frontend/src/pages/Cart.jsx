@@ -311,7 +311,7 @@ const Cart = () => {
                             "column",
                           alignItems:
                             "flex-end",
-                          gap: "4px",
+                          gap: "10px",
                         }}
                       >
                         <strong>

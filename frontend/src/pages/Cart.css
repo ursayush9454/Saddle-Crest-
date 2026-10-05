@@ -372,7 +372,7 @@
   text-align: center;
 
   width: min(650px, 88%);
-  margin:auto;
+  margin: auto;
   align-items: center;
 }
 
@@ -463,6 +463,10 @@
   .cart-item-price {
     display: none;
   }
+
+  .cart-item-price strong {
+    margin-top: 1rem;
+  }
 }
 
 @media (max-width: 700px) {
@@ -515,9 +519,29 @@
     display: none;
   }
 
+  /* PRICE — sits left of the quantity box, never overlaps it */
   .cart-item-price {
-    display: block;
     grid-column: 2;
+    align-self: end;
+
+    display: flex;
+    align-items: center;
+    min-height: 40px;                 /* same height as quantity box */
+    max-width: calc(100% - 118px);    /* leave room for quantity box */
+  }
+
+  /* JSX has inline styles here, so !important is required */
+  .cart-item-price > div {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    align-items: baseline !important;
+    justify-content: flex-start;
+    gap: 2px 8px !important;
+  }
+
+  .cart-item-price strong {
+    margin-top: 0;
+    font-size: 15px;
   }
 
   .cart-quantity {
