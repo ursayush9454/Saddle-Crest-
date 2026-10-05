@@ -106,12 +106,10 @@ const Footer = () => {
           </Link>
 
 <Link to="/reviews"> Reviews</Link>
-          <a
-            href="#instagram"
-            className="footer-link-external"
-          >
-            Instagram
-          </a>
+          <Link to="/instagram" className="footer-link-external">
+          Instagram
+          </Link>
+         
 
         </div>
 

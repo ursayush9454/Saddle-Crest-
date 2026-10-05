@@ -13,6 +13,7 @@ import heroImage2 from "../assets/hero2.png";
 import heroImage3 from "../assets/hero3.jpg";
 import heroImage4 from "../assets/Hero4.jpg";
 import heroImage5 from "../assets/hero6.png";
+import { Link } from "react-router-dom";
 
 const SLIDE_DURATION = 5000;
 
@@ -203,6 +204,23 @@ const Hero = () => {
     setProgressKey((prev) => prev + 1);
   };
 
+  /* =====================================================
+     SCROLL DOWN (below hero section)
+  ===================================================== */
+
+  const handleScrollDown = (e) => {
+    const hero = e.currentTarget.closest(".hero");
+
+    const top = hero
+      ? hero.getBoundingClientRect().bottom + window.scrollY
+      : window.innerHeight;
+
+    window.scrollTo({
+      top,
+      behavior: "smooth",
+    });
+  };
+
   const slide = slides[activeSlide];
 
   return (
@@ -246,13 +264,10 @@ const Hero = () => {
           {slide.description}
         </p>
 
-        <a
-          href="#collections"
-          className="hero-button"
-        >
+        <Link to="/shop" className="hero-button">
           Explore Collection
           <ArrowRight size={16} />
-        </a>
+        </Link>
       </div>
 
       {/* =================================================
@@ -311,15 +326,18 @@ const Hero = () => {
 
         {/* SCROLL */}
 
-        <div className="scroll-indicator">
-
+        <button
+          type="button"
+          className="scroll-indicator"
+          onClick={handleScrollDown}
+          aria-label="Scroll down"
+        >
           <div className="scroll-circle">
             <ArrowDown size={14} />
           </div>
 
           <span>SCROLL</span>
-
-        </div>
+        </button>
 
         {/* EST */}
 
