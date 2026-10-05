@@ -13,14 +13,24 @@ const upload = require("../middleware/upload");
 // Get all active products
 r.get("/", c.list);
 
-// Get single active product
-r.get("/:id", c.getOne);
-
 /*
 |--------------------------------------------------------------------------
 | ADMIN PRODUCT ROUTES
 |--------------------------------------------------------------------------
 */
+
+// Get all products for admin
+// status = active | inactive | all
+// IMPORTANT: This must come before /:id
+r.get(
+  "/admin/all",
+  auth,
+  adminOnly,
+  c.adminList
+);
+
+// Get single active product
+r.get("/:id", c.getOne);
 
 // Create product
 r.post(
@@ -40,7 +50,7 @@ r.put(
   c.update
 );
 
-// Archive product
+// Archive / deactivate product
 r.delete(
   "/:id",
   auth,

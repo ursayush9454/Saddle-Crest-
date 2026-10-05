@@ -1,32 +1,5 @@
 const Product = require("../models/Product");
-const cloudinary = require("../config/cloudinary");
-
-/*
-|--------------------------------------------------------------------------
-| CLOUDINARY IMAGE UPLOAD
-|--------------------------------------------------------------------------
-*/
-
-const uploadToCloudinary = (buffer) => {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: "saddle-and-crest/products",
-        resource_type: "image",
-      },
-      (error, result) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-
-        resolve(result.secure_url);
-      }
-    );
-
-    stream.end(buffer);
-  });
-};
+const cloudinary = require("cloudinary").v2;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,8 +7,27 @@ const uploadToCloudinary = (buffer) => {
 |--------------------------------------------------------------------------
 */
 
+const uploadToCloudinary = (fileBuffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "saddle-crest/products",
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result.secure_url);
+        }
+      }
+    );
+
+    stream.end(fileBuffer);
+  });
+};
+
 const normalizeArray = (value) => {
-  if (!value) {
+  if (value === undefined || value === null) {
     return [];
   }
 
@@ -43,157 +35,90 @@ const normalizeArray = (value) => {
     return value.filter(Boolean);
   }
 
-  return [value].filter(Boolean);
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+
+      if (Array.isArray(parsed)) {
+        return parsed.filter(Boolean);
+      }
+    } catch (error) {
+      // Not JSON, continue
+    }
+
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
 };
 
-const parseBoolean = (
-  value,
-  defaultValue = false
-) => {
-  if (
-    value === undefined ||
-    value === null ||
-    value === ""
-  ) {
+const parseBoolean = (value, defaultValue = false) => {
+  if (value === undefined || value === null || value === "") {
     return defaultValue;
   }
 
-  if (
-    value === true ||
-    value === "true"
-  ) {
-    return true;
+  if (typeof value === "boolean") {
+    return value;
   }
 
-  if (
-    value === false ||
-    value === "false"
-  ) {
-    return false;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+
+    if (["true", "1", "yes", "on"].includes(normalized)) {
+      return true;
+    }
+
+    if (["false", "0", "no", "off"].includes(normalized)) {
+      return false;
+    }
   }
 
-  return defaultValue;
+  return Boolean(value);
 };
-
-/*
-|--------------------------------------------------------------------------
-| PRICE HELPER
-|--------------------------------------------------------------------------
-|
-| Converts incoming FormData/string values into safe numbers.
-|
-*/
 
 const parsePrice = (value) => {
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number) || number < 0) {
+    return undefined;
+  }
+
+  return number;
+};
+
+const parseSalePrice = (value) => {
   if (
     value === undefined ||
     value === null ||
-    value === ""
+    value === "" ||
+    value === "null"
   ) {
     return null;
   }
 
-  const normalizedValue = String(value)
-    .replace(/,/g, "")
-    .trim();
+  const number = Number(value);
 
-  const parsedValue = Number(normalizedValue);
-
-  if (!Number.isFinite(parsedValue)) {
+  if (!Number.isFinite(number) || number < 0) {
     return null;
   }
 
-  return parsedValue;
+  return number;
 };
 
 /*
 |--------------------------------------------------------------------------
-| SALE PRICE HELPER
-|--------------------------------------------------------------------------
-|
-| Rules:
-|
-| Regular Price = ₹3900
-| Sale Price    = ₹3700
-|
-| This is VALID.
-|
-| Sale Price must:
-| - be greater than 0
-| - be strictly lower than regular price
-|
-*/
-
-const parseSalePrice = (
-  value,
-  regularPrice
-) => {
-  /*
-   * Empty sale price means:
-   * product is not on sale.
-   */
-
-  if (
-    value === undefined ||
-    value === null ||
-    String(value).trim() === ""
-  ) {
-    return null;
-  }
-
-  const salePrice = parsePrice(value);
-
-  if (
-    salePrice === null ||
-    salePrice <= 0
-  ) {
-    throw new Error(
-      "Please enter a valid sale price."
-    );
-  }
-
-  if (
-    !Number.isFinite(regularPrice) ||
-    regularPrice <= 0
-  ) {
-    throw new Error(
-      "Please enter a valid regular price."
-    );
-  }
-
-  /*
-   * IMPORTANT:
-   *
-   * Sale price must be LOWER than
-   * regular price.
-   *
-   * Example:
-   *
-   * 3900 > 3700 = VALID
-   * 3900 = 3900 = INVALID
-   * 3900 < 4000 = INVALID
-   */
-
-  if (salePrice >= regularPrice) {
-    throw new Error(
-      "Sale price must be lower than the regular price."
-    );
-  }
-
-  return salePrice;
-};
-
-/*
-|--------------------------------------------------------------------------
-| GET ALL PRODUCTS
+| PUBLIC - GET ACTIVE PRODUCTS
 |--------------------------------------------------------------------------
 */
 
-exports.list = async (
-  req,
-  res,
-  next
-) => {
+exports.list = async (req, res) => {
   try {
     const {
       search,
@@ -208,851 +133,947 @@ exports.list = async (
       limit = 12,
     } = req.query;
 
+    // PUBLIC STORE ONLY SHOWS ACTIVE PRODUCTS
     const query = {
       isActive: true,
     };
 
     /*
     |--------------------------------------------------------------------------
-    | SEARCH
+    | Search
     |--------------------------------------------------------------------------
     */
 
-    if (search) {
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim(), "i");
+
       query.$or = [
-        {
-          name: new RegExp(
-            search,
-            "i"
-          ),
-        },
-        {
-          description: new RegExp(
-            search,
-            "i"
-          ),
-        },
-        {
-          tags: new RegExp(
-            search,
-            "i"
-          ),
-        },
+        { name: searchRegex },
+        { description: searchRegex },
+        { shortDescription: searchRegex },
+        { category: searchRegex },
+        { sku: searchRegex },
       ];
     }
 
     /*
     |--------------------------------------------------------------------------
-    | CATEGORY
+    | Category
     |--------------------------------------------------------------------------
     */
 
-    if (category) {
-      query.category = category;
+    if (category && category.trim()) {
+      query.category = category.trim();
     }
 
     /*
     |--------------------------------------------------------------------------
-    | FEATURED
+    | Featured
     |--------------------------------------------------------------------------
     */
 
     if (featured !== undefined) {
-      query.featured =
-        featured === "true";
+      query.featured = parseBoolean(featured);
     }
 
     /*
     |--------------------------------------------------------------------------
-    | BEST SELLER
+    | Best Seller
     |--------------------------------------------------------------------------
     */
 
     if (bestSeller !== undefined) {
-      query.bestSeller =
-        bestSeller === "true";
+      query.bestSeller = parseBoolean(bestSeller);
     }
 
     /*
     |--------------------------------------------------------------------------
-    | NEW ARRIVAL
+    | New Arrival
     |--------------------------------------------------------------------------
     */
 
     if (newArrival !== undefined) {
-      query.newArrival =
-        newArrival === "true";
+      query.newArrival = parseBoolean(newArrival);
     }
 
     /*
     |--------------------------------------------------------------------------
-    | PRICE FILTER
+    | Price Filter
     |--------------------------------------------------------------------------
     */
 
-    const parsedMinPrice =
-      parsePrice(minPrice);
-
-    const parsedMaxPrice =
-      parsePrice(maxPrice);
-
-    if (
-      parsedMinPrice !== null ||
-      parsedMaxPrice !== null
-    ) {
+    if (minPrice !== undefined || maxPrice !== undefined) {
       query.price = {};
 
-      if (
-        parsedMinPrice !== null
-      ) {
-        query.price.$gte =
-          parsedMinPrice;
+      if (minPrice !== undefined && minPrice !== "") {
+        const min = Number(minPrice);
+
+        if (Number.isFinite(min)) {
+          query.price.$gte = min;
+        }
       }
 
-      if (
-        parsedMaxPrice !== null
-      ) {
-        query.price.$lte =
-          parsedMaxPrice;
+      if (maxPrice !== undefined && maxPrice !== "") {
+        const max = Number(maxPrice);
+
+        if (Number.isFinite(max)) {
+          query.price.$lte = max;
+        }
+      }
+
+      if (Object.keys(query.price).length === 0) {
+        delete query.price;
       }
     }
 
     /*
     |--------------------------------------------------------------------------
-    | SORTING
+    | Sorting
     |--------------------------------------------------------------------------
     */
 
-    const sorts = {
-      newest: {
-        createdAt: -1,
-      },
-
-      priceLow: {
-        price: 1,
-      },
-
-      priceHigh: {
-        price: -1,
-      },
-
-      name: {
-        name: 1,
-      },
+    let sortOption = {
+      createdAt: -1,
     };
 
-    /*
-    |--------------------------------------------------------------------------
-    | PAGINATION
-    |--------------------------------------------------------------------------
-    */
+    switch (sort) {
+      case "priceLow":
+        sortOption = {
+          price: 1,
+        };
+        break;
 
-    const parsedPage =
-      Number(page);
+      case "priceHigh":
+        sortOption = {
+          price: -1,
+        };
+        break;
 
-    const parsedLimit =
-      Number(limit);
+      case "name":
+        sortOption = {
+          name: 1,
+        };
+        break;
 
-    const currentPage =
-      Number.isFinite(
-        parsedPage
-      ) && parsedPage > 0
-        ? Math.floor(parsedPage)
-        : 1;
-
-    const perPage =
-      Number.isFinite(
-        parsedLimit
-      ) && parsedLimit > 0
-        ? Math.min(
-            100,
-            Math.floor(
-              parsedLimit
-            )
-          )
-        : 12;
+      case "newest":
+      default:
+        sortOption = {
+          createdAt: -1,
+        };
+        break;
+    }
 
     /*
     |--------------------------------------------------------------------------
-    | FETCH
+    | Pagination
     |--------------------------------------------------------------------------
     */
 
-    const [
-      products,
-      total,
-    ] = await Promise.all([
+    const currentPage = Math.max(Number(page) || 1, 1);
+    const perPage = Math.min(
+      Math.max(Number(limit) || 12, 1),
+      100
+    );
+
+    const skip = (currentPage - 1) * perPage;
+
+    const [products, total] = await Promise.all([
       Product.find(query)
-        .sort(
-          sorts[sort] ||
-            sorts.newest
-        )
-        .skip(
-          (currentPage - 1) *
-            perPage
-        )
-        .limit(perPage),
+        .sort(sortOption)
+        .skip(skip)
+        .limit(perPage)
+        .lean(),
 
-      Product.countDocuments(
-        query
-      ),
+      Product.countDocuments(query),
     ]);
 
+    return res.status(200).json({
+      message: "Products fetched successfully",
+      products,
+      pagination: {
+        page: currentPage,
+        limit: perPage,
+        total,
+        totalPages: Math.ceil(total / perPage),
+      },
+    });
+  } catch (error) {
+    console.error("List products error:", error);
+
+    return res.status(500).json({
+      message: "Failed to fetch products",
+      error: error.message,
+    });
+  }
+};
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN - GET ALL PRODUCTS
+|--------------------------------------------------------------------------
+|
+| status:
+| active   -> only active products
+| inactive -> only inactive products
+| all      -> active + inactive
+|
+*/
+
+exports.adminList = async (req, res) => {
+  try {
+    const {
+      search,
+      category,
+      status = "active",
+      featured,
+      bestSeller,
+      newArrival,
+      sort = "newest",
+      page = 1,
+      limit = 20,
+    } = req.query;
+
+    const query = {};
+
     /*
     |--------------------------------------------------------------------------
-    | RESPONSE
+    | Product Status
     |--------------------------------------------------------------------------
     */
 
-    res.json({
-      message:
-        "Products fetched successfully",
+    if (status === "inactive") {
+      query.isActive = false;
+    } else if (status === "all") {
+      // No isActive filter
+    } else {
+      // Default admin view = active products
+      query.isActive = true;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim(), "i");
+
+      query.$or = [
+        { name: searchRegex },
+        { description: searchRegex },
+        { shortDescription: searchRegex },
+        { category: searchRegex },
+        { sku: searchRegex },
+      ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Category
+    |--------------------------------------------------------------------------
+    */
+
+    if (category && category.trim()) {
+      query.category = category.trim();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Featured
+    |--------------------------------------------------------------------------
+    */
+
+    if (featured !== undefined) {
+      query.featured = parseBoolean(featured);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Best Seller
+    |--------------------------------------------------------------------------
+    */
+
+    if (bestSeller !== undefined) {
+      query.bestSeller = parseBoolean(bestSeller);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | New Arrival
+    |--------------------------------------------------------------------------
+    */
+
+    if (newArrival !== undefined) {
+      query.newArrival = parseBoolean(newArrival);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sorting
+    |--------------------------------------------------------------------------
+    */
+
+    let sortOption = {
+      createdAt: -1,
+    };
+
+    switch (sort) {
+      case "priceLow":
+        sortOption = {
+          price: 1,
+        };
+        break;
+
+      case "priceHigh":
+        sortOption = {
+          price: -1,
+        };
+        break;
+
+      case "name":
+        sortOption = {
+          name: 1,
+        };
+        break;
+
+      case "stockLow":
+        sortOption = {
+          stock: 1,
+        };
+        break;
+
+      case "newest":
+      default:
+        sortOption = {
+          createdAt: -1,
+        };
+        break;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+    const currentPage = Math.max(Number(page) || 1, 1);
+
+    const perPage = Math.min(
+      Math.max(Number(limit) || 20, 1),
+      100
+    );
+
+    const skip = (currentPage - 1) * perPage;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fetch Products + Counts
+    |--------------------------------------------------------------------------
+    */
+
+    const [products, total, activeCount, inactiveCount] =
+      await Promise.all([
+        Product.find(query)
+          .sort(sortOption)
+          .skip(skip)
+          .limit(perPage)
+          .lean(),
+
+        Product.countDocuments(query),
+
+        Product.countDocuments({
+          isActive: true,
+        }),
+
+        Product.countDocuments({
+          isActive: false,
+        }),
+      ]);
+
+    return res.status(200).json({
+      message: "Admin products fetched successfully",
 
       products,
+
+      counts: {
+        active: activeCount,
+        inactive: inactiveCount,
+        total: activeCount + inactiveCount,
+      },
 
       pagination: {
         page: currentPage,
         limit: perPage,
         total,
-        pages: Math.ceil(
-          total / perPage
-        ),
+        totalPages: Math.ceil(total / perPage),
       },
     });
   } catch (error) {
-    next(error);
+    console.error("Admin list products error:", error);
+
+    return res.status(500).json({
+      message: "Failed to fetch admin products",
+      error: error.message,
+    });
   }
 };
 
 /*
 |--------------------------------------------------------------------------
-| GET SINGLE PRODUCT
+| PUBLIC - GET SINGLE ACTIVE PRODUCT
 |--------------------------------------------------------------------------
 */
 
-exports.getOne = async (
-  req,
-  res,
-  next
-) => {
+exports.getOne = async (req, res) => {
   try {
-    const product =
-      await Product.findOne({
-        _id: req.params.id,
-        isActive: true,
-      });
+    const product = await Product.findOne({
+      _id: req.params.id,
+      isActive: true,
+    }).lean();
 
     if (!product) {
       return res.status(404).json({
-        message:
-          "Product not found",
+        message: "Product not found",
       });
     }
 
-    res.json({
-      message:
-        "Product fetched successfully",
-
+    return res.status(200).json({
+      message: "Product fetched successfully",
       product,
     });
   } catch (error) {
-    next(error);
+    console.error("Get product error:", error);
+
+    return res.status(500).json({
+      message: "Failed to fetch product",
+      error: error.message,
+    });
   }
 };
 
 /*
 |--------------------------------------------------------------------------
-| CREATE PRODUCT
+| ADMIN - CREATE PRODUCT
 |--------------------------------------------------------------------------
 */
 
-exports.create = async (
-  req,
-  res,
-  next
-) => {
+exports.create = async (req, res) => {
   try {
-    console.log(
-      "Creating product..."
-    );
-
-    console.log(
-      "Uploaded files:",
-      req.files?.length || 0
-    );
-
     /*
     |--------------------------------------------------------------------------
-    | UPLOAD FILES
+    | Images
     |--------------------------------------------------------------------------
     */
 
     let uploadedImages = [];
 
-    if (
-      req.files &&
-      req.files.length > 0
-    ) {
-      uploadedImages =
-        await Promise.all(
-          req.files.map(
-            (file) =>
-              uploadToCloudinary(
-                file.buffer
-              )
-          )
-        );
+    if (req.files && req.files.length > 0) {
+      uploadedImages = await Promise.all(
+        req.files.map((file) =>
+          uploadToCloudinary(file.buffer)
+        )
+      );
     }
 
     /*
     |--------------------------------------------------------------------------
-    | IMAGE URLS
+    | Image URLs
     |--------------------------------------------------------------------------
     */
 
-    const urlImages =
-      normalizeArray(
-        req.body.images
-      );
+    const imageUrls = normalizeArray(req.body.images);
 
-    const imageUrls = [
+    const allImages = [
       ...uploadedImages,
-      ...urlImages,
-    ];
+      ...imageUrls,
+    ].filter(Boolean);
 
-    /*
-    |--------------------------------------------------------------------------
-    | IMAGE REQUIRED
-    |--------------------------------------------------------------------------
-    */
+    const primaryImage =
+      req.body.image ||
+      allImages[0] ||
+      "";
 
-    if (
-      imageUrls.length === 0
-    ) {
+    if (!primaryImage) {
       return res.status(400).json({
-        message:
-          "At least one product image is required",
+        message: "At least one product image is required",
       });
     }
 
     /*
     |--------------------------------------------------------------------------
-    | REGULAR PRICE
+    | Price
     |--------------------------------------------------------------------------
     */
 
-    const price =
-      parsePrice(
-        req.body.price
-      );
+    const price = parsePrice(req.body.price);
 
-    if (
-      price === null ||
-      price <= 0
-    ) {
+    if (price === undefined) {
       return res.status(400).json({
-        message:
-          "Please enter a valid product price.",
+        message: "Valid product price is required",
       });
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | SALE PRICE
-    |--------------------------------------------------------------------------
-    */
-
-    let salePrice = null;
-
-    try {
-      salePrice =
-        parseSalePrice(
-          req.body.salePrice,
-          price
-        );
-    } catch (error) {
-      return res.status(400).json({
-        message:
-          error.message,
-      });
-    }
+    const salePrice = parseSalePrice(
+      req.body.salePrice
+    );
 
     /*
     |--------------------------------------------------------------------------
-    | PRODUCT DATA
+    | Product Data
     |--------------------------------------------------------------------------
     */
 
     const productData = {
-      name:
-        req.body.name,
+      name: req.body.name,
+      slug: req.body.slug,
+      sku: req.body.sku,
 
-      slug:
-        req.body.slug || "",
-
-      sku:
-        req.body.sku || undefined,
-
-      description:
-        req.body.description,
+      description: req.body.description,
 
       shortDescription:
-        req.body.shortDescription ||
-        "",
+        req.body.shortDescription || "",
 
-      /*
-       * REGULAR PRICE
-       */
       price,
 
-      /*
-       * SALE PRICE
-       *
-       * null = no sale
-       */
       salePrice,
 
-      category:
-        req.body.category,
+      category: req.body.category,
 
       categoryId:
-        req.body.categoryId ||
-        null,
+        req.body.categoryId || null,
 
-      image:
-        imageUrls[0],
+      image: primaryImage,
 
-      images:
-        imageUrls,
+      images: allImages,
 
       stock:
-        parsePrice(
-          req.body.stock
-        ) ?? 0,
+        Number(req.body.stock) >= 0
+          ? Number(req.body.stock)
+          : 0,
 
       lowStockThreshold:
-        parsePrice(
-          req.body
-            .lowStockThreshold
-        ) ?? 5,
+        Number(req.body.lowStockThreshold) >= 0
+          ? Number(req.body.lowStockThreshold)
+          : 5,
 
       badge:
         req.body.badge || "",
 
-      tags: normalizeArray(
-        req.body.tags
+      tags: normalizeArray(req.body.tags),
+
+      sizes: normalizeArray(req.body.sizes),
+
+      colors: normalizeArray(req.body.colors),
+
+      featured: parseBoolean(
+        req.body.featured,
+        false
       ),
 
-      sizes: normalizeArray(
-        req.body.sizes
+      bestSeller: parseBoolean(
+        req.body.bestSeller,
+        false
       ),
 
-      colors: normalizeArray(
-        req.body.colors
+      newArrival: parseBoolean(
+        req.body.newArrival,
+        false
       ),
 
-      featured:
-        parseBoolean(
-          req.body.featured
-        ),
+      /*
+      |--------------------------------------------------------------------------
+      | ACTIVE PRODUCT CHECKBOX
+      |--------------------------------------------------------------------------
+      |
+      | If checkbox is unchecked -> false
+      | If not provided -> true
+      |
+      */
 
-      bestSeller:
-        parseBoolean(
-          req.body.bestSeller
-        ),
-
-      newArrival:
-        parseBoolean(
-          req.body.newArrival
-        ),
-
-      isActive:
-        parseBoolean(
-          req.body.isActive,
-          true
-        ),
+      isActive: parseBoolean(
+        req.body.isActive,
+        true
+      ),
     };
 
     /*
     |--------------------------------------------------------------------------
-    | SAVE
+    | Sale Price Validation
     |--------------------------------------------------------------------------
     */
 
-    const product =
-      await Product.create(
-        productData
-      );
-
-    console.log(
-      "Product created:",
-      product._id
-    );
-
-    res.status(201).json({
-      message:
-        "Product created successfully",
-
-      product,
-    });
-  } catch (error) {
-    console.error(
-      "Create product error:",
-      error
-    );
-
-    next(error);
-  }
-};
-
-/*
-|--------------------------------------------------------------------------
-| UPDATE PRODUCT
-|--------------------------------------------------------------------------
-*/
-
-exports.update = async (
-  req,
-  res,
-  next
-) => {
-  try {
-    const product =
-      await Product.findById(
-        req.params.id
-      );
-
-    if (!product) {
-      return res.status(404).json({
+    if (
+      salePrice !== null &&
+      salePrice >= price
+    ) {
+      return res.status(400).json({
         message:
-          "Product not found",
+          "Sale price must be lower than regular price",
       });
     }
 
     /*
     |--------------------------------------------------------------------------
-    | UPLOAD NEW FILES
+    | Create
+    |--------------------------------------------------------------------------
+    */
+
+    const product = await Product.create(
+      productData
+    );
+
+    return res.status(201).json({
+      message: "Product created successfully",
+      product,
+    });
+  } catch (error) {
+    console.error("Create product error:", error);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Duplicate SKU
+    |--------------------------------------------------------------------------
+    */
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        message:
+          "A product with this SKU already exists",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Failed to create product",
+      error: error.message,
+    });
+  }
+};
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN - UPDATE PRODUCT
+|--------------------------------------------------------------------------
+*/
+
+exports.update = async (req, res) => {
+  try {
+    const product =
+      await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Images
     |--------------------------------------------------------------------------
     */
 
     let uploadedImages = [];
 
-    if (
-      req.files &&
-      req.files.length > 0
-    ) {
-      uploadedImages =
-        await Promise.all(
-          req.files.map(
-            (file) =>
-              uploadToCloudinary(
-                file.buffer
-              )
-          )
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | EXISTING IMAGES
-    |--------------------------------------------------------------------------
-    */
-
-    const existingImages =
-      normalizeArray(
-        req.body.existingImages
+    if (req.files && req.files.length > 0) {
+      uploadedImages = await Promise.all(
+        req.files.map((file) =>
+          uploadToCloudinary(file.buffer)
+        )
       );
-
-    /*
-    |--------------------------------------------------------------------------
-    | NEW URL IMAGES
-    |--------------------------------------------------------------------------
-    */
-
-    const urlImages =
-      normalizeArray(
-        req.body.images
-      );
-
-    /*
-    |--------------------------------------------------------------------------
-    | COMBINE IMAGES
-    |--------------------------------------------------------------------------
-    */
-
-    let imageUrls = [
-      ...existingImages,
-      ...urlImages,
-      ...uploadedImages,
-    ];
-
-    /*
-    |--------------------------------------------------------------------------
-    | KEEP OLD IMAGES
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-      imageUrls.length === 0
-    ) {
-      imageUrls =
-        product.images?.length
-          ? product.images
-          : product.image
-          ? [product.image]
-          : [];
     }
 
     /*
     |--------------------------------------------------------------------------
-    | IMAGE REQUIRED
+    | Existing Images
     |--------------------------------------------------------------------------
     */
 
-    if (
-      imageUrls.length === 0
-    ) {
-      return res.status(400).json({
-        message:
-          "Product must have at least one image",
-      });
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | REGULAR PRICE
-    |--------------------------------------------------------------------------
-    */
-
-    const price =
-      parsePrice(
-        req.body.price
-      );
-
-    if (
-      price === null ||
-      price <= 0
-    ) {
-      return res.status(400).json({
-        message:
-          "Please enter a valid product price.",
-      });
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | SALE PRICE
-    |--------------------------------------------------------------------------
-    */
-
-    let salePrice = null;
-
-    try {
-      salePrice =
-        parseSalePrice(
-          req.body.salePrice,
-          price
-        );
-    } catch (error) {
-      return res.status(400).json({
-        message:
-          error.message,
-      });
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE DATA
-    |--------------------------------------------------------------------------
-    */
-
-    const updateData = {
-      name:
-        req.body.name,
-
-      slug:
-        req.body.slug || "",
-
-      sku:
-        req.body.sku || undefined,
-
-      description:
-        req.body.description,
-
-      shortDescription:
-        req.body.shortDescription ||
-        "",
-
-      /*
-       * REGULAR PRICE
-       */
-      price,
-
-      /*
-       * SALE PRICE
-       *
-       * ₹3900 regular
-       * ₹3700 sale
-       *
-       * salePrice = 3700
-       */
-      salePrice,
-
-      category:
-        req.body.category,
-
-      categoryId:
-        req.body.categoryId ||
-        null,
-
-      image:
-        imageUrls[0],
-
-      images:
-        imageUrls,
-
-      stock:
-        parsePrice(
-          req.body.stock
-        ) ?? 0,
-
-      lowStockThreshold:
-        parsePrice(
-          req.body
-            .lowStockThreshold
-        ) ?? 5,
-
-      badge:
-        req.body.badge || "",
-
-      tags: normalizeArray(
-        req.body.tags
-      ),
-
-      sizes: normalizeArray(
-        req.body.sizes
-      ),
-
-      colors: normalizeArray(
-        req.body.colors
-      ),
-
-      featured:
-        parseBoolean(
-          req.body.featured,
-          product.featured
-        ),
-
-      bestSeller:
-        parseBoolean(
-          req.body.bestSeller,
-          product.bestSeller
-        ),
-
-      newArrival:
-        parseBoolean(
-          req.body.newArrival,
-          product.newArrival
-        ),
-
-      isActive:
-        parseBoolean(
-          req.body.isActive,
-          product.isActive
-        ),
-    };
-
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE DATABASE
-    |--------------------------------------------------------------------------
-    */
-
-    const updatedProduct =
-      await Product.findByIdAndUpdate(
-        req.params.id,
-        updateData,
-        {
-          returnDocument:
-            "after",
-
-          runValidators: true,
-        }
-      );
-
-    if (!updatedProduct) {
-      return res.status(404).json({
-        message:
-          "Product not found",
-      });
-    }
-
-    res.json({
-      message:
-        "Product updated successfully",
-
-      product:
-        updatedProduct,
-    });
-  } catch (error) {
-    console.error(
-      "Update product error:",
-      error
+    let existingImages = normalizeArray(
+      req.body.existingImages
     );
 
-    next(error);
+    /*
+    |--------------------------------------------------------------------------
+    | New Image URLs
+    |--------------------------------------------------------------------------
+    */
+
+    const newImageUrls = normalizeArray(
+      req.body.images
+    );
+
+    let allImages = [
+      ...existingImages,
+      ...newImageUrls,
+      ...uploadedImages,
+    ].filter(Boolean);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Primary Image
+    |--------------------------------------------------------------------------
+    */
+
+    let primaryImage =
+      req.body.image ||
+      allImages[0] ||
+      product.image;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Price
+    |--------------------------------------------------------------------------
+    */
+
+    const parsedPrice =
+      parsePrice(req.body.price);
+
+    const price =
+      parsedPrice !== undefined
+        ? parsedPrice
+        : product.price;
+
+    const parsedSalePrice =
+      parseSalePrice(req.body.salePrice);
+
+    let salePrice;
+
+    if (
+      req.body.salePrice === undefined
+    ) {
+      salePrice = product.salePrice;
+    } else {
+      salePrice = parsedSalePrice;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sale Price Validation
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      salePrice !== null &&
+      salePrice !== undefined &&
+      salePrice >= price
+    ) {
+      return res.status(400).json({
+        message:
+          "Sale price must be lower than regular price",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update Fields
+    |--------------------------------------------------------------------------
+    */
+
+    product.name =
+      req.body.name ?? product.name;
+
+    product.slug =
+      req.body.slug ?? product.slug;
+
+    product.sku =
+      req.body.sku ?? product.sku;
+
+    product.description =
+      req.body.description ??
+      product.description;
+
+    product.shortDescription =
+      req.body.shortDescription ??
+      product.shortDescription;
+
+    product.price = price;
+
+    product.salePrice = salePrice;
+
+    product.category =
+      req.body.category ??
+      product.category;
+
+    product.categoryId =
+      req.body.categoryId !== undefined
+        ? req.body.categoryId || null
+        : product.categoryId;
+
+    product.image = primaryImage;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Only update images if new/existing image data was sent
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      req.body.images !== undefined ||
+      req.body.existingImages !== undefined ||
+      uploadedImages.length > 0
+    ) {
+      if (allImages.length > 0) {
+        product.images = allImages;
+        product.image = allImages[0];
+      }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stock
+    |--------------------------------------------------------------------------
+    */
+
+    if (req.body.stock !== undefined) {
+      const stock = Number(req.body.stock);
+
+      if (
+        Number.isFinite(stock) &&
+        stock >= 0
+      ) {
+        product.stock = stock;
+      }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Low Stock Threshold
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      req.body.lowStockThreshold !==
+      undefined
+    ) {
+      const threshold = Number(
+        req.body.lowStockThreshold
+      );
+
+      if (
+        Number.isFinite(threshold) &&
+        threshold >= 0
+      ) {
+        product.lowStockThreshold =
+          threshold;
+      }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Other Fields
+    |--------------------------------------------------------------------------
+    */
+
+    if (req.body.badge !== undefined) {
+      product.badge = req.body.badge;
+    }
+
+    if (req.body.tags !== undefined) {
+      product.tags = normalizeArray(
+        req.body.tags
+      );
+    }
+
+    if (req.body.sizes !== undefined) {
+      product.sizes = normalizeArray(
+        req.body.sizes
+      );
+    }
+
+    if (req.body.colors !== undefined) {
+      product.colors = normalizeArray(
+        req.body.colors
+      );
+    }
+
+    if (req.body.featured !== undefined) {
+      product.featured = parseBoolean(
+        req.body.featured
+      );
+    }
+
+    if (req.body.bestSeller !== undefined) {
+      product.bestSeller = parseBoolean(
+        req.body.bestSeller
+      );
+    }
+
+    if (req.body.newArrival !== undefined) {
+      product.newArrival = parseBoolean(
+        req.body.newArrival
+      );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACTIVE / INACTIVE
+    |--------------------------------------------------------------------------
+    |
+    | This is important.
+    |
+    | Admin can edit an inactive product and
+    | activate it again.
+    |
+    */
+
+    product.isActive = parseBoolean(
+      req.body.isActive,
+      product.isActive
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Save
+    |--------------------------------------------------------------------------
+    */
+
+    await product.save();
+
+    return res.status(200).json({
+      message: "Product updated successfully",
+      product,
+    });
+  } catch (error) {
+    console.error("Update product error:", error);
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        message:
+          "A product with this SKU already exists",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Failed to update product",
+      error: error.message,
+    });
   }
 };
 
 /*
 |--------------------------------------------------------------------------
-| DELETE / ARCHIVE PRODUCT
+| ADMIN - ARCHIVE / DEACTIVATE PRODUCT
 |--------------------------------------------------------------------------
 */
 
-exports.remove = async (
-  req,
-  res,
-  next
-) => {
+exports.remove = async (req, res) => {
   try {
-    console.log(
-      "Archive product request:",
-      req.params.id
-    );
-
     const product =
-      await Product.findByIdAndUpdate(
-        req.params.id,
-        {
-          isActive: false,
-        },
-        {
-          returnDocument:
-            "after",
-
-          runValidators: true,
-        }
-      );
+      await Product.findById(req.params.id);
 
     if (!product) {
       return res.status(404).json({
-        message:
-          "Product not found",
+        message: "Product not found",
       });
     }
 
-    console.log(
-      "Product archived successfully:",
-      product._id
-    );
+    product.isActive = false;
+
+    await product.save();
 
     return res.status(200).json({
-      success: true,
-
-      message:
-        "Product archived successfully",
-
+      message: "Product archived successfully",
       product,
     });
   } catch (error) {
@@ -1061,6 +1082,9 @@ exports.remove = async (
       error
     );
 
-    next(error);
+    return res.status(500).json({
+      message: "Failed to archive product",
+      error: error.message,
+    });
   }
 };

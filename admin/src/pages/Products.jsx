@@ -13,6 +13,8 @@ import {
   X,
   SlidersHorizontal,
   Flame,
+  CheckCircle2,
+  Archive,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -43,10 +45,30 @@ const Products = () => {
 
 
   // =========================================================
-  // DELETE LOADING
+  // PRODUCT STATUS TAB
+  // =========================================================
+
+  const [productStatus, setProductStatus] =
+    useState("active");
+
+
+  const [productCounts, setProductCounts] =
+    useState({
+      active: 0,
+      inactive: 0,
+      total: 0,
+    });
+
+
+  // =========================================================
+  // ACTION LOADING
   // =========================================================
 
   const [deletingId, setDeletingId] =
+    useState(null);
+
+
+  const [activatingId, setActivatingId] =
     useState(null);
 
 
@@ -57,11 +79,14 @@ const Products = () => {
   const [search, setSearch] =
     useState("");
 
+
   const [categoryFilter, setCategoryFilter] =
     useState("all");
 
+
   const [stockFilter, setStockFilter] =
     useState("all");
+
 
   const [typeFilter, setTypeFilter] =
     useState("all");
@@ -74,10 +99,12 @@ const Products = () => {
   const [highlyOrdered, setHighlyOrdered] =
     useState([]);
 
+
   const [
     highlyOrderedLoading,
     setHighlyOrderedLoading,
   ] = useState(false);
+
 
   const [
     showHighlyOrdered,
@@ -89,18 +116,28 @@ const Products = () => {
   // LOAD PRODUCTS
   // =========================================================
 
-  const loadProducts = async () => {
+  const loadProducts = async (
+    status = productStatus
+  ) => {
     try {
       setError("");
       setLoading(true);
 
       const result =
         await apiRequest(
-          "/admin/products"
+          `/products/admin/all?status=${status}`
         );
 
       setProducts(
         result?.products || []
+      );
+
+      setProductCounts(
+        result?.counts || {
+          active: 0,
+          inactive: 0,
+          total: 0,
+        }
       );
     } catch (err) {
       console.error(
@@ -160,47 +197,33 @@ const Products = () => {
   // =========================================================
 
   useEffect(() => {
-    let mounted = true;
-
-    const load = async () => {
-      try {
-        setError("");
-
-        const result =
-          await apiRequest(
-            "/admin/products"
-          );
-
-        if (mounted) {
-          setProducts(
-            result?.products || []
-          );
-
-          setLoading(false);
-        }
-      } catch (err) {
-        console.error(
-          "Initial products load error:",
-          err
-        );
-
-        if (mounted) {
-          setError(
-            err.message ||
-              "Failed to load products."
-          );
-
-          setLoading(false);
-        }
-      }
-    };
-
-    load();
-
-    return () => {
-      mounted = false;
-    };
+    loadProducts("active");
   }, []);
+
+
+  // =========================================================
+  // CHANGE PRODUCT STATUS TAB
+  // =========================================================
+
+  const changeProductStatus = (
+    status
+  ) => {
+    if (
+      status === productStatus
+    ) {
+      return;
+    }
+
+    setProductStatus(status);
+
+    // Reset filters when switching tabs
+    setSearch("");
+    setCategoryFilter("all");
+    setStockFilter("all");
+    setTypeFilter("all");
+
+    loadProducts(status);
+  };
 
 
   // =========================================================
@@ -246,7 +269,9 @@ const Products = () => {
       return products.filter(
         (product) => {
 
+          // =================================================
           // SEARCH
+          // =================================================
 
           const matchesSearch =
             !searchValue ||
@@ -261,7 +286,9 @@ const Products = () => {
               .includes(searchValue);
 
 
+          // =================================================
           // CATEGORY
+          // =================================================
 
           const productCategory =
             product.category?.trim() ||
@@ -274,7 +301,9 @@ const Products = () => {
               categoryFilter;
 
 
+          // =================================================
           // STOCK
+          // =================================================
 
           const stock =
             Number(
@@ -316,7 +345,9 @@ const Products = () => {
           }
 
 
+          // =================================================
           // TYPE
+          // =================================================
 
           let matchesType =
             true;
@@ -438,7 +469,7 @@ const Products = () => {
 
 
   // =========================================================
-  // DELETE / ARCHIVE PRODUCT
+  // ARCHIVE / DEACTIVATE PRODUCT
   // =========================================================
 
   const removeProduct =
@@ -475,7 +506,6 @@ const Products = () => {
 
 
         // Remove immediately
-
         setProducts(
           (currentProducts) =>
             currentProducts.filter(
@@ -485,13 +515,28 @@ const Products = () => {
         );
 
 
+        // Update count immediately
+        setProductCounts(
+          (current) => ({
+            ...current,
+            active:
+              Math.max(
+                current.active - 1,
+                0
+              ),
+            inactive:
+              current.inactive + 1,
+          })
+        );
+
+
         // Sync backend
-
-        await loadProducts();
-
+        await loadProducts(
+          productStatus
+        );
       } catch (err) {
         console.error(
-          "Delete product error:",
+          "Archive product error:",
           err
         );
 
@@ -501,6 +546,257 @@ const Products = () => {
         );
       } finally {
         setDeletingId(
+          null
+        );
+      }
+    };
+
+
+  // =========================================================
+  // ACTIVATE PRODUCT
+  // =========================================================
+
+  const activateProduct =
+    async (product) => {
+      if (!product?._id) {
+        setError(
+          "Product ID is missing."
+        );
+
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          `Activate "${product.name}" and make it visible on the storefront?`
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        setError("");
+
+        setActivatingId(
+          product._id
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update inactive product
+        |--------------------------------------------------------------------------
+        |
+        | We send the existing product data back
+        | with isActive = true.
+        |
+        */
+
+        const formData =
+          new FormData();
+
+        formData.append(
+          "name",
+          product.name || ""
+        );
+
+        formData.append(
+          "slug",
+          product.slug || ""
+        );
+
+        formData.append(
+          "sku",
+          product.sku || ""
+        );
+
+        formData.append(
+          "description",
+          product.description || ""
+        );
+
+        formData.append(
+          "shortDescription",
+          product.shortDescription || ""
+        );
+
+        formData.append(
+          "price",
+          product.price ?? 0
+        );
+
+        formData.append(
+          "salePrice",
+          product.salePrice ?? ""
+        );
+
+        formData.append(
+          "category",
+          product.category || ""
+        );
+
+        formData.append(
+          "categoryId",
+          product.categoryId || ""
+        );
+
+        formData.append(
+          "image",
+          product.image || ""
+        );
+
+        formData.append(
+          "stock",
+          product.stock ?? 0
+        );
+
+        formData.append(
+          "lowStockThreshold",
+          product.lowStockThreshold ?? 5
+        );
+
+        formData.append(
+          "badge",
+          product.badge || ""
+        );
+
+        formData.append(
+          "featured",
+          product.featured
+            ? "true"
+            : "false"
+        );
+
+        formData.append(
+          "bestSeller",
+          product.bestSeller
+            ? "true"
+            : "false"
+        );
+
+        formData.append(
+          "newArrival",
+          product.newArrival
+            ? "true"
+            : "false"
+        );
+
+        formData.append(
+          "isActive",
+          "true"
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Existing images
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+          product.images &&
+          Array.isArray(
+            product.images
+          )
+        ) {
+          product.images.forEach(
+            (image) => {
+              formData.append(
+                "existingImages",
+                image
+              );
+            }
+          );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Arrays
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+          Array.isArray(
+            product.tags
+          )
+        ) {
+          formData.append(
+            "tags",
+            JSON.stringify(
+              product.tags
+            )
+          );
+        }
+
+        if (
+          Array.isArray(
+            product.sizes
+          )
+        ) {
+          formData.append(
+            "sizes",
+            JSON.stringify(
+              product.sizes
+            )
+          );
+        }
+
+        if (
+          Array.isArray(
+            product.colors
+          )
+        ) {
+          formData.append(
+            "colors",
+            JSON.stringify(
+              product.colors
+            )
+          );
+        }
+
+
+        await apiRequest(
+          `/products/${product._id}`,
+          {
+            method: "PUT",
+            body: formData,
+          }
+        );
+
+
+        // Refresh inactive list
+        await loadProducts(
+          "inactive"
+        );
+
+
+        // Update counts
+        setProductCounts(
+          (current) => ({
+            ...current,
+            active:
+              current.active + 1,
+            inactive:
+              Math.max(
+                current.inactive - 1,
+                0
+              ),
+          })
+        );
+      } catch (err) {
+        console.error(
+          "Activate product error:",
+          err
+        );
+
+        setError(
+          err.message ||
+            "Failed to activate product."
+        );
+      } finally {
+        setActivatingId(
           null
         );
       }
@@ -556,6 +852,15 @@ const Products = () => {
       {error && (
         <div className="products-error">
           {error}
+
+          <button
+            type="button"
+            onClick={() =>
+              setError("")
+            }
+          >
+            <X size={14} />
+          </button>
         </div>
       )}
 
@@ -607,12 +912,16 @@ const Products = () => {
 
           <button
             className="products-refresh-btn"
-            onClick={
-              loadProducts
+            onClick={() =>
+              loadProducts(
+                productStatus
+              )
             }
             disabled={
               deletingId !==
-              null
+                null ||
+              activatingId !==
+                null
             }
           >
             <RefreshCw
@@ -637,6 +946,98 @@ const Products = () => {
           </button>
 
         </div>
+
+      </section>
+
+
+      {/* =====================================================
+          ACTIVE / INACTIVE TABS
+      ===================================================== */}
+
+      <section className="products-status-tabs">
+
+        <button
+          type="button"
+          className={
+            productStatus ===
+            "active"
+              ? "products-status-tab active"
+              : "products-status-tab"
+          }
+          onClick={() =>
+            changeProductStatus(
+              "active"
+            )
+          }
+        >
+
+          <span className="products-status-icon active-icon">
+            <CheckCircle2
+              size={16}
+            />
+          </span>
+
+          <span className="products-status-content">
+
+            <strong>
+              Active Products
+            </strong>
+
+            <small>
+              Visible on storefront
+            </small>
+
+          </span>
+
+          <span className="products-status-count">
+            {
+              productCounts.active
+            }
+          </span>
+
+        </button>
+
+
+        <button
+          type="button"
+          className={
+            productStatus ===
+            "inactive"
+              ? "products-status-tab inactive active"
+              : "products-status-tab inactive"
+          }
+          onClick={() =>
+            changeProductStatus(
+              "inactive"
+            )
+          }
+        >
+
+          <span className="products-status-icon inactive-icon">
+            <Archive
+              size={16}
+            />
+          </span>
+
+          <span className="products-status-content">
+
+            <strong>
+              Inactive Products
+            </strong>
+
+            <small>
+              Hidden from storefront
+            </small>
+
+          </span>
+
+          <span className="products-status-count">
+            {
+              productCounts.inactive
+            }
+          </span>
+
+        </button>
 
       </section>
 
@@ -1213,29 +1614,69 @@ const Products = () => {
 
         <section className="products-empty">
 
-          <Package
-            size={35}
-          />
+          {productStatus ===
+          "inactive" ? (
 
-          <h3>
-            No products found
-          </h3>
+            <>
 
-          <p>
-            Start adding products
-            to your catalogue.
-          </p>
+              <Archive
+                size={35}
+              />
 
-          <button
-            onClick={() =>
-              navigate(
-                "/add-product"
-              )
-            }
-            className="products-add-btn"
-          >
-            + Add Product
-          </button>
+              <h3>
+                No inactive products
+              </h3>
+
+              <p>
+                Products you archive
+                will appear here.
+              </p>
+
+              <button
+                type="button"
+                onClick={() =>
+                  changeProductStatus(
+                    "active"
+                  )
+                }
+                className="products-add-btn"
+              >
+                View Active Products
+              </button>
+
+            </>
+
+          ) : (
+
+            <>
+
+              <Package
+                size={35}
+              />
+
+              <h3>
+                No products found
+              </h3>
+
+              <p>
+                Start adding products
+                to your catalogue.
+              </p>
+
+              <button
+                onClick={() =>
+                  navigate(
+                    "/add-product"
+                  )
+                }
+                className="products-add-btn"
+              >
+                + Add Product
+              </button>
+
+            </>
+
+          )}
 
         </section>
 
@@ -1396,6 +1837,11 @@ const Products = () => {
 
                           const isDeleting =
                             deletingId ===
+                            product._id;
+
+
+                          const isActivating =
+                            activatingId ===
                             product._id;
 
 
@@ -1596,7 +2042,8 @@ const Products = () => {
                                     }
                                     title="Edit product"
                                     disabled={
-                                      isDeleting
+                                      isDeleting ||
+                                      isActivating
                                     }
                                   >
 
@@ -1609,46 +2056,100 @@ const Products = () => {
                                   </button>
 
 
-                                  {/* DELETE */}
+                                  {/* ACTIVE PRODUCT -> ARCHIVE */}
 
-                                  <button
-                                    type="button"
-                                    className="delete"
-                                    onClick={() =>
-                                      removeProduct(
-                                        product._id
-                                      )
-                                    }
-                                    title={
-                                      isDeleting
-                                        ? "Archiving..."
-                                        : "Archive product"
-                                    }
-                                    disabled={
-                                      isDeleting
-                                    }
-                                  >
+                                  {productStatus ===
+                                    "active" && (
 
-                                    {isDeleting ? (
+                                    <button
+                                      type="button"
+                                      className="delete"
+                                      onClick={() =>
+                                        removeProduct(
+                                          product._id
+                                        )
+                                      }
+                                      title={
+                                        isDeleting
+                                          ? "Archiving..."
+                                          : "Archive product"
+                                      }
+                                      disabled={
+                                        isDeleting ||
+                                        isActivating
+                                      }
+                                    >
 
-                                      <RefreshCw
-                                        size={
-                                          14
-                                        }
-                                        className="spin"
-                                      />
+                                      {isDeleting ? (
 
-                                    ) : (
+                                        <RefreshCw
+                                          size={
+                                            14
+                                          }
+                                          className="spin"
+                                        />
 
-                                      <Trash2
-                                        size={
-                                          14
-                                        }
-                                      />
+                                      ) : (
 
-                                    )}
+                                        <Trash2
+                                          size={
+                                            14
+                                          }
+                                        />
 
-                                  </button>
+                                      )}
+
+                                    </button>
+
+                                  )}
+
+
+                                  {/* INACTIVE PRODUCT -> ACTIVATE */}
+
+                                  {productStatus ===
+                                    "inactive" && (
+
+                                    <button
+                                      type="button"
+                                      className="product-activate-btn"
+                                      onClick={() =>
+                                        activateProduct(
+                                          product
+                                        )
+                                      }
+                                      title={
+                                        isActivating
+                                          ? "Activating..."
+                                          : "Activate product"
+                                      }
+                                      disabled={
+                                        isActivating ||
+                                        isDeleting
+                                      }
+                                    >
+
+                                      {isActivating ? (
+
+                                        <RefreshCw
+                                          size={
+                                            14
+                                          }
+                                          className="spin"
+                                        />
+
+                                      ) : (
+
+                                        <CheckCircle2
+                                          size={
+                                            14
+                                          }
+                                        />
+
+                                      )}
+
+                                    </button>
+
+                                  )}
 
                                 </div>
 
