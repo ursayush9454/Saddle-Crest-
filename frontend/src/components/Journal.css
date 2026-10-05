@@ -105,9 +105,7 @@ text-decoration: none;
   display: grid;
 
   grid-template-columns:
-    1.25fr
-    1fr
-    1fr;
+    repeat(3,1fr);
 
   gap: 16px;
 }
@@ -242,7 +240,7 @@ text-decoration: none;
     transform 0.3s ease;
 }
 
-.journal-image button:hover {
+.journal-image button {
   background: #c5a46d;
   color: #171410;
 
@@ -286,9 +284,10 @@ text-decoration: none;
   display: inline-flex;
   align-items: center;
 
-  gap: 6px;
+  gap: 2px;
 
-  color: #c5a46d;
+  color: #f0a014;
+  
 
   font-family: "Jost", sans-serif;
   font-size: 8px;
@@ -299,10 +298,15 @@ text-decoration: none;
   text-transform: uppercase;
 
   transition: gap 0.3s ease;
+ 
+
 }
 
 .journal-read:hover {
   gap: 10px;
+  border-radius: 0;
+  transition: 1s ease-in;
+
 }
 
 .journal-read span {
